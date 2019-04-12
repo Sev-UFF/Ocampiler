@@ -14,5 +14,3 @@ class ['t] stack init = object
     items <- hd :: items
   
 end;;
-
-(* Definindo arvore. talvez nao seja necessario *)
