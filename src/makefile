@@ -1,0 +1,67 @@
+# The Caml compilers. You may have to add various -I options.
+
+CAMLC = ocamlc
+CAMLDEP = ocamldep
+CAMLLEX = ocamllex
+CAMLYACC = ocamlyacc
+
+
+
+# Lex stuff
+LEXSOURCES = lexer.mll
+LEXGENERATED = lexer.ml
+
+# Yacc stuff
+YACCSOURCES = parser.mly
+YACCGENERATED = parser.mli parser.ml
+
+GENERATED = $(LEXGENERATED) $(YACCGENERATED)
+
+# Caml sources
+SOURCES =  $(GENERATED) calc.ml
+# Caml object files to link
+OBJS = lexer.cmo parser.cmo calc.cmo 
+
+# Name of executable file to generate
+EXEC = calc
+
+# This part should be generic
+# Don't forget to create (touch) the file ./.depend at first use.
+
+# Building the world
+all: depend $(EXEC)
+
+$(EXEC): $(GENERATED) $(OBJS)
+	$(CAMLC) $(OBJS) -o $(EXEC)
+
+
+
+
+%.ml: %.mll
+	$(CAMLLEX) $<
+
+%.mli: %.mly
+	$(CAMLYACC) $<
+
+%.ml: %.mly
+	$(CAMLYACC) $<
+
+%.cmi: %.mli
+	$(CAMLC) -c $<
+
+%.cmo: %.ml
+	$(CAMLC) -c $<
+
+
+
+# Clean up
+clear:
+	rm -f *.cm[io] *.cmx *~ .*~ #*#
+	rm -f $(GENERATED)
+	rm -f $(EXEC)
+
+# Dependencies
+depend: $(SOURCES) $(GENERATED) $(LEXSOURCES) $(YACCSOURCES)
+	$(CAMLDEP) *.mli *.ml > .depend
+
+include .depend

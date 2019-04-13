@@ -23,7 +23,5 @@ class sum (a: expression) (b: expression) = object
 end;;
 
 
-let z = new num 4.0 in
-  print_float z#getValue
 
 (* type expOptCode = SUM | SUB | MUL | DIV | EQ | LT | LE | GT | GE | AND | OR | NOT *)

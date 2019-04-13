@@ -7,15 +7,15 @@
         %left TIMES DIV         /* medium precedence */
         %nonassoc UMINUS        /* highest precedence */
         %start main             /* the entry point */
-        %type <expression> main
+        %type <string> main
         %%
         main:
             expr EOL                { $1 }
         ;
         expr:
-            INT                     {  pi.num $1 }
+            INT                     {  $1 }
           | LPAREN expr RPAREN      { $2 }
-          | expr PLUS expr          {  Sum(1, 2)  "SUM(" ^  $1 ^ ", " ^  $3 ^ ")"}
+          | expr PLUS expr          {   "SUM(" ^  $1 ^ ", " ^  $3 ^ ")"}
           | expr MINUS expr         { "$1 - $3" }
           | expr TIMES expr         { "$1 * $3" }
           | expr DIV expr           { "$1 / $3" }

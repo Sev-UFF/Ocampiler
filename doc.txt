@@ -12,10 +12,10 @@ Gerar analise lexica e sintatica
 procurar o outro documento que tem exemplos mais avancados como if e while
 
 
-
-
-
-
+#com organizaco em pastas (A trabalhar)
+ocamllex -o bin/lexer.ml lexer.mll
+ocamlyacc -b bin/parser parser.mly
+ocamlc -o bin/parser.cmi -c bin/parser.mli
 
 
 instalacao:
