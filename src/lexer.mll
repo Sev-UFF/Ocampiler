@@ -4,8 +4,7 @@
         exception Eof
         }
         rule token = parse
-            [' ' '\t']     { token lexbuf }     (* skip blanks *)
-          | ['\n' ]        { EOL }
+            [' ' '\t' '\r' '\n' ]     { token lexbuf }     (* skip blanks *)
           | ['0'-'9']+ as lxm { INT( lxm) }
           | '+'            { PLUS }
           | '-'            { MINUS }
@@ -13,4 +12,4 @@
           | '/'            { DIV }
           | '('            { LPAREN }
           | ')'            { RPAREN }
-          | eof            { raise Eof }
+          | eof            { EOF }

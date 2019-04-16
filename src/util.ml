@@ -1,3 +1,5 @@
+open Printf;;
+
 (* Definindo pilha *)
 
 class ['t] stack init = object
@@ -14,3 +16,10 @@ class ['t] stack init = object
     items <- hd :: items
   
 end;;
+
+
+let readInputFile file_name =
+  let ch = open_in file_name in
+    let s = really_input_string ch (in_channel_length ch) in
+    close_in ch;
+    s

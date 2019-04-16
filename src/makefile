@@ -18,12 +18,12 @@ YACCGENERATED = parser.mli parser.ml
 GENERATED = $(LEXGENERATED) $(YACCGENERATED)
 
 # Caml sources
-SOURCES =  $(GENERATED) calc.ml
+SOURCES =  $(GENERATED) util.ml main.ml
 # Caml object files to link
-OBJS = lexer.cmo parser.cmo calc.cmo 
+OBJS = lexer.cmo parser.cmo util.cmo  main.cmo
 
 # Name of executable file to generate
-EXEC = calc
+EXEC = main
 
 # This part should be generic
 # Don't forget to create (touch) the file ./.depend at first use.
@@ -33,9 +33,6 @@ all: depend $(EXEC)
 
 $(EXEC): $(GENERATED) $(OBJS)
 	$(CAMLC) $(OBJS) -o $(EXEC)
-
-
-
 
 %.ml: %.mll
 	$(CAMLLEX) $<

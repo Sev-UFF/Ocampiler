@@ -11,6 +11,12 @@ ocamlc -o calc lexer.cmo parser.cmo calc.cmo
 Gerar analise lexica e sintatica
 procurar o outro documento que tem exemplos mais avancados como if e while
 
+usage:
+    run:
+        make
+        ./main -f {FileName}
+    Clear:
+        make clear
 
 #com organizaco em pastas (A trabalhar)
 ocamllex -o bin/lexer.ml lexer.mll
