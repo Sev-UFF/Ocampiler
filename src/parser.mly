@@ -1,5 +1,5 @@
   /* File parser.mly */
-        %token <float> VALUE
+        %token <int> VALUE
         %token PLUS MINUS TIMES DIV
         %token LPAREN RPAREN
         %token EOF
@@ -7,17 +7,17 @@
         %left TIMES DIV         /* medium precedence */
         %nonassoc UMINUS        /* highest precedence */
         %start main             /* the entry point */
-        %type <Pi.statement> main
+        %type <Pi.expression> main
         %%
         main:
             expr EOF                { $1 }
         ;
         expr: 
-            VALUE                     { new Pi.num  $1 }
-          | LPAREN expr RPAREN      { new Pi.statement }
-          | expr PLUS expr          {  new Pi.statement }
-          | expr MINUS expr         { new Pi.statement }
-          | expr TIMES expr         { new Pi.statement }
-          | expr DIV expr           { new Pi.statement }
-          | MINUS expr %prec UMINUS { new Pi.statement }
+            VALUE                     { Pi.Num($1) }
+          | LPAREN expr RPAREN      { $2 }
+          | expr PLUS expr          {  Pi.Sum($1, $3)  }
+          | expr MINUS expr         { Pi.Num(2) }
+          | expr TIMES expr         { Pi.Num(2) }
+          | expr DIV expr           { Pi.Num(2) }
+          | MINUS expr %prec UMINUS { Pi.Num(2) }
         ;

@@ -18,9 +18,9 @@ YACCGENERATED = parser.mli parser.ml
 GENERATED = $(LEXGENERATED) $(YACCGENERATED)
 
 # Caml sources
-SOURCES = pi.ml $(GENERATED) util.ml main.ml
+SOURCES = util.ml pi.ml $(GENERATED)  main.ml
 # Caml object files to link
-OBJS = pi.cmo lexer.cmo parser.cmo util.cmo  main.cmo
+OBJS = util.cmo pi.cmo lexer.cmo parser.cmo   main.cmo
 
 # Name of executable file to generate
 EXEC = main

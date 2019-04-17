@@ -5,7 +5,7 @@
         }
         rule token = parse
             [' ' '\t' '\r' '\n' ]     { token lexbuf }     (* skip blanks *)
-          | ['0'-'9']+ as  lxm { VALUE( float_of_string lxm) }
+          | ['0'-'9']+ as  lxm { VALUE( int_of_string lxm) }
           | '+'            { PLUS }
           | '-'            { MINUS }
           | '*'            { TIMES }

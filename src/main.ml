@@ -4,6 +4,7 @@ let z = new num 5.0 in
   print_float z#getValue;; *)
 
 open Util;;
+open Pi;;
 open Printf;;
 
 let willReadFile = ref false;;
@@ -30,5 +31,7 @@ let () =
     
   done;
   print_endline !fileContents;
-  let result = Parser.main Lexer.token (Lexing.from_string !fileContents) in 
-    print_endline result;
+  let tree = Parser.main Lexer.token (Lexing.from_string !fileContents) in 
+    (* print_endline "result"; *)
+    let a = string_of_expression tree in
+      print_endline a;;
