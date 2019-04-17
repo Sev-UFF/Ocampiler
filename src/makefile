@@ -23,13 +23,31 @@ SOURCES = util.ml pi.ml $(GENERATED)  main.ml
 OBJS = util.cmo pi.cmo lexer.cmo parser.cmo   main.cmo
 
 # Name of executable file to generate
-EXEC = main
+EXEC = ocampiler
 
 # This part should be generic
 # Don't forget to create (touch) the file ./.depend at first use.
 
+#install package dependencies
+install:
+	sudo add-apt-repository ppa:avsm/ppa
+	sudo apt update
+	sudo apt install opam
+	$(MAKE) run
+
 # Building the world
-all: depend $(EXEC)
+run: depend $(EXEC)
+
+# Clean up
+clear:
+	rm -f *.cm[io] *.cmx *~ .*~ #*#
+	rm -f $(GENERATED)
+	rm -f $(EXEC)
+
+# Dependencies
+depend: $(SOURCES) $(GENERATED) $(LEXSOURCES) $(YACCSOURCES)
+	$(CAMLDEP) *.mli *.ml > .depend
+
 
 $(EXEC): $(GENERATED) $(OBJS)
 	$(CAMLC) $(OBJS) -o $(EXEC)
@@ -51,14 +69,6 @@ $(EXEC): $(GENERATED) $(OBJS)
 
 
 
-# Clean up
-clear:
-	rm -f *.cm[io] *.cmx *~ .*~ #*#
-	rm -f $(GENERATED)
-	rm -f $(EXEC)
 
-# Dependencies
-depend: $(SOURCES) $(GENERATED) $(LEXSOURCES) $(YACCSOURCES)
-	$(CAMLDEP) *.mli *.ml > .depend
 
 include .depend
