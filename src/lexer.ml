@@ -110,11 +110,11 @@ and __ocaml_lex_token_rec lexbuf __ocaml_lex_state =
   | 1 ->
 let
 # 8 "lexer.mll"
-                          lxm
+                           lxm
 # 115 "lexer.ml"
 = Lexing.sub_lexeme lexbuf lexbuf.Lexing.lex_start_pos lexbuf.Lexing.lex_curr_pos in
 # 8 "lexer.mll"
-                              ( INT( lxm) )
+                               ( VALUE( float_of_string lxm) )
 # 119 "lexer.ml"
 
   | 2 ->

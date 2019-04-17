@@ -1,5 +1,5 @@
 type token =
-  | INT of (string)
+  | VALUE of (float)
   | PLUS
   | MINUS
   | TIMES
@@ -21,7 +21,7 @@ let yytransl_const = [|
     0|]
 
 let yytransl_block = [|
-  257 (* INT *);
+  257 (* VALUE *);
     0|]
 
 let yylhs = "\255\255\
@@ -137,7 +137,7 @@ let yynames_const = "\
   "
 
 let yynames_block = "\
-  INT\000\
+  VALUE\000\
   "
 
 let yyact = [|
@@ -148,19 +148,19 @@ let yyact = [|
 # 13 "parser.mly"
                                     ( _1 )
 # 151 "parser.ml"
-               : string))
+               : Pi.statement))
 ; (fun __caml_parser_env ->
-    let _1 = (Parsing.peek_val __caml_parser_env 0 : string) in
+    let _1 = (Parsing.peek_val __caml_parser_env 0 : float) in
     Obj.repr(
 # 16 "parser.mly"
-                                    (  _1 )
+                                      ( new Pi.statement )
 # 158 "parser.ml"
                : 'expr))
 ; (fun __caml_parser_env ->
     let _2 = (Parsing.peek_val __caml_parser_env 1 : 'expr) in
     Obj.repr(
 # 17 "parser.mly"
-                                    ( _2 )
+                                    ( new Pi.statement )
 # 165 "parser.ml"
                : 'expr))
 ; (fun __caml_parser_env ->
@@ -168,7 +168,7 @@ let yyact = [|
     let _3 = (Parsing.peek_val __caml_parser_env 0 : 'expr) in
     Obj.repr(
 # 18 "parser.mly"
-                                    (   "SUM(" ^  _1 ^ ", " ^  _3 ^ ")")
+                                    (  new Pi.statement )
 # 173 "parser.ml"
                : 'expr))
 ; (fun __caml_parser_env ->
@@ -176,7 +176,7 @@ let yyact = [|
     let _3 = (Parsing.peek_val __caml_parser_env 0 : 'expr) in
     Obj.repr(
 # 19 "parser.mly"
-                                    ( "$1 - $3" )
+                                    ( new Pi.statement )
 # 181 "parser.ml"
                : 'expr))
 ; (fun __caml_parser_env ->
@@ -184,7 +184,7 @@ let yyact = [|
     let _3 = (Parsing.peek_val __caml_parser_env 0 : 'expr) in
     Obj.repr(
 # 20 "parser.mly"
-                                    ( "$1 * $3" )
+                                    ( new Pi.statement )
 # 189 "parser.ml"
                : 'expr))
 ; (fun __caml_parser_env ->
@@ -192,14 +192,14 @@ let yyact = [|
     let _3 = (Parsing.peek_val __caml_parser_env 0 : 'expr) in
     Obj.repr(
 # 21 "parser.mly"
-                                    ( "$1 / $3" )
+                                    ( new Pi.statement )
 # 197 "parser.ml"
                : 'expr))
 ; (fun __caml_parser_env ->
     let _2 = (Parsing.peek_val __caml_parser_env 0 : 'expr) in
     Obj.repr(
 # 22 "parser.mly"
-                                    ( "- $2" )
+                                    ( new Pi.statement )
 # 204 "parser.ml"
                : 'expr))
 (* Entry main *)
@@ -223,4 +223,4 @@ let yytables =
     Parsing.names_const=yynames_const;
     Parsing.names_block=yynames_block }
 let main (lexfun : Lexing.lexbuf -> token) (lexbuf : Lexing.lexbuf) =
-   (Parsing.yyparse yytables 1 lexfun lexbuf : string)
+   (Parsing.yyparse yytables 1 lexfun lexbuf : Pi.statement)

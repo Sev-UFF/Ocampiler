@@ -1,5 +1,5 @@
 type token =
-  | INT of (string)
+  | VALUE of (float)
   | PLUS
   | MINUS
   | TIMES
@@ -9,4 +9,4 @@ type token =
   | EOF
 
 val main :
-  (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> string
+  (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> Pi.statement
