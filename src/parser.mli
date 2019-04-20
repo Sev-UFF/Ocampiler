@@ -9,7 +9,6 @@ type token =
   | GREATER
   | GREATEREQUAL
   | EQUAL
-  | NOT
   | NEGATION
   | LPAREN
   | RPAREN

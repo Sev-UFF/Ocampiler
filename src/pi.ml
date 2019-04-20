@@ -5,10 +5,11 @@ type expression =
   | Sum of expression * expression
   | Sub of expression * expression
   | Mul of expression * expression
-  | Div of expression * expression;;
-
-
-
+  | Div of expression * expression
+  | Ge of expression * expression
+  | Gt of expression * expression
+  | Le of expression * expression
+  | Lt of expression * expression;;
 
 
 

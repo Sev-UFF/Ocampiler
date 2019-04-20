@@ -1,7 +1,7 @@
   /* File parser.mly */
         %token <int> VALUE
         %token PLUS MINUS TIMES DIV
-        %token LESS LESSEQUAL GREATER GREATEREQUAL EQUAL NOT
+        %token LESS LESSEQUAL GREATER GREATEREQUAL EQUAL NEGATION
         %token NEGATION
         %token LPAREN RPAREN
         %token EOF
@@ -22,4 +22,8 @@
           | expr TIMES expr         { Pi.Mul($1, $3) }
           | expr DIV expr           { Pi.Div($1, $3) }
           | MINUS expr %prec UMINUS { Pi.Num(2) }
+          | expr LESS expr          { Pi.Lt($1, $3)  }
+          | expr LESSEQUAL expr     { Pi.Le($1, $3)  }
+          | expr GREATER expr       { Pi.Gt($1, $3)  }
+          | expr GREATEREQUAL expr  { Pi.Le($1, $3)  }
         ;

@@ -12,4 +12,7 @@
           | '/'            { DIV }
           | '('            { LPAREN }
           | ')'            { RPAREN }
+          | '<'            { LESS }
+          | '>'            { GREATER }
+          | '='            { EQUAL }
           | eof            { EOF }

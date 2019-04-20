@@ -29,3 +29,7 @@ let rec string_of_expression expression =
   | Num x -> "NUM (" ^ (string_of_int x) ^ ")"
   | Mul (x, y) -> "MUL (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
   | Div (x, y) -> "DIV (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
+  | Gt (x, y) -> "GT (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
+  | Ge (x, y) -> "GE (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
+  | Lt (x, y) -> "LT (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
+  | Le (x, y) -> "LE (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"

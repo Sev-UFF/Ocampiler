@@ -1,13 +1,20 @@
 https://caml.inria.fr/pub/docs/manual-ocaml/lexyacc.html
 ocamllex lexer.mll       # generates lexer.ml
 ocamlyacc parser.mly     # generates parser.ml and parser.mli
-ocamlc -c parser.mli
 ocamlc -c pi.ml
+ocamlc -c parser.mli
 ocamlc -c lexer.ml
 ocamlc -c parser.ml
 ocamlc -c util.ml
 ocamlc -c main.ml
 ocamlc -o main util.cmo lexer.cmo parser.cmo main.cmo
+
+
+
+
+http://fsl.cs.illinois.edu/images/0/0d/CS522-Spring-2011-PL-book-imp.pdf
+BNF de Imp
+
 
 ocamlc -c calc.ml
 ocamlc -o calc lexer.cmo parser.cmo calc.cmo
