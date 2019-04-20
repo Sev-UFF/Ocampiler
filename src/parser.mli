@@ -1,0 +1,12 @@
+type token =
+  | VALUE of (int)
+  | PLUS
+  | MINUS
+  | TIMES
+  | DIV
+  | LPAREN
+  | RPAREN
+  | EOF
+
+val main :
+  (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> Pi.expression

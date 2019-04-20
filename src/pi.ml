@@ -2,7 +2,9 @@
 
 type expression = 
   | Num of int
-  | Sum of expression * expression;;
+  | Sum of expression * expression
+  | Mul of expression * expression
+  | Div of expression * expression;;
 
 
 

@@ -2,8 +2,8 @@ calc.cmo : parser.cmi lexer.cmo
 calc.cmx : parser.cmx lexer.cmx
 lexer.cmo : parser.cmi
 lexer.cmx : parser.cmx
-main.cmo : util.cmo pi.cmo parser.cmi lexer.cmo
-main.cmx : util.cmx pi.cmx parser.cmx lexer.cmx
+main.cmo : pi.cmo parser.cmi lexer.cmo
+main.cmx : pi.cmx parser.cmx lexer.cmx
 parser.cmo : pi.cmo parser.cmi
 parser.cmx : pi.cmx parser.cmi
 parser.cmi : pi.cmo
