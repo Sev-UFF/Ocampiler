@@ -3,8 +3,10 @@
 type expression = 
   | Num of int
   | Sum of expression * expression
+  | Sub of expression * expression
   | Mul of expression * expression
   | Div of expression * expression;;
+
 
 
 

@@ -4,6 +4,13 @@ type token =
   | MINUS
   | TIMES
   | DIV
+  | LESS
+  | LESSEQUAL
+  | GREATER
+  | GREATEREQUAL
+  | EQUAL
+  | NOT
+  | NEGATION
   | LPAREN
   | RPAREN
   | EOF

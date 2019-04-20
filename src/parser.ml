@@ -4,6 +4,13 @@ type token =
   | MINUS
   | TIMES
   | DIV
+  | LESS
+  | LESSEQUAL
+  | GREATER
+  | GREATEREQUAL
+  | EQUAL
+  | NOT
+  | NEGATION
   | LPAREN
   | RPAREN
   | EOF
@@ -15,8 +22,15 @@ let yytransl_const = [|
   259 (* MINUS *);
   260 (* TIMES *);
   261 (* DIV *);
-  262 (* LPAREN *);
-  263 (* RPAREN *);
+  262 (* LESS *);
+  263 (* LESSEQUAL *);
+  264 (* GREATER *);
+  265 (* GREATEREQUAL *);
+  266 (* EQUAL *);
+  267 (* NOT *);
+  268 (* NEGATION *);
+  269 (* LPAREN *);
+  270 (* RPAREN *);
     0 (* EOF *);
     0|]
 
@@ -40,9 +54,9 @@ let yydefred = "\000\000\
 let yydgoto = "\002\000\
 \006\000\007\000"
 
-let yysindex = "\007\000\
-\255\254\000\000\000\000\255\254\255\254\000\000\009\000\000\000\
-\014\255\255\254\255\254\255\254\255\254\000\000\000\000\006\255\
+let yysindex = "\014\000\
+\255\254\000\000\000\000\255\254\255\254\000\000\005\000\000\000\
+\004\255\255\254\255\254\255\254\255\254\000\000\000\000\006\255\
 \006\255\000\000\000\000"
 
 let yyrindex = "\000\000\
@@ -51,13 +65,13 @@ let yyrindex = "\000\000\
 \003\000\000\000\000\000"
 
 let yygindex = "\000\000\
-\000\000\002\000"
+\000\000\009\000"
 
-let yytablesize = 270
+let yytablesize = 273
 let yytable = "\003\000\
-\004\000\004\000\005\000\000\000\005\000\008\000\009\000\001\000\
-\014\000\012\000\013\000\016\000\017\000\018\000\019\000\010\000\
-\011\000\012\000\013\000\000\000\015\000\000\000\000\000\000\000\
+\004\000\004\000\005\000\000\000\014\000\010\000\011\000\012\000\
+\013\000\012\000\013\000\005\000\008\000\009\000\001\000\000\000\
+\000\000\015\000\016\000\017\000\018\000\019\000\000\000\000\000\
 \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
 \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
 \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
@@ -87,13 +101,14 @@ let yytable = "\003\000\
 \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
 \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
 \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
-\000\000\000\000\004\000\004\000\005\000\005\000\000\000\004\000\
-\000\000\005\000\010\000\011\000\012\000\013\000"
+\000\000\000\000\004\000\004\000\005\000\005\000\010\000\011\000\
+\012\000\013\000\000\000\000\000\000\000\000\000\004\000\000\000\
+\005\000"
 
 let yycheck = "\001\001\
-\000\000\003\001\000\000\255\255\006\001\004\000\005\000\001\000\
-\000\000\004\001\005\001\010\000\011\000\012\000\013\000\002\001\
-\003\001\004\001\005\001\255\255\007\001\255\255\255\255\255\255\
+\000\000\003\001\000\000\255\255\000\000\002\001\003\001\004\001\
+\005\001\004\001\005\001\013\001\004\000\005\000\001\000\255\255\
+\255\255\014\001\010\000\011\000\012\000\013\000\255\255\255\255\
 \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
 \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
 \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
@@ -123,14 +138,22 @@ let yycheck = "\001\001\
 \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
 \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
 \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
-\255\255\255\255\002\001\003\001\002\001\003\001\255\255\007\001\
-\255\255\007\001\002\001\003\001\004\001\005\001"
+\255\255\255\255\002\001\003\001\002\001\003\001\002\001\003\001\
+\004\001\005\001\255\255\255\255\255\255\255\255\014\001\255\255\
+\014\001"
 
 let yynames_const = "\
   PLUS\000\
   MINUS\000\
   TIMES\000\
   DIV\000\
+  LESS\000\
+  LESSEQUAL\000\
+  GREATER\000\
+  GREATEREQUAL\000\
+  EQUAL\000\
+  NOT\000\
+  NEGATION\000\
   LPAREN\000\
   RPAREN\000\
   EOF\000\
@@ -145,62 +168,62 @@ let yyact = [|
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 1 : 'expr) in
     Obj.repr(
-# 13 "parser.mly"
+# 15 "parser.mly"
                                     ( _1 )
-# 151 "parser.ml"
+# 174 "parser.ml"
                : Pi.expression))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 0 : int) in
     Obj.repr(
-# 16 "parser.mly"
-                                      ( Pi.Num(_1) )
-# 158 "parser.ml"
+# 18 "parser.mly"
+                                    ( Pi.Num(_1) )
+# 181 "parser.ml"
                : 'expr))
 ; (fun __caml_parser_env ->
     let _2 = (Parsing.peek_val __caml_parser_env 1 : 'expr) in
     Obj.repr(
-# 17 "parser.mly"
-                                    ( _2 )
-# 165 "parser.ml"
-               : 'expr))
-; (fun __caml_parser_env ->
-    let _1 = (Parsing.peek_val __caml_parser_env 2 : 'expr) in
-    let _3 = (Parsing.peek_val __caml_parser_env 0 : 'expr) in
-    Obj.repr(
-# 18 "parser.mly"
-                                    (  Pi.Sum(_1, _3)  )
-# 173 "parser.ml"
-               : 'expr))
-; (fun __caml_parser_env ->
-    let _1 = (Parsing.peek_val __caml_parser_env 2 : 'expr) in
-    let _3 = (Parsing.peek_val __caml_parser_env 0 : 'expr) in
-    Obj.repr(
 # 19 "parser.mly"
-                                    ( Pi.Num(2) )
-# 181 "parser.ml"
+                                    ( _2 )
+# 188 "parser.ml"
                : 'expr))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 2 : 'expr) in
     let _3 = (Parsing.peek_val __caml_parser_env 0 : 'expr) in
     Obj.repr(
 # 20 "parser.mly"
-                                    ( Pi.Mul(_1, _3) )
-# 189 "parser.ml"
+                                    ( Pi.Sum(_1, _3) )
+# 196 "parser.ml"
                : 'expr))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 2 : 'expr) in
     let _3 = (Parsing.peek_val __caml_parser_env 0 : 'expr) in
     Obj.repr(
 # 21 "parser.mly"
+                                    ( Pi.Sub(_1, _3) )
+# 204 "parser.ml"
+               : 'expr))
+; (fun __caml_parser_env ->
+    let _1 = (Parsing.peek_val __caml_parser_env 2 : 'expr) in
+    let _3 = (Parsing.peek_val __caml_parser_env 0 : 'expr) in
+    Obj.repr(
+# 22 "parser.mly"
+                                    ( Pi.Mul(_1, _3) )
+# 212 "parser.ml"
+               : 'expr))
+; (fun __caml_parser_env ->
+    let _1 = (Parsing.peek_val __caml_parser_env 2 : 'expr) in
+    let _3 = (Parsing.peek_val __caml_parser_env 0 : 'expr) in
+    Obj.repr(
+# 23 "parser.mly"
                                     ( Pi.Div(_1, _3) )
-# 197 "parser.ml"
+# 220 "parser.ml"
                : 'expr))
 ; (fun __caml_parser_env ->
     let _2 = (Parsing.peek_val __caml_parser_env 0 : 'expr) in
     Obj.repr(
-# 22 "parser.mly"
+# 24 "parser.mly"
                                     ( Pi.Num(2) )
-# 204 "parser.ml"
+# 227 "parser.ml"
                : 'expr))
 (* Entry main *)
 ; (fun __caml_parser_env -> raise (Parsing.YYexit (Parsing.peek_val __caml_parser_env 0)))
