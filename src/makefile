@@ -5,8 +5,6 @@ CAMLDEP = ocamldep
 CAMLLEX = ocamllex
 CAMLYACC = ocamlyacc
 
-
-
 # Lex stuff
 LEXSOURCES = lexer.mll
 LEXGENERATED = lexer.ml
@@ -66,9 +64,6 @@ $(EXEC): $(GENERATED) $(OBJS)
 
 %.cmo: %.ml
 	$(CAMLC) -c $<
-
-
-
 
 
 include .depend
