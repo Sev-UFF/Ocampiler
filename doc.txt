@@ -24,6 +24,18 @@ ocamlyacc -b bin/parser parser.mly
 ocamlc -o bin/parser.cmi -c bin/parser.mli
 
 
+ocamllex lexer.mll
+10 states, 267 transitions, table size 1128 bytes
+ocamlyacc parser.mly
+ocamldep *.mli *.ml > .depend
+ocamlc -c pi.ml
+ocamlc -c util.ml
+ocamlc -c parser.mli
+ocamlc -c lexer.ml
+ocamlc -c parser.ml
+ocamlc -c main.ml
+ocamlc util.cmo pi.cmo lexer.cmo parser.cmo   main.cmo -o ocampiler
+
 instalacao:
 add-apt-repository ppa:avsm/ppa
 apt update
