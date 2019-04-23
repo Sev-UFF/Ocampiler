@@ -59,3 +59,10 @@ opam switch create 4.06.1
 eval `opam env`
 
 - conferir se ocamlc, ocamllex e ocamlyacc estao instalados
+
+
+//definindo pilha de inteiros
+let exmeplo = new int stack
+
+//definindo uma pilha de expressoes
+let controle = new expression stack
