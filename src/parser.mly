@@ -7,7 +7,6 @@
         %token EOF
         %left PLUS MINUS        /* lowest precedence */
         %left TIMES DIV         /* medium precedence */
-        %nonassoc UMINUS        /* highest precedence */
         %start main             /* the entry point */
         %type <Pi.expression> main
         %%
@@ -21,7 +20,6 @@
           | expr MINUS expr         { Pi.Sub($1, $3) }
           | expr TIMES expr         { Pi.Mul($1, $3) }
           | expr DIV expr           { Pi.Div($1, $3) }
-          | MINUS expr %prec UMINUS { Pi.Num(2) }
           | expr LESS EQUAL expr    { Pi.Le($1, $4)  }
           | expr LESS expr          { Pi.Lt($1, $3)  }
           | expr GREATER expr       { Pi.Gt($1, $3)  }
