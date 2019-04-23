@@ -16,7 +16,7 @@
         expr: 
             VALUE                   { Pi.Num($1) }
           | LPAREN expr RPAREN      { $2 }
-          | expr PLUS expr          { Pi.Sum($1, $3) }
+          | l PLUS r          { Pi.Sum(l, r) }
           | expr MINUS expr         { Pi.Sub($1, $3) }
           | expr TIMES expr         { Pi.Mul($1, $3) }
           | expr DIV expr           { Pi.Div($1, $3) }
