@@ -1,5 +1,6 @@
 type token =
-  | VALUE of (int)
+  | NUMBER of (int)
+  | BOOLEAN of (bool)
   | PLUS
   | MINUS
   | TIMES
@@ -8,13 +9,13 @@ type token =
   | LESSEQUAL
   | GREATER
   | GREATEREQUAL
-  | EQUAL
+  | EQUALS
+  | AND
+  | OR
   | NEGATION
-  | TRUE
-  | FALSE
   | LPAREN
   | RPAREN
   | EOF
 
 val main :
-  (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> Pi.expression
+  (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> Pi.statement

@@ -14,10 +14,12 @@
           | ')'            { RPAREN }
           | '<'            { LESS }
           | '>'            { GREATER }
-          | '='            { EQUAL }
           | ">="           { GREATEREQUAL }
           | "<="           { LESSEQUAL }
-          | "true"         { TRUE }
-          | "false"        { FALSE }
+          | "True"  as lxm       { BOOLEAN(bool_of_string (String.lowercase_ascii lxm) )}
+          | "False"   as lxm       { BOOLEAN(bool_of_string (String.lowercase_ascii lxm) ) }
           | "not"          { NEGATION }
+          | "and"          { AND }
+          | "or"           { OR }
+          | "=="           { EQUALS }
           | eof            { EOF }

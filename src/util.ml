@@ -22,11 +22,24 @@ let readInputFile file_name =
     close_in ch;
     s
 
-let rec string_of_expression expression = 
-  match expression with 
-  | Sum (x, y) -> "SUM (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
-  | Sub (x, y) -> "SUB (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
-  | Num x -> "NUM (" ^ (string_of_int x) ^ ")"
+
+
+let rec string_of_arithmetic_expression arithmetic_expression = 
+  match arithmetic_expression with 
+  | Sum (x, y) -> "SUM (" ^ (string_of_arithmetic_expression x) ^ ", " ^ (string_of_arithmetic_expression y) ^ ")"
+  | Num (x) -> "NUM (" ^ (string_of_int x) ^ ")"
+  | Sub (x, y) -> "SUB (" ^ (string_of_arithmetic_expression x) ^ ", " ^ (string_of_arithmetic_expression y) ^ ")";;
+
+
+let rec string_of_expression expression =
+  match expression with
+  | AExp(x) -> string_of_arithmetic_expression x;;
+
+let rec string_of_statement statement =
+  match statement with
+  | Exp (x) -> string_of_expression x;;
+
+  (* 
   | Mul (x, y) -> "MUL (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
   | Div (x, y) -> "DIV (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
   | Gt (x, y) -> "GT (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
@@ -35,3 +48,6 @@ let rec string_of_expression expression =
   | Le (x, y) -> "LE (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
   | Boo (x) -> "BOO (" ^ (string_of_bool x) ^ ")"
   | Not (x) -> "NOT (" ^ (string_of_expression x) ^ ")"
+  | Eq(x, y) -> "EQ ("^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
+  | And(x, y) -> "AND ("^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
+  | Or(x, y) -> "OR ("^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")" *)
