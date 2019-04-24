@@ -1,6 +1,3 @@
-
-
-
 type expression = 
   | Num of int
   | Sum of expression * expression
@@ -10,7 +7,9 @@ type expression =
   | Ge of expression * expression
   | Gt of expression * expression
   | Le of expression * expression
-  | Lt of expression * expression;;
+  | Lt of expression * expression
+  | Boo of bool
+  | Not of expression;;
 
 
 

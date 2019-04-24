@@ -15,4 +15,9 @@
           | '<'            { LESS }
           | '>'            { GREATER }
           | '='            { EQUAL }
+          | ">="           { GREATEREQUAL }
+          | "<="           { LESSEQUAL }
+          | "true"         { TRUE }
+          | "false"        { FALSE }
+          | "not"          { NEGATION }
           | eof            { EOF }

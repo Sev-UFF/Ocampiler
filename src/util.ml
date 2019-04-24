@@ -33,3 +33,5 @@ let rec string_of_expression expression =
   | Ge (x, y) -> "GE (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
   | Lt (x, y) -> "LT (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
   | Le (x, y) -> "LE (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
+  | Boo (x) -> "BOO (" ^ (string_of_bool x) ^ ")"
+  | Not (x) -> "NOT (" ^ (string_of_expression x) ^ ")"
