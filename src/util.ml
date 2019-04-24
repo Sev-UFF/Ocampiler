@@ -28,14 +28,20 @@ let rec string_of_arithmetic_expression arithmetic_expression =
   match arithmetic_expression with 
   | Sum (x, y) -> "SUM (" ^ (string_of_arithmetic_expression x) ^ ", " ^ (string_of_arithmetic_expression y) ^ ")"
   | Num (x) -> "NUM (" ^ (string_of_int x) ^ ")"
-  | Sub (x, y) -> "SUB (" ^ (string_of_arithmetic_expression x) ^ ", " ^ (string_of_arithmetic_expression y) ^ ")";;
+  | Sub (x, y) -> "SUB (" ^ (string_of_arithmetic_expression x) ^ ", " ^ (string_of_arithmetic_expression y) ^ ")"
+  
+and string_of_boolean_expression boolean_expression =
+  match boolean_expression with 
+  | Boo(x) -> "BOO (" ^ (string_of_bool x) ^ ")"
+  | Eq (x, y) ->  "EQ (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
 
 
-let rec string_of_expression expression =
+and string_of_expression expression =
   match expression with
-  | AExp(x) -> string_of_arithmetic_expression x;;
+  | AExp(x) -> string_of_arithmetic_expression x
+  | BExp(x) -> string_of_boolean_expression x
 
-let rec string_of_statement statement =
+and string_of_statement statement =
   match statement with
   | Exp (x) -> string_of_expression x;;
 
