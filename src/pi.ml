@@ -1,12 +1,5 @@
 
 
-type pi = 
-  | statement
-  | optCodes;;
-
-  type optCodes = 
-    | #SUM
-    | #MUL;;
 
 type expression = 
   | Num of int
