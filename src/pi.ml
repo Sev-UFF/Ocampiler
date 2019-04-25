@@ -9,7 +9,6 @@
   and booleanExpression =
     | Boo of bool  
     | Eq of expression * expression
-    (* | Eq of arithmeticExpression * arithmeticExpression *)
     | Lt of arithmeticExpression * arithmeticExpression
     | Le of arithmeticExpression * arithmeticExpression
     | Gt of arithmeticExpression * arithmeticExpression
@@ -31,7 +30,7 @@
 
   and pi = 
   | Statement of statement
-  | ExpOc of expOc;
+  | ExpOc of expOc;;
 
 (* type expOptCode = SUM | SUB | MUL | DIV | EQ | LT | LE | GT | GE | AND | OR | NOT *)
 

@@ -117,7 +117,7 @@ and __ocaml_lex_token_rec lexbuf __ocaml_lex_state =
   match Lexing.engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
 # 7 "lexer.mll"
-                                      ( token lexbuf )
+                                    ( token lexbuf )
 # 122 "lexer.ml"
 
   | 1 ->
@@ -127,57 +127,57 @@ let
 # 128 "lexer.ml"
 = Lexing.sub_lexeme lexbuf lexbuf.Lexing.lex_start_pos lexbuf.Lexing.lex_curr_pos in
 # 8 "lexer.mll"
-                               ( NUMBER( int_of_string lxm) )
+                                    ( NUMBER( int_of_string lxm) )
 # 132 "lexer.ml"
 
   | 2 ->
 # 9 "lexer.mll"
-                           ( PLUS )
+                                    ( PLUS )
 # 137 "lexer.ml"
 
   | 3 ->
 # 10 "lexer.mll"
-                           ( MINUS )
+                                    ( MINUS )
 # 142 "lexer.ml"
 
   | 4 ->
 # 11 "lexer.mll"
-                           ( TIMES )
+                                    ( TIMES )
 # 147 "lexer.ml"
 
   | 5 ->
 # 12 "lexer.mll"
-                           ( DIV )
+                                    ( DIV )
 # 152 "lexer.ml"
 
   | 6 ->
 # 13 "lexer.mll"
-                           ( LPAREN )
+                                    ( LPAREN )
 # 157 "lexer.ml"
 
   | 7 ->
 # 14 "lexer.mll"
-                           ( RPAREN )
+                                    ( RPAREN )
 # 162 "lexer.ml"
 
   | 8 ->
 # 15 "lexer.mll"
-                           ( LESS )
+                                    ( LESS )
 # 167 "lexer.ml"
 
   | 9 ->
 # 16 "lexer.mll"
-                           ( GREATER )
+                                    ( GREATER )
 # 172 "lexer.ml"
 
   | 10 ->
 # 17 "lexer.mll"
-                           ( GREATEREQUAL )
+                                    ( GREATEREQUAL )
 # 177 "lexer.ml"
 
   | 11 ->
 # 18 "lexer.mll"
-                           ( LESSEQUAL )
+                                    ( LESSEQUAL )
 # 182 "lexer.ml"
 
   | 12 ->
@@ -187,7 +187,7 @@ let
 # 188 "lexer.ml"
 = Lexing.sub_lexeme lexbuf lexbuf.Lexing.lex_start_pos (lexbuf.Lexing.lex_start_pos + 4) in
 # 19 "lexer.mll"
-                                 ( BOOLEAN(bool_of_string (String.lowercase_ascii lxm) ))
+                                    ( BOOLEAN(bool_of_string (String.lowercase_ascii lxm) ))
 # 192 "lexer.ml"
 
   | 13 ->
@@ -197,32 +197,32 @@ let
 # 198 "lexer.ml"
 = Lexing.sub_lexeme lexbuf lexbuf.Lexing.lex_start_pos (lexbuf.Lexing.lex_start_pos + 5) in
 # 20 "lexer.mll"
-                                   ( BOOLEAN(bool_of_string (String.lowercase_ascii lxm) ) )
+                                    ( BOOLEAN(bool_of_string (String.lowercase_ascii lxm) ) )
 # 202 "lexer.ml"
 
   | 14 ->
 # 21 "lexer.mll"
-                           ( NEGATION )
+                                    ( NEGATION )
 # 207 "lexer.ml"
 
   | 15 ->
 # 22 "lexer.mll"
-                           ( AND )
+                                    ( AND )
 # 212 "lexer.ml"
 
   | 16 ->
 # 23 "lexer.mll"
-                           ( OR )
+                                    ( OR )
 # 217 "lexer.ml"
 
   | 17 ->
 # 24 "lexer.mll"
-                           ( EQUALS )
+                                    ( EQUALS )
 # 222 "lexer.ml"
 
   | 18 ->
 # 25 "lexer.mll"
-                           ( EOF )
+                                    ( EOF )
 # 227 "lexer.ml"
 
   | __ocaml_lex_state -> lexbuf.Lexing.refill_buff lexbuf;

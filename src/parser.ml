@@ -12,6 +12,7 @@ type token =
   | EQUALS
   | AND
   | OR
+  | NOT
   | NEGATION
   | LPAREN
   | RPAREN
@@ -31,9 +32,10 @@ let yytransl_const = [|
   267 (* EQUALS *);
   268 (* AND *);
   269 (* OR *);
-  270 (* NEGATION *);
-  271 (* LPAREN *);
-  272 (* RPAREN *);
+  270 (* NOT *);
+  271 (* NEGATION *);
+  272 (* LPAREN *);
+  273 (* RPAREN *);
     0 (* EOF *);
     0|]
 
@@ -43,38 +45,51 @@ let yytransl_block = [|
     0|]
 
 let yylhs = "\255\255\
-\001\000\002\000\003\000\003\000\004\000\004\000\005\000\005\000\
-\005\000\000\000"
+\001\000\002\000\003\000\003\000\004\000\004\000\004\000\004\000\
+\004\000\005\000\005\000\005\000\005\000\005\000\005\000\005\000\
+\005\000\005\000\005\000\000\000"
 
 let yylen = "\002\000\
-\002\000\001\000\001\000\001\000\001\000\003\000\001\000\003\000\
-\003\000\002\000"
+\002\000\001\000\001\000\001\000\001\000\003\000\003\000\003\000\
+\003\000\001\000\003\000\003\000\003\000\003\000\003\000\003\000\
+\003\000\003\000\002\000\002\000"
 
 let yydefred = "\000\000\
-\000\000\000\000\005\000\007\000\010\000\000\000\002\000\000\000\
-\000\000\001\000\000\000\000\000\000\000\006\000\000\000\000\000\
-\000\000"
+\000\000\000\000\005\000\010\000\000\000\020\000\000\000\002\000\
+\000\000\000\000\000\000\000\000\001\000\000\000\000\000\000\000\
+\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
+\000\000\000\000\000\000\008\000\009\000\000\000\000\000\000\000\
+\000\000\000\000\000\000\000\000\000\000"
 
 let yydgoto = "\002\000\
-\005\000\006\000\007\000\008\000\009\000"
+\006\000\007\000\008\000\011\000\010\000"
 
-let yysindex = "\006\000\
-\004\255\000\000\000\000\000\000\000\000\009\000\000\000\253\254\
-\255\254\000\000\010\255\010\255\004\255\000\000\009\255\253\254\
-\255\254"
+let yysindex = "\255\255\
+\002\255\000\000\000\000\000\000\002\255\000\000\002\000\000\000\
+\040\255\041\255\040\255\041\255\000\000\004\255\004\255\004\255\
+\004\255\004\255\004\255\004\255\004\255\004\255\002\255\002\255\
+\002\255\005\255\005\255\000\000\000\000\003\255\003\255\003\255\
+\003\255\003\255\041\255\041\255\041\255"
 
 let yyrindex = "\000\000\
-\000\000\000\000\000\000\000\000\000\000\000\000\000\000\013\000\
-\014\000\000\000\000\000\000\000\000\000\000\000\001\000\000\000\
-\015\000"
+\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
+\013\000\014\000\000\000\019\000\000\000\000\000\000\000\000\000\
+\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
+\000\000\001\000\012\000\000\000\000\000\015\000\018\000\021\000\
+\024\000\027\000\020\000\023\000\025\000"
 
 let yygindex = "\000\000\
-\000\000\000\000\000\000\247\255\003\000"
+\000\000\000\000\000\000\016\000\017\000"
 
-let yytablesize = 268
-let yytable = "\011\000\
-\009\000\014\000\015\000\016\000\003\000\004\000\001\000\012\000\
-\010\000\013\000\003\000\011\000\003\000\004\000\008\000\017\000\
+let yytablesize = 296
+let yytable = "\001\000\
+\006\000\013\000\003\000\004\000\003\000\014\000\015\000\016\000\
+\017\000\016\000\017\000\007\000\003\000\004\000\013\000\005\000\
+\009\000\014\000\019\000\011\000\015\000\012\000\017\000\016\000\
+\018\000\000\000\012\000\000\000\000\000\026\000\027\000\028\000\
+\029\000\030\000\031\000\032\000\033\000\034\000\000\000\035\000\
+\036\000\037\000\014\000\015\000\016\000\017\000\018\000\019\000\
+\020\000\021\000\022\000\023\000\024\000\025\000\000\000\000\000\
 \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
 \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
 \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
@@ -100,17 +115,20 @@ let yytable = "\011\000\
 \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
 \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
 \000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
-\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
-\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
-\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
-\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
-\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
-\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\
-\000\000\000\000\000\000\009\000"
+\000\000\000\000\000\000\006\000\006\000\000\000\000\000\006\000\
+\006\000\006\000\006\000\006\000\006\000\006\000\007\000\007\000\
+\000\000\000\000\007\000\007\000\007\000\007\000\007\000\007\000\
+\007\000\013\000\013\000\013\000\014\000\014\000\014\000\015\000\
+\015\000\015\000\016\000\016\000\016\000\012\000\012\000\012\000"
 
-let yycheck = "\003\001\
-\000\000\011\000\012\000\013\000\001\001\002\001\001\000\011\001\
-\000\000\011\001\001\001\003\001\000\000\000\000\000\000\013\000\
+let yycheck = "\001\000\
+\000\000\000\000\001\001\002\001\001\001\003\001\004\001\005\001\
+\006\001\005\001\006\001\000\000\000\000\000\000\000\000\014\001\
+\001\000\000\000\000\000\000\000\000\000\005\000\000\000\000\000\
+\000\000\255\255\000\000\255\255\255\255\014\000\015\000\016\000\
+\017\000\018\000\019\000\020\000\021\000\022\000\255\255\023\000\
+\024\000\025\000\003\001\004\001\005\001\006\001\007\001\008\001\
+\009\001\010\001\011\001\011\001\012\001\013\001\255\255\255\255\
 \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
 \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
 \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
@@ -136,13 +154,11 @@ let yycheck = "\003\001\
 \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
 \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
 \255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
-\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
-\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
-\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
-\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
-\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
-\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\255\
-\255\255\255\255\255\255\011\001"
+\255\255\255\255\255\255\003\001\004\001\255\255\255\255\007\001\
+\008\001\009\001\010\001\011\001\012\001\013\001\003\001\004\001\
+\255\255\255\255\007\001\008\001\009\001\010\001\011\001\012\001\
+\013\001\011\001\012\001\013\001\011\001\012\001\013\001\011\001\
+\012\001\013\001\011\001\012\001\013\001\011\001\012\001\013\001"
 
 let yynames_const = "\
   PLUS\000\
@@ -156,6 +172,7 @@ let yynames_const = "\
   EQUALS\000\
   AND\000\
   OR\000\
+  NOT\000\
   NEGATION\000\
   LPAREN\000\
   RPAREN\000\
@@ -174,35 +191,35 @@ let yyact = [|
     Obj.repr(
 # 19 "parser.mly"
                                          ( _1 )
-# 178 "parser.ml"
+# 195 "parser.ml"
                : Pi.statement))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 0 : Pi.expression) in
     Obj.repr(
 # 22 "parser.mly"
                      ( Pi.Exp(_1))
-# 185 "parser.ml"
+# 202 "parser.ml"
                : Pi.statement))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 0 : Pi.arithmeticExpression) in
     Obj.repr(
 # 25 "parser.mly"
-                                                   ( Pi.AExp( _1) )
-# 192 "parser.ml"
+                                                    ( Pi.AExp( _1) )
+# 209 "parser.ml"
                : Pi.expression))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 0 : Pi.booleanExpression) in
     Obj.repr(
 # 26 "parser.mly"
-                                                  ( Pi.BExp( _1) )
-# 199 "parser.ml"
+                                                    ( Pi.BExp( _1) )
+# 216 "parser.ml"
                : Pi.expression))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 0 : int) in
     Obj.repr(
 # 29 "parser.mly"
-                                   ( Pi.Num(_1) )
-# 206 "parser.ml"
+                                                                    ( Pi.Num(_1) )
+# 223 "parser.ml"
                : Pi.arithmeticExpression))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 2 : Pi.arithmeticExpression) in
@@ -210,30 +227,109 @@ let yyact = [|
     Obj.repr(
 # 30 "parser.mly"
                                                                     ( Pi.Sum( _1, _3 )  )
-# 214 "parser.ml"
+# 231 "parser.ml"
+               : Pi.arithmeticExpression))
+; (fun __caml_parser_env ->
+    let _1 = (Parsing.peek_val __caml_parser_env 2 : Pi.arithmeticExpression) in
+    let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.arithmeticExpression) in
+    Obj.repr(
+# 31 "parser.mly"
+                                                                    ( Pi.Sub( _1, _3 )  )
+# 239 "parser.ml"
+               : Pi.arithmeticExpression))
+; (fun __caml_parser_env ->
+    let _1 = (Parsing.peek_val __caml_parser_env 2 : Pi.arithmeticExpression) in
+    let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.arithmeticExpression) in
+    Obj.repr(
+# 32 "parser.mly"
+                                                                    ( Pi.Mul( _1, _3 )  )
+# 247 "parser.ml"
+               : Pi.arithmeticExpression))
+; (fun __caml_parser_env ->
+    let _1 = (Parsing.peek_val __caml_parser_env 2 : Pi.arithmeticExpression) in
+    let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.arithmeticExpression) in
+    Obj.repr(
+# 33 "parser.mly"
+                                                                    ( Pi.Div( _1, _3 )  )
+# 255 "parser.ml"
                : Pi.arithmeticExpression))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 0 : bool) in
     Obj.repr(
-# 33 "parser.mly"
+# 36 "parser.mly"
                   ( Pi.Boo(_1) )
-# 221 "parser.ml"
+# 262 "parser.ml"
                : Pi.booleanExpression))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 2 : Pi.booleanExpression) in
     let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.booleanExpression) in
     Obj.repr(
-# 34 "parser.mly"
-                                                       ( Pi.Eq( Pi.BExp( _1), Pi.BExp(_3) ) )
-# 229 "parser.ml"
+# 37 "parser.mly"
+                                                                      ( Pi.Eq( Pi.BExp(_1), Pi.BExp(_3)) )
+# 270 "parser.ml"
                : Pi.booleanExpression))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 2 : Pi.arithmeticExpression) in
     let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.arithmeticExpression) in
     Obj.repr(
-# 35 "parser.mly"
-                                                             ( Pi.Eq( Pi.AExp(_1), Pi.AExp(_3) )  )
-# 237 "parser.ml"
+# 38 "parser.mly"
+                                                                      ( Pi.Eq( Pi.AExp(_1), Pi.AExp(_3)) )
+# 278 "parser.ml"
+               : Pi.booleanExpression))
+; (fun __caml_parser_env ->
+    let _1 = (Parsing.peek_val __caml_parser_env 2 : Pi.arithmeticExpression) in
+    let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.arithmeticExpression) in
+    Obj.repr(
+# 39 "parser.mly"
+                                                                      ( Pi.Lt( _1, _3) )
+# 286 "parser.ml"
+               : Pi.booleanExpression))
+; (fun __caml_parser_env ->
+    let _1 = (Parsing.peek_val __caml_parser_env 2 : Pi.arithmeticExpression) in
+    let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.arithmeticExpression) in
+    Obj.repr(
+# 40 "parser.mly"
+                                                                      ( Pi.Le( _1, _3) )
+# 294 "parser.ml"
+               : Pi.booleanExpression))
+; (fun __caml_parser_env ->
+    let _1 = (Parsing.peek_val __caml_parser_env 2 : Pi.arithmeticExpression) in
+    let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.arithmeticExpression) in
+    Obj.repr(
+# 41 "parser.mly"
+                                                                      ( Pi.Gt( _1, _3) )
+# 302 "parser.ml"
+               : Pi.booleanExpression))
+; (fun __caml_parser_env ->
+    let _1 = (Parsing.peek_val __caml_parser_env 2 : Pi.arithmeticExpression) in
+    let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.arithmeticExpression) in
+    Obj.repr(
+# 42 "parser.mly"
+                                                                      ( Pi.Ge( _1, _3) )
+# 310 "parser.ml"
+               : Pi.booleanExpression))
+; (fun __caml_parser_env ->
+    let _1 = (Parsing.peek_val __caml_parser_env 2 : Pi.booleanExpression) in
+    let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.booleanExpression) in
+    Obj.repr(
+# 43 "parser.mly"
+                                                                      ( Pi.And( _1, _3) )
+# 318 "parser.ml"
+               : Pi.booleanExpression))
+; (fun __caml_parser_env ->
+    let _1 = (Parsing.peek_val __caml_parser_env 2 : Pi.booleanExpression) in
+    let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.booleanExpression) in
+    Obj.repr(
+# 44 "parser.mly"
+                                                                      ( Pi.Or( _1, _3) )
+# 326 "parser.ml"
+               : Pi.booleanExpression))
+; (fun __caml_parser_env ->
+    let _2 = (Parsing.peek_val __caml_parser_env 0 : Pi.booleanExpression) in
+    Obj.repr(
+# 45 "parser.mly"
+                                                                      ( Pi.Not( _2 ))
+# 333 "parser.ml"
                : Pi.booleanExpression))
 (* Entry main *)
 ; (fun __caml_parser_env -> raise (Parsing.YYexit (Parsing.peek_val __caml_parser_env 0)))
