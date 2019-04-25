@@ -21,22 +21,35 @@
     | AExp of arithmeticExpression
     | BExp of booleanExpression
 
+  and cmd = 
+    | Loop of booleanExpression * cmd
+    | Cseq of cmd * cmd
+    | Nop
+    | Assign 
+    | Cond of booleanExpression * cmd * cmd
+
   and statement = 
-  | Exp of expression
+   | Exp of expression
+   | Cmd of cmd
   
   and expOc =
-  | OPSUM
-  | OPSUB
-  | OPMUL
-  | OPDIV
-  | OPEQ
-  | OPLT
-  | OPLE
-  | OPGT
-  | OPGE
-  | OPAND
-  | OPOR
-  | OPNOT
+   | OPSUM
+   | OPMUL
+   | OPSUB 
+   | OPDIV 
+   | OPEQ 
+   | OPLT 
+   | OPLE 
+   | OPGT 
+   | OPGE 
+   | OPAND 
+   | OPOR 
+   | OPNOT
+   | OPASSIGN 
+   | OPLOOP 
+   | OPCOND
+   | OPNOP
+   | OPCSEQ
 
   and pi = 
   | Statement of statement

@@ -22,4 +22,10 @@
           | "and"                   { AND }
           | "or"                    { OR }
           | "=="                    { EQUALS }
+          | "while"                 { LOOP }
+          | "do"                    { DO }
+          | "if"                    { IF }
+          | "then"                  { THEN }
+          | "else"                  { ELSE }
+          | "end"                   { END }
           | eof                     { EOF }

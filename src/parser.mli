@@ -13,6 +13,12 @@ type token =
   | AND
   | OR
   | NOT
+  | LOOP
+  | DO
+  | IF
+  | THEN
+  | ELSE
+  | END
   | NEGATION
   | LPAREN
   | RPAREN

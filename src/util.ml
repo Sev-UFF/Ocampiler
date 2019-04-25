@@ -50,6 +50,15 @@ and string_of_expression expression =
   | AExp(x) -> string_of_arithmetic_expression x
   | BExp(x) -> string_of_boolean_expression x
 
+and string_of_command command = 
+  match command with
+  | Loop(x, y) -> "LOOP (" ^ (string_of_boolean_expression x) ^ ", " ^ (string_of_command y) ^ ")"
+  | Cseq(x, y) -> "CSEQ (" ^ (string_of_command x) ^ ", " ^ (string_of_command y) ^ ")"
+  | Nop -> "NOP"
+  | Assign -> "ASSIGN"
+  | Cond(x, y, z) -> "COND (" ^ (string_of_boolean_expression x) ^ ", " ^ (string_of_command y) ^ ", " ^ (string_of_command z) ^ ")"
+
 and string_of_statement statement =
   match statement with
-  | Exp (x) -> string_of_expression x;;
+  | Exp (x) -> string_of_expression x
+  | Cmd (x) -> string_of_command x;;
