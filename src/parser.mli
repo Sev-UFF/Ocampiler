@@ -12,6 +12,7 @@ type token =
   | EQUALS
   | AND
   | OR
+  | NOT
   | NEGATION
   | LPAREN
   | RPAREN
