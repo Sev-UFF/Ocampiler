@@ -4,7 +4,7 @@
         %token PLUS MINUS TIMES DIV
         %token LESS LESSEQUAL GREATER GREATEREQUAL EQUALS AND OR
         %token LOOP DO IF THEN ELSE END
-        %token NEGATION
+        %token NEGATION NOP
         %token LPAREN RPAREN
         %token EOF
         %left PLUS MINUS        /* lowest precedence */
@@ -29,6 +29,9 @@
           LOOP booleanExpression DO cmd             { Pi.Loop($2, $4)}
           | IF booleanExpression THEN cmd ELSE cmd  { Pi.Cond($2, $4, $6)}
           | IF booleanExpression THEN cmd           { Pi.Cond($2, $4, Pi.Nop)}
+          | IF booleanExpression THEN NOP           { Pi.Cond($2, Pi.Nop, Pi.Nop)}
+          | IF booleanExpression THEN NOP ELSE NOP          { Pi.Cond($2, Pi.Nop, Pi.Nop)}
+
         ;
         expression: 
             arithmeticExpression                    { Pi.AExp( $1) }

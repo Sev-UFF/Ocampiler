@@ -28,4 +28,5 @@
           | "then"                  { THEN }
           | "else"                  { ELSE }
           | "end"                   { END }
+          | "nop"                   { NOP }
           | eof                     { EOF }
