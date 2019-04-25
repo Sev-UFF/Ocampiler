@@ -2,7 +2,7 @@
         %token <int> NUMBER
         %token <bool> BOOLEAN
         %token PLUS MINUS TIMES DIV
-        %token LESS LESSEQUAL GREATER GREATEREQUAL EQUALS AND OR NOT
+        %token LESS LESSEQUAL GREATER GREATEREQUAL EQUALS AND OR
         %token LOOP DO IF THEN ELSE END
         %token NEGATION
         %token LPAREN RPAREN
@@ -53,6 +53,6 @@
           | arithmeticExpression GREATEREQUAL arithmeticExpression    { Pi.Ge( $1, $3) }
           | booleanExpression AND booleanExpression                   { Pi.And( $1, $3) }
           | booleanExpression OR booleanExpression                    { Pi.Or( $1, $3) }
-          | NOT booleanExpression                                     { Pi.Not( $2 )}
+          | NEGATION booleanExpression                                     { Pi.Not( $2 )}
           | LPAREN booleanExpression RPAREN                           { $2 }
         ;

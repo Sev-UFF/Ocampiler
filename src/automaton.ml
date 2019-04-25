@@ -1,8 +1,8 @@
-open Pi;;
+(* open Pi;;
 open Util;;
 
-let controlStack =  new pi stack;;
-let valueStack =  new pi stack;;
+let controlStack = new pi stack;;
+let valueStack = new pi stack;;
 
 let rec evaluateStatement statement = 
   controlStack#push statement
@@ -20,5 +20,7 @@ let rec evaluateStatement statement =
 
 
   end
-  print_endline "terminou";;
+  print_endline "terminou";; *)
+
+  (* nao funciona ainda, tentado com if e com pattern matchin *)
   
