@@ -27,11 +27,21 @@
   
   and expOc =
   | OPSUM
+  | OPSUB
   | OPMUL
+  | OPDIV
+  | OPEQ
+  | OPLT
+  | OPLE
+  | OPGT
+  | OPGE
+  | OPAND
+  | OPOR
+  | OPNOT
 
   and pi = 
   | Statement of statement
-  | ExpOc of expOc;
+  | ExpOc of expOc;;
 
 (* type expOptCode = SUM | SUB | MUL | DIV | EQ | LT | LE | GT | GE | AND | OR | NOT *)
 

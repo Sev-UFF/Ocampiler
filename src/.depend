@@ -1,3 +1,5 @@
+automaton.cmo :
+automaton.cmx :
 lexer.cmo : parser.cmi
 lexer.cmx : parser.cmx
 main.cmo : util.cmo pi.cmo parser.cmi lexer.cmo
