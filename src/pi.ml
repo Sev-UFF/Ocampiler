@@ -50,6 +50,7 @@
    | OPASSIGN 
    | OPLOOP 
    | OPCOND
+   | OPCSEQ
 
 
   and control = 
