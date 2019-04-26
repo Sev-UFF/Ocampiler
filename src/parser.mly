@@ -16,7 +16,7 @@
         %type <Pi.expression> expression
         %type <Pi.arithmeticExpression> arithmeticExpression
         %type <Pi.booleanExpression> booleanExpression
-        %type <Pi.cmd> cmd
+        %type <Pi.command> cmd
         %%
         main:
             statement EOF                { $1 }

@@ -8,7 +8,7 @@ open Pi;;
 open Printf;;
 
 let willReadFile = ref false;;
-let fileContents = ref "valor antigo";;
+let fileContents = ref "";;
   
     
 let () =
@@ -30,8 +30,10 @@ let () =
       
     
   done;
+  (* reclamar se nao tiver aberto o arquivo *)
   print_endline !fileContents;
   let tree = Parser.main Lexer.token (Lexing.from_string !fileContents) in 
     (* print_endline "result"; *)
-    let a = string_of_statement tree in
-      print_endline a;;
+    (* let a = string_of_statement tree in
+      print_endline a; *)
+        Automaton.evaluatePi [Statement(tree)] [];;

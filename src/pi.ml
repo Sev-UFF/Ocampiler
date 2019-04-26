@@ -21,16 +21,16 @@
     | AExp of arithmeticExpression
     | BExp of booleanExpression
 
-  and cmd = 
-    | Loop of booleanExpression * cmd
-    | CSeq of cmd * cmd
+  and command = 
+    | Loop of booleanExpression * command
+    | CSeq of command * command
     | Nop
     | Assign of string * expression
-    | Cond of booleanExpression * cmd * cmd
+    | Cond of booleanExpression * command * command
 
   and statement = 
    | Exp of expression
-   | Cmd of cmd
+   | Cmd of command
   
   and expOc =
    | OPSUM
@@ -45,16 +45,15 @@
    | OPAND 
    | OPOR 
    | OPNOT
+
+   and cmdOc =
    | OPASSIGN 
    | OPLOOP 
    | OPCOND
-   | OPNOP
-   | OPCSEQ
 
-  and pi = 
+
+  and control = 
   | Statement of statement
   | ExpOc of expOc
-  | None;;
-
-(* type expOptCode = SUM | SUB | MUL | DIV | EQ | LT | LE | GT | GE | AND | OR | NOT *)
+  | CmdOc of cmdOc;;
 

@@ -1,21 +1,5 @@
 open Pi;;
 
-(* Definindo pilha *)
-class  stack init = object
-  val mutable items : pi list = init
-
-  method pop = 
-    match items with
-    | hd :: tl -> 
-      items <- tl;
-       hd;
-    | [] -> None
-
-  method push hd =
-    items <- hd :: items
-  
-end;;
-
 let readInputFile file_name =
   let ch = open_in file_name in
     let s = really_input_string ch (in_channel_length ch) in
@@ -63,4 +47,35 @@ and string_of_statement statement =
   | Exp (x) -> string_of_expression x
   | Cmd (x) -> string_of_command x
   
-and string_of_pi pi = "tteste";;
+and string_of_exp_opcode expOc =
+  match expOc with
+  | OPSUM -> "OPSUM"
+  | OPMUL -> "OPMUL"
+  | OPSUB  -> "OPSUB"
+  | OPDIV  -> "OPDIV"
+  | OPEQ  -> "OPEQ"
+  | OPLT  -> "OPLT"
+  | OPLE  -> "OPLE"
+  | OPGT  -> "OPGT"
+  | OPGE  -> "OPGE"
+  | OPAND  -> "OPAND"
+  | OPOR  -> "OPOR"
+  | OPNOT -> "OPNOT"
+
+  and string_of_cmd_opcode cmdOc =
+  match cmdOc with
+  | OPASSIGN  -> "OPASSIGN"
+  | OPLOOP  -> "OPLOOP"
+  | OPCOND -> "OPCOND"
+
+
+and string_of_ctn ctn =
+  match ctn with 
+  | Statement(x) -> string_of_statement x
+  | ExpOc(x) -> string_of_exp_opcode x
+  | CmdOc(x) -> string_of_cmd_opcode x 
+  
+and string_of_pi_list list = 
+  "[ " ^ (String.concat ", " (List.map string_of_ctn list)) ^ " ]"
+;;
+
