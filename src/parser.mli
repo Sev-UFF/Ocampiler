@@ -25,7 +25,6 @@ type token =
   | LPAREN
   | RPAREN
   | EOF
-  | EOL
 
 val main :
   (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> Pi.statement

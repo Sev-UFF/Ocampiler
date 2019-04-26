@@ -1,26 +1,10 @@
-(* open Pi;;
 open Util;;
+open Pi;;
 
-let controlStack = new pi stack;;
-let valueStack = new pi stack;;
-
-let rec evaluateStatement statement = 
-  controlStack#push statement
-
-  while controlStack != [] do
-    let value = controlStack#pop in 
-      if value == Sum(x, y) begin
-       controlStack#push ExpOc(OPSUM)
-       controlStack#push ExpOc(OPSUM)
-       controlStack#push ExpOc(OPSUM)
-      end
-      else begin
-        controlStack#push ExpOc(OPMUL)
-      end
+let rec evaluatePi (controlStack : stack) (valueStack : stack)   =
 
 
-  end
-  print_endline "terminou";; *)
+  let value = controlStack#pop in 
+    string_of_pi value
+    ;;
 
-  (* nao funciona ainda, tentado com if e com pattern matchin *)
-  

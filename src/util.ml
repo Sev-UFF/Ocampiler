@@ -1,14 +1,14 @@
 open Pi;;
 
 (* Definindo pilha *)
-class ['t] stack init = object
-  val mutable items : 't list = init
+class  stack init = object
+  val mutable items : pi list = init
 
   method pop = 
     match items with
     | hd :: tl -> 
       items <- tl;
-      Some hd
+       hd;
     | [] -> None
 
   method push hd =
@@ -61,4 +61,6 @@ and string_of_command command =
 and string_of_statement statement =
   match statement with
   | Exp (x) -> string_of_expression x
-  | Cmd (x) -> string_of_command x;;
+  | Cmd (x) -> string_of_command x
+  
+and string_of_pi pi = "tteste";;

@@ -25,7 +25,6 @@ type token =
   | LPAREN
   | RPAREN
   | EOF
-  | EOL
 
 open Parsing;;
 let _ = parse_error;;
@@ -53,7 +52,6 @@ let yytransl_const = [|
   280 (* LPAREN *);
   281 (* RPAREN *);
     0 (* EOF *);
-  282 (* EOL *);
     0|]
 
 let yytransl_block = [|
@@ -252,7 +250,6 @@ let yynames_const = "\
   LPAREN\000\
   RPAREN\000\
   EOF\000\
-  EOL\000\
   "
 
 let yynames_block = "\
@@ -268,214 +265,214 @@ let yyact = [|
     Obj.repr(
 # 22 "parser.mly"
                                          ( _1 )
-# 272 "parser.ml"
+# 269 "parser.ml"
                : Pi.statement))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 0 : Pi.expression) in
     Obj.repr(
-# 26 "parser.mly"
+# 25 "parser.mly"
                      ( Pi.Exp(_1))
-# 279 "parser.ml"
+# 276 "parser.ml"
                : Pi.statement))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 0 : Pi.cmd) in
     Obj.repr(
-# 27 "parser.mly"
+# 26 "parser.mly"
                 (Pi.Cmd(_1))
-# 286 "parser.ml"
+# 283 "parser.ml"
                : Pi.statement))
 ; (fun __caml_parser_env ->
     let _2 = (Parsing.peek_val __caml_parser_env 3 : Pi.booleanExpression) in
     let _4 = (Parsing.peek_val __caml_parser_env 1 : Pi.cmd) in
     Obj.repr(
-# 30 "parser.mly"
+# 29 "parser.mly"
                                                        ( Pi.Loop(_2, _4))
-# 294 "parser.ml"
+# 291 "parser.ml"
                : Pi.cmd))
 ; (fun __caml_parser_env ->
     let _2 = (Parsing.peek_val __caml_parser_env 5 : Pi.booleanExpression) in
     let _4 = (Parsing.peek_val __caml_parser_env 3 : Pi.cmd) in
     let _6 = (Parsing.peek_val __caml_parser_env 1 : Pi.cmd) in
     Obj.repr(
-# 31 "parser.mly"
+# 30 "parser.mly"
                                                         ( Pi.Cond(_2, _4, _6))
-# 303 "parser.ml"
+# 300 "parser.ml"
                : Pi.cmd))
 ; (fun __caml_parser_env ->
     let _2 = (Parsing.peek_val __caml_parser_env 3 : Pi.booleanExpression) in
     let _4 = (Parsing.peek_val __caml_parser_env 1 : Pi.cmd) in
     Obj.repr(
-# 32 "parser.mly"
+# 31 "parser.mly"
                                                      ( Pi.Cond(_2, _4, Pi.Nop))
-# 311 "parser.ml"
+# 308 "parser.ml"
                : Pi.cmd))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 2 : string) in
     let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.expression) in
     Obj.repr(
-# 33 "parser.mly"
+# 32 "parser.mly"
                                                     ( Pi.Assign(_1, _3) )
-# 319 "parser.ml"
+# 316 "parser.ml"
                : Pi.cmd))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 1 : Pi.cmd) in
     let _2 = (Parsing.peek_val __caml_parser_env 0 : Pi.cmd) in
     Obj.repr(
-# 34 "parser.mly"
+# 33 "parser.mly"
                                                  ( Pi.CSeq(_1, _2) )
-# 327 "parser.ml"
+# 324 "parser.ml"
                : Pi.cmd))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 0 : Pi.arithmeticExpression) in
     Obj.repr(
-# 38 "parser.mly"
+# 37 "parser.mly"
                                                     ( Pi.AExp( _1) )
-# 334 "parser.ml"
+# 331 "parser.ml"
                : Pi.expression))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 0 : Pi.booleanExpression) in
     Obj.repr(
-# 39 "parser.mly"
+# 38 "parser.mly"
                                                     ( Pi.BExp( _1) )
-# 341 "parser.ml"
+# 338 "parser.ml"
                : Pi.expression))
 ; (fun __caml_parser_env ->
     let _2 = (Parsing.peek_val __caml_parser_env 1 : Pi.expression) in
     Obj.repr(
-# 40 "parser.mly"
+# 39 "parser.mly"
                                                     ( _2 )
-# 348 "parser.ml"
+# 345 "parser.ml"
                : Pi.expression))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 0 : int) in
     Obj.repr(
-# 43 "parser.mly"
+# 42 "parser.mly"
                                                                     ( Pi.Num(_1) )
-# 355 "parser.ml"
+# 352 "parser.ml"
+               : Pi.arithmeticExpression))
+; (fun __caml_parser_env ->
+    let _1 = (Parsing.peek_val __caml_parser_env 2 : Pi.arithmeticExpression) in
+    let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.arithmeticExpression) in
+    Obj.repr(
+# 43 "parser.mly"
+                                                                    ( Pi.Sum( _1, _3 )  )
+# 360 "parser.ml"
                : Pi.arithmeticExpression))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 2 : Pi.arithmeticExpression) in
     let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.arithmeticExpression) in
     Obj.repr(
 # 44 "parser.mly"
-                                                                    ( Pi.Sum( _1, _3 )  )
-# 363 "parser.ml"
+                                                                    ( Pi.Sub( _1, _3 )  )
+# 368 "parser.ml"
                : Pi.arithmeticExpression))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 2 : Pi.arithmeticExpression) in
     let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.arithmeticExpression) in
     Obj.repr(
 # 45 "parser.mly"
-                                                                    ( Pi.Sub( _1, _3 )  )
-# 371 "parser.ml"
+                                                                    ( Pi.Mul( _1, _3 )  )
+# 376 "parser.ml"
                : Pi.arithmeticExpression))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 2 : Pi.arithmeticExpression) in
     let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.arithmeticExpression) in
     Obj.repr(
 # 46 "parser.mly"
-                                                                    ( Pi.Mul( _1, _3 )  )
-# 379 "parser.ml"
-               : Pi.arithmeticExpression))
-; (fun __caml_parser_env ->
-    let _1 = (Parsing.peek_val __caml_parser_env 2 : Pi.arithmeticExpression) in
-    let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.arithmeticExpression) in
-    Obj.repr(
-# 47 "parser.mly"
                                                                     ( Pi.Div( _1, _3 )  )
-# 387 "parser.ml"
+# 384 "parser.ml"
                : Pi.arithmeticExpression))
 ; (fun __caml_parser_env ->
     let _2 = (Parsing.peek_val __caml_parser_env 1 : Pi.arithmeticExpression) in
     Obj.repr(
-# 48 "parser.mly"
+# 47 "parser.mly"
                                                                     ( _2 )
-# 394 "parser.ml"
+# 391 "parser.ml"
                : Pi.arithmeticExpression))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 0 : bool) in
     Obj.repr(
-# 51 "parser.mly"
+# 50 "parser.mly"
                   ( Pi.Boo(_1) )
-# 401 "parser.ml"
+# 398 "parser.ml"
                : Pi.booleanExpression))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 2 : Pi.booleanExpression) in
     let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.booleanExpression) in
     Obj.repr(
-# 52 "parser.mly"
+# 51 "parser.mly"
                                                                       ( Pi.Eq( Pi.BExp(_1), Pi.BExp(_3)) )
-# 409 "parser.ml"
+# 406 "parser.ml"
+               : Pi.booleanExpression))
+; (fun __caml_parser_env ->
+    let _1 = (Parsing.peek_val __caml_parser_env 2 : Pi.arithmeticExpression) in
+    let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.arithmeticExpression) in
+    Obj.repr(
+# 52 "parser.mly"
+                                                                      ( Pi.Eq( Pi.AExp(_1), Pi.AExp(_3)) )
+# 414 "parser.ml"
                : Pi.booleanExpression))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 2 : Pi.arithmeticExpression) in
     let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.arithmeticExpression) in
     Obj.repr(
 # 53 "parser.mly"
-                                                                      ( Pi.Eq( Pi.AExp(_1), Pi.AExp(_3)) )
-# 417 "parser.ml"
+                                                                      ( Pi.Lt( _1, _3) )
+# 422 "parser.ml"
                : Pi.booleanExpression))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 2 : Pi.arithmeticExpression) in
     let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.arithmeticExpression) in
     Obj.repr(
 # 54 "parser.mly"
-                                                                      ( Pi.Lt( _1, _3) )
-# 425 "parser.ml"
+                                                                      ( Pi.Le( _1, _3) )
+# 430 "parser.ml"
                : Pi.booleanExpression))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 2 : Pi.arithmeticExpression) in
     let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.arithmeticExpression) in
     Obj.repr(
 # 55 "parser.mly"
-                                                                      ( Pi.Le( _1, _3) )
-# 433 "parser.ml"
+                                                                      ( Pi.Gt( _1, _3) )
+# 438 "parser.ml"
                : Pi.booleanExpression))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 2 : Pi.arithmeticExpression) in
     let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.arithmeticExpression) in
     Obj.repr(
 # 56 "parser.mly"
-                                                                      ( Pi.Gt( _1, _3) )
-# 441 "parser.ml"
+                                                                      ( Pi.Ge( _1, _3) )
+# 446 "parser.ml"
                : Pi.booleanExpression))
 ; (fun __caml_parser_env ->
-    let _1 = (Parsing.peek_val __caml_parser_env 2 : Pi.arithmeticExpression) in
-    let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.arithmeticExpression) in
+    let _1 = (Parsing.peek_val __caml_parser_env 2 : Pi.booleanExpression) in
+    let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.booleanExpression) in
     Obj.repr(
 # 57 "parser.mly"
-                                                                      ( Pi.Ge( _1, _3) )
-# 449 "parser.ml"
+                                                                      ( Pi.And( _1, _3) )
+# 454 "parser.ml"
                : Pi.booleanExpression))
 ; (fun __caml_parser_env ->
     let _1 = (Parsing.peek_val __caml_parser_env 2 : Pi.booleanExpression) in
     let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.booleanExpression) in
     Obj.repr(
 # 58 "parser.mly"
-                                                                      ( Pi.And( _1, _3) )
-# 457 "parser.ml"
-               : Pi.booleanExpression))
-; (fun __caml_parser_env ->
-    let _1 = (Parsing.peek_val __caml_parser_env 2 : Pi.booleanExpression) in
-    let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.booleanExpression) in
-    Obj.repr(
-# 59 "parser.mly"
                                                                       ( Pi.Or( _1, _3) )
-# 465 "parser.ml"
+# 462 "parser.ml"
                : Pi.booleanExpression))
 ; (fun __caml_parser_env ->
     let _3 = (Parsing.peek_val __caml_parser_env 1 : Pi.booleanExpression) in
     Obj.repr(
-# 60 "parser.mly"
+# 59 "parser.mly"
                                                                                        ( Pi.Not( _3 ))
-# 472 "parser.ml"
+# 469 "parser.ml"
                : Pi.booleanExpression))
 ; (fun __caml_parser_env ->
     let _2 = (Parsing.peek_val __caml_parser_env 1 : Pi.booleanExpression) in
     Obj.repr(
-# 61 "parser.mly"
+# 60 "parser.mly"
                                                                       ( _2 )
-# 479 "parser.ml"
+# 476 "parser.ml"
                : Pi.booleanExpression))
 (* Entry main *)
 ; (fun __caml_parser_env -> raise (Parsing.YYexit (Parsing.peek_val __caml_parser_env 0)))
