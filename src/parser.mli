@@ -1,6 +1,7 @@
 type token =
   | NUMBER of (int)
   | BOOLEAN of (bool)
+  | ID of (string)
   | PLUS
   | MINUS
   | TIMES
@@ -18,11 +19,13 @@ type token =
   | THEN
   | ELSE
   | END
+  | ASSIGN
   | NEGATION
   | NOP
   | LPAREN
   | RPAREN
   | EOF
+  | EOL
 
 val main :
   (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> Pi.statement

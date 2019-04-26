@@ -1,1 +1,3 @@
-if (3>5) then nop else nop
+
+
+if True then teste := 243 end

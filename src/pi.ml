@@ -23,9 +23,9 @@
 
   and cmd = 
     | Loop of booleanExpression * cmd
-    | Cseq of cmd * cmd
+    | CSeq of cmd * cmd
     | Nop
-    | Assign 
+    | Assign of string * expression
     | Cond of booleanExpression * cmd * cmd
 
   and statement = 

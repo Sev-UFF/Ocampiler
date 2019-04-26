@@ -1,12 +1,13 @@
  /* File parser.mly */
         %token <int> NUMBER
         %token <bool> BOOLEAN
+        %token <string> ID
         %token PLUS MINUS TIMES DIV
         %token LESS LESSEQUAL GREATER GREATEREQUAL EQUALS AND OR
-        %token LOOP DO IF THEN ELSE END
+        %token LOOP DO IF THEN ELSE END ASSIGN
         %token NEGATION NOP
         %token LPAREN RPAREN
-        %token EOF
+        %token EOF 
         %left PLUS MINUS        /* lowest precedence */
         %left TIMES DIV         /* medium precedence */
         %start main             /* the entry point */
@@ -19,18 +20,17 @@
         %%
         main:
             statement EOF                { $1 }
-            
         ;
         statement:
           expression { Pi.Exp($1)}
           | cmd {Pi.Cmd($1)}
         ;
         cmd:
-          LOOP booleanExpression DO cmd             { Pi.Loop($2, $4)}
-          | IF booleanExpression THEN cmd ELSE cmd  { Pi.Cond($2, $4, $6)}
-          | IF booleanExpression THEN cmd           { Pi.Cond($2, $4, Pi.Nop)}
-          | IF booleanExpression THEN NOP           { Pi.Cond($2, Pi.Nop, Pi.Nop)}
-          | IF booleanExpression THEN NOP ELSE NOP          { Pi.Cond($2, Pi.Nop, Pi.Nop)}
+          LOOP booleanExpression DO cmd  END           { Pi.Loop($2, $4)}
+          | IF booleanExpression THEN cmd ELSE cmd END  { Pi.Cond($2, $4, $6)}
+          | IF booleanExpression THEN cmd END        { Pi.Cond($2, $4, Pi.Nop)}
+          | ID ASSIGN expression                    { Pi.Assign($1, $3) }
+          | cmd  cmd                             { Pi.CSeq($1, $2) }
 
         ;
         expression: 
@@ -56,6 +56,6 @@
           | arithmeticExpression GREATEREQUAL arithmeticExpression    { Pi.Ge( $1, $3) }
           | booleanExpression AND booleanExpression                   { Pi.And( $1, $3) }
           | booleanExpression OR booleanExpression                    { Pi.Or( $1, $3) }
-          | NEGATION booleanExpression                                     { Pi.Not( $2 )}
+          | NEGATION LPAREN booleanExpression RPAREN                                   { Pi.Not( $3 )}
           | LPAREN booleanExpression RPAREN                           { $2 }
         ;

@@ -4,7 +4,7 @@
         exception Eof
         }
         rule token = parse
-            [' ' '\t' '\r' '\n' ]   { token lexbuf }     (* skip blanks *)
+            [' ' '\t' '\r' '\n'  ]   { token lexbuf }     (* skip blanks *)
           | ['0'-'9']+ as  lxm      { NUMBER( int_of_string lxm) }
           | '+'                     { PLUS }
           | '-'                     { MINUS }
@@ -28,5 +28,7 @@
           | "then"                  { THEN }
           | "else"                  { ELSE }
           | "end"                   { END }
+          | ":="                    { ASSIGN }
           | "nop"                   { NOP }
+          | (['a'-'z' 'A'-'Z' '_'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*) as  lxm      { ID(lxm) }
           | eof                     { EOF }

@@ -66,3 +66,5 @@ let controle = new expression stack
 
 
 https://github.com/ChristianoBraga/PiFramework/blob/master/doc/pi-in-a-nutshell.md
+
+https://github.com/ChristianoBraga/PiFramework/blob/master/doc/pi-denotations-for-imp.md
