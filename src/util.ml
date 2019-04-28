@@ -49,24 +49,24 @@ and string_of_statement statement =
   
 and string_of_exp_opcode expOc =
   match expOc with
-  | OPSUM -> "OPSUM"
-  | OPMUL -> "OPMUL"
-  | OPSUB  -> "OPSUB"
-  | OPDIV  -> "OPDIV"
-  | OPEQ  -> "OPEQ"
-  | OPLT  -> "OPLT"
-  | OPLE  -> "OPLE"
-  | OPGT  -> "OPGT"
-  | OPGE  -> "OPGE"
-  | OPAND  -> "OPAND"
-  | OPOR  -> "OPOR"
-  | OPNOT -> "OPNOT"
+  | OPSUM -> "#SUM"
+  | OPMUL -> "#MUL"
+  | OPSUB  -> "#SUB"
+  | OPDIV  -> "#DIV"
+  | OPEQ  -> "#EQ"
+  | OPLT  -> "#LT"
+  | OPLE  -> "#LE"
+  | OPGT  -> "#GT"
+  | OPGE  -> "#GE"
+  | OPAND  -> "#AND"
+  | OPOR  -> "#OR"
+  | OPNOT -> "#NOT"
 
   and string_of_cmd_opcode cmdOc =
   match cmdOc with
-  | OPASSIGN  -> "OPASSIGN"
-  | OPLOOP  -> "OPLOOP"
-  | OPCOND -> "OPCOND"
+  | OPASSIGN  -> "#ASSIGN"
+  | OPLOOP  -> "#LOOP"
+  | OPCOND -> "#COND"
 
 
 and string_of_ctn ctn =
