@@ -1,5 +1,5 @@
-automaton.cmo : util.cmo pi.cmo
-automaton.cmx : util.cmx pi.cmx
+automaton.cmo : util.cmo pi.cmo dictionary.cmo
+automaton.cmx : util.cmx pi.cmx dictionary.cmx
 dictionary.cmo :
 dictionary.cmx :
 lexer.cmo : parser.cmi

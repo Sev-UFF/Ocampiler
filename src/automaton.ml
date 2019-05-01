@@ -4,7 +4,7 @@ open Pi;;
 exception Foo of string;;
 
 
-let rec evaluatePi (controlStack : control list) (valueStack : control list) enviroment  =
+let rec evaluatePi (controlStack : control list) (valueStack : control list) (enviroment : 'a Dictionary.AssocList.dict) (memory : 'a Dictionary.AssocList.dict) =
 
   print_endline "\n";
   print_endline "Pilha de Controle:";
@@ -19,33 +19,33 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) env
         match exp with 
         | AExp(aExp) -> (
           match aExp with 
-          | Num(x) -> evaluatePi (List.tl controlStack) ((List.hd controlStack)::valueStack) enviroment;
-          | Sum(x, y) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPSUM)::(List.tl controlStack))  ( valueStack ) enviroment
-          | Sub(x, y) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPSUB)::(List.tl controlStack))  ( valueStack ) enviroment
-          | Mul(x, y) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPMUL)::(List.tl controlStack))  ( valueStack ) enviroment
-          | Div(x, y) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPDIV)::(List.tl controlStack))  ( valueStack ) enviroment
+          | Num(x) -> evaluatePi (List.tl controlStack) ((List.hd controlStack)::valueStack) enviroment memory;
+          | Sum(x, y) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPSUM)::(List.tl controlStack))  ( valueStack ) enviroment memory
+          | Sub(x, y) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPSUB)::(List.tl controlStack))  ( valueStack ) enviroment memory
+          | Mul(x, y) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPMUL)::(List.tl controlStack))  ( valueStack ) enviroment memory
+          | Div(x, y) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPDIV)::(List.tl controlStack))  ( valueStack ) enviroment memory
         );
         | BExp(bExp) -> (
           match bExp with 
-          | Boo(x) -> evaluatePi (List.tl controlStack) ((List.hd controlStack)::valueStack) enviroment;
-          | Eq(x, y) -> evaluatePi  (Statement(Exp(x))::Statement(Exp(y))::ExpOc(OPEQ)::(List.tl controlStack))  ( valueStack ) enviroment
-          | Lt(x, y) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPLT)::(List.tl controlStack))  ( valueStack ) enviroment
-          | Le(x, y) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPLE)::(List.tl controlStack))  ( valueStack ) enviroment
-          | Gt(x, y) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPGT)::(List.tl controlStack))  ( valueStack ) enviroment
-          | Ge(x, y) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPGE)::(List.tl controlStack))  ( valueStack ) enviroment
-          | And(x, y) -> evaluatePi  (Statement(Exp(BExp(x)))::Statement(Exp(BExp(y)))::ExpOc(OPAND)::(List.tl controlStack))  ( valueStack ) enviroment
-          | Or(x, y) -> evaluatePi  (Statement(Exp(BExp(x)))::Statement(Exp(BExp(y)))::ExpOc(OPOR)::(List.tl controlStack))  ( valueStack ) enviroment
-          | Not(x) -> evaluatePi  (Statement(Exp(BExp(x)))::ExpOc(OPNOT)::(List.tl controlStack))  ( valueStack ) enviroment
+          | Boo(x) -> evaluatePi (List.tl controlStack) ((List.hd controlStack)::valueStack) enviroment memory;
+          | Eq(x, y) -> evaluatePi  (Statement(Exp(x))::Statement(Exp(y))::ExpOc(OPEQ)::(List.tl controlStack))  ( valueStack ) enviroment memory
+          | Lt(x, y) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPLT)::(List.tl controlStack))  ( valueStack ) enviroment memory
+          | Le(x, y) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPLE)::(List.tl controlStack))  ( valueStack ) enviroment memory
+          | Gt(x, y) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPGT)::(List.tl controlStack))  ( valueStack ) enviroment memory
+          | Ge(x, y) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPGE)::(List.tl controlStack))  ( valueStack ) enviroment memory
+          | And(x, y) -> evaluatePi  (Statement(Exp(BExp(x)))::Statement(Exp(BExp(y)))::ExpOc(OPAND)::(List.tl controlStack))  ( valueStack ) enviroment memory
+          | Or(x, y) -> evaluatePi  (Statement(Exp(BExp(x)))::Statement(Exp(BExp(y)))::ExpOc(OPOR)::(List.tl controlStack))  ( valueStack ) enviroment memory
+          | Not(x) -> evaluatePi  (Statement(Exp(BExp(x)))::ExpOc(OPNOT)::(List.tl controlStack))  ( valueStack ) enviroment memory
         );
       );
       | Id(id) -> ();
       | Cmd(cmd) -> (
         match cmd with 
-        | Loop(x, y) -> evaluatePi  (Statement(Exp(BExp(x)))::CmdOc(OPLOOP)::(List.tl controlStack))  (Statement(Cmd(Loop(x, y)))::valueStack ) enviroment
-        | CSeq(x, y) -> evaluatePi  (Statement(Cmd(x))::Statement(Cmd(y))::(List.tl controlStack))  ( valueStack ) enviroment
-        | Assign(x, y) -> evaluatePi  (Statement(Exp(y))::CmdOc(OPASSIGN)::(List.tl controlStack))  ( Statement(Id(x))::valueStack ) enviroment
-        | Cond(x, y, z) -> evaluatePi  (Statement(Exp(BExp(x)))::CmdOc(OPCOND)::(List.tl controlStack))  (Statement(Cmd(Cond(x, y, z)))::valueStack ) enviroment
-        | Nop -> evaluatePi  (List.tl controlStack) (valueStack) enviroment
+        | Loop(x, y) -> evaluatePi  (Statement(Exp(BExp(x)))::CmdOc(OPLOOP)::(List.tl controlStack))  (Statement(Cmd(Loop(x, y)))::valueStack ) enviroment memory
+        | CSeq(x, y) -> evaluatePi  (Statement(Cmd(x))::Statement(Cmd(y))::(List.tl controlStack))  ( valueStack ) enviroment memory
+        | Assign(x, y) -> evaluatePi  (Statement(Exp(y))::CmdOc(OPASSIGN)::(List.tl controlStack))  ( Statement(Id(x))::valueStack ) enviroment memory
+        | Cond(x, y, z) -> evaluatePi  (Statement(Exp(BExp(x)))::CmdOc(OPCOND)::(List.tl controlStack))  (Statement(Cmd(Cond(x, y, z)))::valueStack ) enviroment memory
+        | Nop -> evaluatePi  (List.tl controlStack) (valueStack) enviroment memory
       );
     )
     | ExpOc(expOc)::tl -> (
@@ -55,7 +55,7 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) env
         | Statement(Exp(AExp(Num(x))))::tl -> (
           match tl with 
           |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
-            evaluatePi (List.tl controlStack) ( Statement(Exp(AExp(Num(x + y)))) :: tl2 ) enviroment
+            evaluatePi (List.tl controlStack) ( Statement(Exp(AExp(Num(x + y)))) :: tl2 ) enviroment memory
           );
           | _ -> raise (Foo "error on opsum")
         )
@@ -67,7 +67,7 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) env
         | Statement(Exp(AExp(Num(x))))::tl -> (
           match tl with 
           |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
-            evaluatePi (List.tl controlStack) ( Statement(Exp(AExp(Num(x * y)))) :: tl2 ) enviroment
+            evaluatePi (List.tl controlStack) ( Statement(Exp(AExp(Num(x * y)))) :: tl2 ) enviroment memory
           );
           | _ -> raise (Foo "error on opmul")
         )
@@ -79,7 +79,7 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) env
         | Statement(Exp(AExp(Num(x))))::tl -> (
           match tl with 
           |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
-            evaluatePi (List.tl controlStack) ( Statement(Exp(AExp(Num(y - x)))) :: tl2 ) enviroment
+            evaluatePi (List.tl controlStack) ( Statement(Exp(AExp(Num(y - x)))) :: tl2 ) enviroment memory
           );
           | _ -> raise (Foo "error on opsub")
         )
@@ -91,7 +91,7 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) env
         | Statement(Exp(AExp(Num(x))))::tl -> (
           match tl with 
           |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
-            evaluatePi (List.tl controlStack) ( Statement(Exp(AExp(Num(x / y)))) :: tl2 ) enviroment
+            evaluatePi (List.tl controlStack) ( Statement(Exp(AExp(Num(x / y)))) :: tl2 ) enviroment memory
           );
           | _ -> raise (Foo "error on opdiv")
         )
@@ -102,7 +102,7 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) env
         | Statement(Exp(AExp(Num(x))))::tl -> (
           match tl with 
           |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
-            evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y == x)))) :: tl2 ) enviroment
+            evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y == x)))) :: tl2 ) enviroment memory
           );
           | _ -> raise (Foo "error on opeq")
         )
@@ -114,7 +114,7 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) env
         | Statement(Exp(AExp(Num(x))))::tl -> (
           match tl with 
           |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
-            evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y < x)))) :: tl2 ) enviroment
+            evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y < x)))) :: tl2 ) enviroment memory
           );
           | _ -> raise (Foo "error on oplt")
         )
@@ -126,7 +126,7 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) env
         | Statement(Exp(AExp(Num(x))))::tl -> (
           match tl with 
           |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
-            evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y <= x)))) :: tl2 ) enviroment
+            evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y <= x)))) :: tl2 ) enviroment memory
           );
           | _ -> raise (Foo "error on ople")
         )
@@ -138,7 +138,7 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) env
         | Statement(Exp(AExp(Num(x))))::tl -> (
           match tl with 
           |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
-            evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y > x)))) :: tl2 ) enviroment
+            evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y > x)))) :: tl2 ) enviroment memory
           );
           | _ -> raise (Foo "error on opgt")
         )
@@ -150,7 +150,7 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) env
         | Statement(Exp(AExp(Num(x))))::tl -> (
           match tl with 
           |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
-            evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y >= x)))) :: tl2 ) enviroment
+            evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y >= x)))) :: tl2 ) enviroment memory
           );
           | _ -> raise (Foo "error on opge")
         )
@@ -162,7 +162,7 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) env
         | Statement(Exp(BExp(Boo(x))))::tl -> (
           match tl with 
           |  Statement(Exp(BExp(Boo(y))))::tl2 -> ( 
-            evaluatePi (List.tl controlStack) ( Statement(Exp(BExp (Boo(y && x)))) :: tl2 ) enviroment
+            evaluatePi (List.tl controlStack) ( Statement(Exp(BExp (Boo(y && x)))) :: tl2 ) enviroment memory
           );
           | _ -> raise (Foo "error on opand")
         )
@@ -173,7 +173,7 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) env
         | Statement(Exp(BExp(Boo(x))))::tl -> (
           match tl with 
           |  Statement(Exp(BExp(Boo(y))))::tl2 -> ( 
-            evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y || x)))) :: tl2 ) enviroment
+            evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y || x)))) :: tl2 ) enviroment memory
           );
           | _ -> raise (Foo "error on opor")
         )
@@ -181,7 +181,7 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) env
       );
       | OPNOT -> (
         match valueStack with
-          Statement(Exp(BExp(Boo(x))))::tl -> evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(not (x))))) :: tl ) enviroment
+          Statement(Exp(BExp(Boo(x))))::tl -> evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(not (x))))) :: tl ) enviroment memory
         | _ -> raise (Foo "error on opnot");
       );
     );
@@ -193,7 +193,7 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) env
         | Statement(Exp(BExp(Boo(x))))::tl -> (
           match tl with 
           |  Statement(Cmd(Loop(y, z)))::tl2 -> ( 
-            if x == true then (evaluatePi (Statement(Cmd(z)) :: Statement(Cmd(Loop(y, z))) :: (List.tl controlStack)) (tl2)  enviroment) else (evaluatePi (List.tl controlStack) (tl2)) enviroment
+            if x == true then (evaluatePi (Statement(Cmd(z)) :: Statement(Cmd(Loop(y, z))) :: (List.tl controlStack)) (tl2)  enviroment memory) else (evaluatePi (List.tl controlStack) (tl2) enviroment memory)
           );
           | _ -> raise (Foo "error on oploop")
         )
@@ -204,7 +204,7 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) env
         | Statement(Exp(BExp(Boo(x))))::tl -> (
           match tl with 
           |  Statement(Cmd(Cond(y, z, w)))::tl2 -> ( 
-            if x == true then (evaluatePi (Statement(Cmd(z)) :: (List.tl controlStack)) (tl2) enviroment) else (evaluatePi (Statement(Cmd(w)) :: (List.tl controlStack)) (tl2) enviroment)
+            if x == true then (evaluatePi (Statement(Cmd(z)) :: (List.tl controlStack)) (tl2) enviroment memory) else (evaluatePi (Statement(Cmd(w)) :: (List.tl controlStack)) (tl2) enviroment memory)
           );
           | _ -> raise (Foo "error on opcond")
         )
@@ -212,4 +212,3 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) env
       );
     )
     | [] -> print_endline "terminou!!!";;
-

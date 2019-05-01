@@ -33,5 +33,5 @@ let () =
 
   
   let tree = Parser.main Lexer.token (Lexing.from_string !fileContents) 
-  and enviroment = make()  in
-        Automaton.evaluatePi [Statement(tree)] [] enviroment;; 
+  and enviroment = make() and memory = make() in
+        Automaton.evaluatePi [Statement(tree)] [] enviroment memory;; 
