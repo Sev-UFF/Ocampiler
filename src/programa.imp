@@ -1,2 +1,1 @@
-
-True == 4
+if 5>4 then x:=3 end

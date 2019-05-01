@@ -20,13 +20,16 @@
   and expression = 
     | AExp of arithmeticExpression
     | BExp of booleanExpression
+  
 
   and command = 
     | Loop of booleanExpression * command
     | CSeq of command * command
     | Nop
-    | Assign of string * expression
+    | Assign of id * expression
     | Cond of booleanExpression * command * command
+
+  and id = string
 
   and statement = 
    | Exp of expression

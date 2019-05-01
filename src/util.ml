@@ -39,7 +39,7 @@ and string_of_command command =
   | Loop(x, y) -> "LOOP (" ^ (string_of_boolean_expression x) ^ ", " ^ (string_of_command y) ^ ")"
   | CSeq(x, y) -> "CSEQ (" ^ (string_of_command x) ^ ", " ^ (string_of_command y) ^ ")"
   | Nop -> "NOP"
-  | Assign(x, y) -> "ASSIGN ( ID(" ^  x ^ "), " ^ (string_of_expression y) ^ ")"
+  | Assign(x, y) -> "ASSIGN ( ID(" ^ (x) ^ "), " ^ (string_of_expression y) ^ ")"
   | Cond(x, y, z) -> "COND (" ^ (string_of_boolean_expression x) ^ ", " ^ (string_of_command y) ^ ", " ^ (string_of_command z) ^ ")"
 
 and string_of_statement statement =
@@ -67,6 +67,7 @@ and string_of_exp_opcode expOc =
   | OPASSIGN  -> "#ASSIGN"
   | OPLOOP  -> "#LOOP"
   | OPCOND -> "#COND"
+
 
 
 and string_of_ctn ctn =
