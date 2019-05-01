@@ -40,7 +40,7 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list)   =
       );
       | Cmd(cmd) -> (
         match cmd with 
-        | Loop(x, y) -> evaluatePi  (Statement(Exp(BExp(x)))::Statement(Cmd(y))::CmdOc(OPLOOP)::(List.tl controlStack))  ( valueStack )
+        | Loop(x, y) -> evaluatePi  (Statement(Exp(BExp(x)))::CmdOc(OPLOOP)::(List.tl controlStack))  (Statement(Cmd(Loop(x, y)))::valueStack )
         | CSeq(x, y) -> evaluatePi  (Statement(Cmd(x))::Statement(Cmd(y))::(List.tl controlStack))  ( valueStack )
         | Assign(x, y) -> print_endline "assign"; (*evaluatePi  (Statement(Exp(y))::CmdOc(OPASSIGN)::(List.tl controlStack))  ( Statement(Exp(x))::valueStack )*)
         | Cond(x, y, z) -> evaluatePi  (Statement(Exp(BExp(x)))::CmdOc(OPCOND)::(List.tl controlStack))  (Statement(Cmd(Cond(x, y, z)))::valueStack )
@@ -187,7 +187,17 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list)   =
     | CmdOc(cmdOc)::tl -> (
       match cmdOc with 
       | OPASSIGN -> print_endline "teste"; print_endline "OPASSIGN";
-      | OPLOOP -> print_endline "teste"; print_endline "OPLOOP";
+      | OPLOOP -> (
+        match valueStack with
+        | Statement(Exp(BExp(Boo(x))))::tl -> (
+          match tl with 
+          |  Statement(Cmd(Loop(y, z)))::tl2 -> ( 
+            if x == true then (evaluatePi (Statement(Cmd(z)) :: Statement(Cmd(Loop(y, z))) :: (List.tl controlStack)) (tl2)) else (evaluatePi (List.tl controlStack) (tl2))
+          );
+          | _ -> raise (Foo "error on opor")
+        )
+        | _ -> raise (Foo "error on opor");
+      );
       | OPCOND -> (
         match valueStack with
         | Statement(Exp(BExp(Boo(x))))::tl -> (

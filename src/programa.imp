@@ -1,1 +1,1 @@
-if 5>5 then x:=3 else X:= 5 end
+while 2>1 do x:=5 end
