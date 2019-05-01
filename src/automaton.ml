@@ -188,7 +188,17 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list)   =
       match cmdOc with 
       | OPASSIGN -> print_endline "teste"; print_endline "OPASSIGN";
       | OPLOOP -> print_endline "teste"; print_endline "OPLOOP";
-      | OPCOND -> print_endline "teste"; print_endline "OPCOND";
+      | OPCOND -> (
+        match valueStack with
+        | Statement(Exp(BExp(Boo(x))))::tl -> (
+          match tl with 
+          |  Statement(Cmd(Cond(y, z, w)))::tl2 -> ( 
+            if x == true then (evaluatePi (Statement(Cmd(z)) :: (List.tl controlStack)) (tl2)) else (evaluatePi (Statement(Cmd(w)) :: (List.tl controlStack)) (tl2))
+          );
+          | _ -> raise (Foo "error on opor")
+        )
+        | _ -> raise (Foo "error on opor");
+      );
     )
     | [] -> print_endline "terminou!!!";;
 
