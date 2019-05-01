@@ -6,6 +6,7 @@ let z = new num 5.0 in
 open Util;;
 open Pi;;
 open Printf;;
+open Dictionary.AssocList;;
 
 let willReadFile = ref false;;
 let fileContents = ref "";;
@@ -26,14 +27,11 @@ let () =
           printf "%s is not a valid argument\n" arg;
         end
       end
-     
-      
-    
   done;
   (* reclamar se nao tiver aberto o arquivo *)
   print_endline !fileContents;
-  let tree = Parser.main Lexer.token (Lexing.from_string !fileContents) in 
-    (* print_endline "result"; *)
-    (* let a = string_of_statement tree in
-      print_endline a; *)
-        Automaton.evaluatePi [Statement(tree)] [];;
+
+  
+  let tree = Parser.main Lexer.token (Lexing.from_string !fileContents) 
+  and enviroment = make()  in
+        Automaton.evaluatePi [Statement(tree)] [] enviroment;; 

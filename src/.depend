@@ -1,9 +1,11 @@
 automaton.cmo : util.cmo pi.cmo
 automaton.cmx : util.cmx pi.cmx
+dictionary.cmo :
+dictionary.cmx :
 lexer.cmo : parser.cmi
 lexer.cmx : parser.cmx
-main.cmo : util.cmo pi.cmo parser.cmi lexer.cmo automaton.cmo
-main.cmx : util.cmx pi.cmx parser.cmx lexer.cmx automaton.cmx
+main.cmo : util.cmo pi.cmo parser.cmi lexer.cmo dictionary.cmo automaton.cmo
+main.cmx : util.cmx pi.cmx parser.cmx lexer.cmx dictionary.cmx automaton.cmx
 parser.cmo : pi.cmo parser.cmi
 parser.cmx : pi.cmx parser.cmi
 parser.cmi : pi.cmo
