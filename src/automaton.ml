@@ -38,11 +38,12 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list)   =
           | Not(x) -> evaluatePi  (Statement(Exp(BExp(x)))::ExpOc(OPNOT)::(List.tl controlStack))  ( valueStack )
         );
       );
+      | Id(id) -> ();
       | Cmd(cmd) -> (
         match cmd with 
         | Loop(x, y) -> evaluatePi  (Statement(Exp(BExp(x)))::CmdOc(OPLOOP)::(List.tl controlStack))  (Statement(Cmd(Loop(x, y)))::valueStack )
         | CSeq(x, y) -> evaluatePi  (Statement(Cmd(x))::Statement(Cmd(y))::(List.tl controlStack))  ( valueStack )
-        | Assign(x, y) -> print_endline "assign"; (*evaluatePi  (Statement(Exp(y))::CmdOc(OPASSIGN)::(List.tl controlStack))  ( Statement(Exp(x))::valueStack )*)
+        | Assign(x, y) -> evaluatePi  (Statement(Exp(y))::CmdOc(OPASSIGN)::(List.tl controlStack))  ( Statement(Id(x))::valueStack )
         | Cond(x, y, z) -> evaluatePi  (Statement(Exp(BExp(x)))::CmdOc(OPCOND)::(List.tl controlStack))  (Statement(Cmd(Cond(x, y, z)))::valueStack )
         | Nop -> evaluatePi  (List.tl controlStack) (valueStack)
       );
@@ -176,7 +177,7 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list)   =
           );
           | _ -> raise (Foo "error on opor")
         )
-        | _ -> raise (Foo "error on op");
+        | _ -> raise (Foo "error on opor");
       );
       | OPNOT -> (
         match valueStack with

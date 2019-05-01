@@ -42,10 +42,13 @@ and string_of_command command =
   | Assign(x, y) -> "ASSIGN ( ID(" ^ (x) ^ "), " ^ (string_of_expression y) ^ ")"
   | Cond(x, y, z) -> "COND (" ^ (string_of_boolean_expression x) ^ ", " ^ (string_of_command y) ^ ", " ^ (string_of_command z) ^ ")"
 
+and string_of_id id = "ID (" ^ id ^ ")"
+
 and string_of_statement statement =
   match statement with
   | Exp (x) -> string_of_expression x
   | Cmd (x) -> string_of_command x
+  | Id (x)  -> string_of_id x
   
 and string_of_exp_opcode expOc =
   match expOc with

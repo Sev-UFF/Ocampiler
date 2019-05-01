@@ -34,6 +34,7 @@
   and statement = 
    | Exp of expression
    | Cmd of command
+   | Id of id
   
   and expOc =
    | OPSUM
