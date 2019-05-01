@@ -44,7 +44,7 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list)   =
         | CSeq(x, y) -> evaluatePi  (Statement(Cmd(x))::Statement(Cmd(y))::(List.tl controlStack))  ( valueStack )
         | Assign(x, y) -> print_endline "assign"; (*evaluatePi  (Statement(Exp(y))::CmdOc(OPASSIGN)::(List.tl controlStack))  ( Statement(Exp(x))::valueStack )*)
         | Cond(x, y, z) -> evaluatePi  (Statement(Exp(BExp(x)))::CmdOc(OPCOND)::(List.tl controlStack))  (Statement(Cmd(Cond(x, y, z)))::valueStack )
-        | Nop -> print_endline "nop";
+        | Nop -> evaluatePi  (List.tl controlStack) (valueStack)
       );
     )
     | ExpOc(expOc)::tl -> (
@@ -68,9 +68,9 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list)   =
           |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
             evaluatePi (List.tl controlStack) ( Statement(Exp(AExp(Num(x * y)))) :: tl2 )
           );
-          | _ -> raise (Foo "error on opmum")
+          | _ -> raise (Foo "error on opmul")
         )
-        | _ -> raise (Foo "error on opmum");
+        | _ -> raise (Foo "error on opmul");
 
       );
       | OPSUB -> (
@@ -103,9 +103,9 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list)   =
           |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
             evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y == x)))) :: tl2 )
           );
-          | _ -> raise (Foo "error on opsum")
+          | _ -> raise (Foo "error on opeq")
         )
-        | _ -> raise (Foo "error on opsum");
+        | _ -> raise (Foo "error on opeq");
 
       );
       | OPLT -> (
@@ -115,9 +115,9 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list)   =
           |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
             evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y < x)))) :: tl2 )
           );
-          | _ -> raise (Foo "error on opsum")
+          | _ -> raise (Foo "error on oplt")
         )
-        | _ -> raise (Foo "error on opsum");
+        | _ -> raise (Foo "error on oplt");
 
       );
       | OPLE -> (
@@ -127,9 +127,9 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list)   =
           |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
             evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y <= x)))) :: tl2 )
           );
-          | _ -> raise (Foo "error on opsum")
+          | _ -> raise (Foo "error on ople")
         )
-        | _ -> raise (Foo "error on opsum");
+        | _ -> raise (Foo "error on opsle");
 
       );
       | OPGT -> (
@@ -139,9 +139,9 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list)   =
           |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
             evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y > x)))) :: tl2 )
           );
-          | _ -> raise (Foo "error on opsum")
+          | _ -> raise (Foo "error on opgt")
         )
-        | _ -> raise (Foo "error on opsum");
+        | _ -> raise (Foo "error on opgt");
 
       );
       | OPGE -> (
@@ -151,9 +151,9 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list)   =
           |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
             evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y >= x)))) :: tl2 )
           );
-          | _ -> raise (Foo "error on opsum")
+          | _ -> raise (Foo "error on opge")
         )
-        | _ -> raise (Foo "error on opsum");
+        | _ -> raise (Foo "error on opge");
 
       );
       | OPAND -> (
@@ -176,12 +176,12 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list)   =
           );
           | _ -> raise (Foo "error on opor")
         )
-        | _ -> raise (Foo "error on opor");
+        | _ -> raise (Foo "error on op");
       );
       | OPNOT -> (
         match valueStack with
           Statement(Exp(BExp(Boo(x))))::tl -> evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(not (x))))) :: tl )
-        | _ -> raise (Foo "error on opor");
+        | _ -> raise (Foo "error on opnot");
       );
     );
     | CmdOc(cmdOc)::tl -> (
@@ -194,9 +194,9 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list)   =
           |  Statement(Cmd(Loop(y, z)))::tl2 -> ( 
             if x == true then (evaluatePi (Statement(Cmd(z)) :: Statement(Cmd(Loop(y, z))) :: (List.tl controlStack)) (tl2)) else (evaluatePi (List.tl controlStack) (tl2))
           );
-          | _ -> raise (Foo "error on opor")
+          | _ -> raise (Foo "error on oploop")
         )
-        | _ -> raise (Foo "error on opor");
+        | _ -> raise (Foo "error on oploop");
       );
       | OPCOND -> (
         match valueStack with
@@ -205,9 +205,9 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list)   =
           |  Statement(Cmd(Cond(y, z, w)))::tl2 -> ( 
             if x == true then (evaluatePi (Statement(Cmd(z)) :: (List.tl controlStack)) (tl2)) else (evaluatePi (Statement(Cmd(w)) :: (List.tl controlStack)) (tl2))
           );
-          | _ -> raise (Foo "error on opor")
+          | _ -> raise (Foo "error on opcond")
         )
-        | _ -> raise (Foo "error on opor");
+        | _ -> raise (Foo "error on opcond");
       );
     )
     | [] -> print_endline "terminou!!!";;
