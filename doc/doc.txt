@@ -1,66 +1,76 @@
-https://caml.inria.fr/pub/docs/manual-ocaml/lexyacc.html
-ocamllex lexer.mll       # generates lexer.ml
-ocamlyacc parser.mly     # generates parser.ml and parser.mli
-ocamlc -c pi.ml
-ocamlc -c parser.mli
-ocamlc -c lexer.ml
-ocamlc -c parser.ml
-ocamlc -c util.ml
-ocamlc -c main.ml
-ocamlc -o main util.cmo lexer.cmo parser.cmo main.cmo
+processo de compilacao:
+
+    https://caml.inria.fr/pub/docs/manual-ocaml/lexyacc.html
+    ocamllex lexer.mll       # generates lexer.ml
+    ocamlyacc parser.mly     # generates parser.ml and parser.mli
+    ocamlc -c pi.ml
+    ocamlc -c parser.mli
+    ocamlc -c lexer.ml
+    ocamlc -c parser.ml
+    ocamlc -c util.ml
+    ocamlc -c main.ml
+    ocamlc -o main util.cmo lexer.cmo parser.cmo main.cmo
+
+    #com organizaco em pastas (A trabalhar)
+        ocamllex -o bin/lexer.ml lexer.mll
+        ocamlyacc -b bin/parser parser.mly
+        ocamlc -o bin/parser.cmi -c bin/parser.mli
 
 
-
-
-
-http://fsl.cs.illinois.edu/images/0/0d/CS522-Spring-2011-PL-book-imp.pdf
-BNF de Imp
-
-
-Gerar analise lexica e sintatica
-procurar o outro documento que tem exemplos mais avancados como if e while
-
-usage:
+uso do make:
     run:
         make
         ./main -f {FileName}
     Clear:
         make clear
 
-#com organizaco em pastas (A trabalhar)
-ocamllex -o bin/lexer.ml lexer.mll
-ocamlyacc -b bin/parser parser.mly
-ocamlc -o bin/parser.cmi -c bin/parser.mli
+
+instalacao ocaml:
+    add-apt-repository ppa:avsm/ppa
+    apt update
+    apt install opam
+    sudo apt install ocaml
+    opam init
+    eval `opam env`
+    opam switch create 4.06.1
+    eval `opam env`
+    - conferir se ocamlc, ocamllex e ocamlyacc estao instalados
 
 
-ocamllex lexer.mll
-10 states, 267 transitions, table size 1128 bytes
-ocamlyacc parser.mly
-ocamldep *.mli *.ml > .depend
-ocamlc -c pi.ml
-ocamlc -c util.ml
-ocamlc -c parser.mli
-ocamlc -c lexer.ml
-ocamlc -c parser.ml
-ocamlc -c main.ml
-ocamlc util.cmo pi.cmo lexer.cmo parser.cmo   main.cmo -o ocampiler
+Links importantes: 
+    https://github.com/ChristianoBraga/PiFramework/blob/master/doc/pi-in-a-nutshell.md
 
-instalacao:
-add-apt-repository ppa:avsm/ppa
-apt update
-apt install opam
-sudo apt install ocaml
-opam init
-eval `opam env`
-opam switch create 4.06.1
-eval `opam env`
+    https://github.com/ChristianoBraga/PiFramework/blob/master/doc/pi-denotations-for-imp.md
 
-- conferir se ocamlc, ocamllex e ocamlyacc estao instalados
-
-//printar uma lista de int chamada l
-print_string (String.concat ", " (List.map string_of_int l))
+    BNF de Imp: http://fsl.cs.illinois.edu/images/0/0d/CS522-Spring-2011-PL-book-imp.pdf
 
 
-https://github.com/ChristianoBraga/PiFramework/blob/master/doc/pi-in-a-nutshell.md
 
-https://github.com/ChristianoBraga/PiFramework/blob/master/doc/pi-denotations-for-imp.md
+Uso do dicionario:
+    let a = [1, "teste"; 3, "opa"];;
+    val a : (int * string) list = [(1, "teste"); (3, "opa")]
+    # lookup 1 a;;
+    - : string = "teste"
+    # lookup 3 a;;
+    - : string = "opa"
+    # lookup 2 a;;
+    Exception: Not_found.
+    # addOrUpdate 3 "novo" a;;
+    - : (int * string) list = [(1, "teste"); (3, "novo")]
+    # lookup 3 a;;
+    - : string = "opa"
+    # a = addOrUpdate 3 "novo" a;;
+    - : bool = false
+    # lookup 3 a;;
+    - : string = "opa"
+    # addOrUpdate 2 "dois" a;;
+    - : (int * string) list = [(1, "teste"); (3, "opa"); (2, "dois")]
+    # let t = addOrUpdate 2 "dois" a;;
+    val t : (int * string) list = [(1, "teste"); (3, "opa"); (2, "dois")]
+    # remove t a;;
+    Error: This expression has type (int * string) list
+        but an expression was expected of type ((int * string) list * 'a) list
+        Type int is not compatible with type (int * string) list 
+    # remove 2 t;;
+    - : (int * string) list = [(1, "teste"); (3, "opa")]
+    # 

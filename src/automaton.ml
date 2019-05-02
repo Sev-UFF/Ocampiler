@@ -1,10 +1,14 @@
 open Util;;
 open Pi;;
 
-exception Foo of string;;
+exception AutomatonException of string;;
+
+type automatonMemoryValues = 
+  | Integer of int
+  | String of string;;
 
 
-let rec evaluatePi (controlStack : control list) (valueStack : control list) (enviroment : 'a Dictionary.AssocList.dict) (memory : 'a Dictionary.AssocList.dict) =
+let rec evaluatePi (controlStack : control list) (valueStack : control list) (enviroment : (string * int) list) (memory : (int * automatonMemoryValues) list) =
 
   print_endline "\n";
   print_endline "Pilha de Controle:";
@@ -57,9 +61,9 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) (en
           |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
             evaluatePi (List.tl controlStack) ( Statement(Exp(AExp(Num(x + y)))) :: tl2 ) enviroment memory
           );
-          | _ -> raise (Foo "error on opsum")
+          | _ -> raise (AutomatonException "error on opsum")
         )
-        | _ -> raise (Foo "error on opsum");
+        | _ -> raise (AutomatonException "error on opsum");
 
       );
       | OPMUL -> (
@@ -69,9 +73,9 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) (en
           |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
             evaluatePi (List.tl controlStack) ( Statement(Exp(AExp(Num(x * y)))) :: tl2 ) enviroment memory
           );
-          | _ -> raise (Foo "error on opmul")
+          | _ -> raise (AutomatonException "error on opmul")
         )
-        | _ -> raise (Foo "error on opmul");
+        | _ -> raise (AutomatonException "error on opmul");
 
       );
       | OPSUB -> (
@@ -81,9 +85,9 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) (en
           |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
             evaluatePi (List.tl controlStack) ( Statement(Exp(AExp(Num(y - x)))) :: tl2 ) enviroment memory
           );
-          | _ -> raise (Foo "error on opsub")
+          | _ -> raise (AutomatonException "error on opsub")
         )
-        | _ -> raise (Foo "error on opsub");
+        | _ -> raise (AutomatonException "error on opsub");
 
       );
       | OPDIV -> (
@@ -93,9 +97,9 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) (en
           |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
             evaluatePi (List.tl controlStack) ( Statement(Exp(AExp(Num(x / y)))) :: tl2 ) enviroment memory
           );
-          | _ -> raise (Foo "error on opdiv")
+          | _ -> raise (AutomatonException "error on opdiv")
         )
-        | _ -> raise (Foo "error on opdiv");
+        | _ -> raise (AutomatonException "error on opdiv");
       );
       | OPEQ -> (
         match valueStack with
@@ -104,9 +108,9 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) (en
           |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
             evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y == x)))) :: tl2 ) enviroment memory
           );
-          | _ -> raise (Foo "error on opeq")
+          | _ -> raise (AutomatonException "error on opeq")
         )
-        | _ -> raise (Foo "error on opeq");
+        | _ -> raise (AutomatonException "error on opeq");
 
       );
       | OPLT -> (
@@ -116,9 +120,9 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) (en
           |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
             evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y < x)))) :: tl2 ) enviroment memory
           );
-          | _ -> raise (Foo "error on oplt")
+          | _ -> raise (AutomatonException "error on oplt")
         )
-        | _ -> raise (Foo "error on oplt");
+        | _ -> raise (AutomatonException "error on oplt");
 
       );
       | OPLE -> (
@@ -128,9 +132,9 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) (en
           |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
             evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y <= x)))) :: tl2 ) enviroment memory
           );
-          | _ -> raise (Foo "error on ople")
+          | _ -> raise (AutomatonException "error on ople")
         )
-        | _ -> raise (Foo "error on opsle");
+        | _ -> raise (AutomatonException "error on opsle");
 
       );
       | OPGT -> (
@@ -140,9 +144,9 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) (en
           |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
             evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y > x)))) :: tl2 ) enviroment memory
           );
-          | _ -> raise (Foo "error on opgt")
+          | _ -> raise (AutomatonException "error on opgt")
         )
-        | _ -> raise (Foo "error on opgt");
+        | _ -> raise (AutomatonException "error on opgt");
 
       );
       | OPGE -> (
@@ -152,9 +156,9 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) (en
           |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
             evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y >= x)))) :: tl2 ) enviroment memory
           );
-          | _ -> raise (Foo "error on opge")
+          | _ -> raise (AutomatonException "error on opge")
         )
-        | _ -> raise (Foo "error on opge");
+        | _ -> raise (AutomatonException "error on opge");
 
       );
       | OPAND -> (
@@ -164,9 +168,9 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) (en
           |  Statement(Exp(BExp(Boo(y))))::tl2 -> ( 
             evaluatePi (List.tl controlStack) ( Statement(Exp(BExp (Boo(y && x)))) :: tl2 ) enviroment memory
           );
-          | _ -> raise (Foo "error on opand")
+          | _ -> raise (AutomatonException "error on opand")
         )
-        | _ -> raise (Foo "error on opand");
+        | _ -> raise (AutomatonException "error on opand");
       );
       | OPOR -> (
         match valueStack with
@@ -175,14 +179,14 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) (en
           |  Statement(Exp(BExp(Boo(y))))::tl2 -> ( 
             evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y || x)))) :: tl2 ) enviroment memory
           );
-          | _ -> raise (Foo "error on opor")
+          | _ -> raise (AutomatonException "error on opor")
         )
-        | _ -> raise (Foo "error on opor");
+        | _ -> raise (AutomatonException "error on opor");
       );
       | OPNOT -> (
         match valueStack with
           Statement(Exp(BExp(Boo(x))))::tl -> evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(not (x))))) :: tl ) enviroment memory
-        | _ -> raise (Foo "error on opnot");
+        | _ -> raise (AutomatonException "error on opnot");
       );
     );
     | CmdOc(cmdOc)::tl -> (
@@ -195,9 +199,9 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) (en
           |  Statement(Cmd(Loop(y, z)))::tl2 -> ( 
             if x == true then (evaluatePi (Statement(Cmd(z)) :: Statement(Cmd(Loop(y, z))) :: (List.tl controlStack)) (tl2)  enviroment memory) else (evaluatePi (List.tl controlStack) (tl2) enviroment memory)
           );
-          | _ -> raise (Foo "error on oploop")
+          | _ -> raise (AutomatonException "error on oploop")
         )
-        | _ -> raise (Foo "error on oploop");
+        | _ -> raise (AutomatonException "error on oploop");
       );
       | OPCOND -> (
         match valueStack with
@@ -206,9 +210,9 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) (en
           |  Statement(Cmd(Cond(y, z, w)))::tl2 -> ( 
             if x == true then (evaluatePi (Statement(Cmd(z)) :: (List.tl controlStack)) (tl2) enviroment memory) else (evaluatePi (Statement(Cmd(w)) :: (List.tl controlStack)) (tl2) enviroment memory)
           );
-          | _ -> raise (Foo "error on opcond")
+          | _ -> raise (AutomatonException "error on opcond")
         )
-        | _ -> raise (Foo "error on opcond");
+        | _ -> raise (AutomatonException "error on opcond");
       );
     )
-    | [] -> print_endline "terminou!!!";;
+    | [] -> print_endline "Process Finished";;

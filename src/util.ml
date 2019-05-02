@@ -1,13 +1,35 @@
 open Pi;;
 
+(* Files *)
 let readInputFile file_name =
   let ch = open_in file_name in
     let s = really_input_string ch (in_channel_length ch) in
     close_in ch;
-    s
+    s;;
+
+(* Dictionaries *)
+let rec lookup (element : 'a) (dictionary : ('a * 'b) list) : 'b = 
+  match dictionary with
+  | [] -> raise Not_found
+  | (key, value)::t -> if element = key then value else lookup element t;;
 
 
+let rec addOrUpdate (key : 'a) (value : 'b) (dictionary : ('a * 'b) list) : ('a * 'b) list = 
+  match dictionary with
+  | [] -> [(key, value)]
+  | (k, v)::t -> if key = k then (key, value)::t else (k, v):: addOrUpdate key value t;;
 
+let rec remove (key : 'a) (dictionary : ('a * 'b) list) : ('a * 'b) list = 
+  match dictionary with 
+  | [] -> []
+  | (k, v)::t -> if k = key then t else (k, v):: remove key t;;
+
+let rec key_exists (key : 'a) (dictionary : ('a * 'b) list) =
+  try let _ = lookup key dictionary in true
+  with Not_found -> false;;
+
+
+(* Pi Denotations *)
 let rec string_of_arithmetic_expression arithmetic_expression = 
   match arithmetic_expression with 
   | Sum (x, y) -> "SUM (" ^ (string_of_arithmetic_expression x) ^ ", " ^ (string_of_arithmetic_expression y) ^ ")"

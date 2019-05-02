@@ -6,7 +6,6 @@ let z = new num 5.0 in
 open Util;;
 open Pi;;
 open Printf;;
-open Dictionary.AssocList;;
 
 let willReadFile = ref false;;
 let fileContents = ref "";;
@@ -33,5 +32,5 @@ let () =
 
   
   let tree = Parser.main Lexer.token (Lexing.from_string !fileContents) 
-  and enviroment = make() and memory = make() in
+  and enviroment = [] and memory = [] in
         Automaton.evaluatePi [Statement(tree)] [] enviroment memory;; 
