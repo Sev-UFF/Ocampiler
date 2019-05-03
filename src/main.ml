@@ -33,4 +33,4 @@ let () =
   
   let tree = Parser.main Lexer.token (Lexing.from_string !fileContents) 
   and enviroment = [] and memory = [] in
-        Automaton.evaluatePi [Statement(tree)] [] enviroment memory;; 
+      Automaton.evaluatePi [Statement(tree)] [] enviroment memory;; 

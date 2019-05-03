@@ -28,6 +28,15 @@ let rec key_exists (key : 'a) (dictionary : ('a * 'b) list) =
   try let _ = lookup key dictionary in true
   with Not_found -> false;;
 
+(* Stacks *)
+let push (value : 'a) (stack : 'a list) : 'a list = value::stack;;
+
+let pop (stack : 'a list) : (('a option)* ('a list)) = 
+  match stack with 
+  | [] -> (None, [])
+  | hd::tl -> (Some hd, tl);;
+
+let is_empty (stack : 'a list) = stack = [];;
 
 (* Pi Denotations *)
 let rec string_of_arithmetic_expression arithmetic_expression = 
@@ -55,22 +64,21 @@ and string_of_expression expression =
   match expression with
   | AExp(x) -> string_of_arithmetic_expression x
   | BExp(x) -> string_of_boolean_expression x
+  | Id(x) -> "ID (" ^ x ^ ")"
 
 and string_of_command command = 
   match command with
   | Loop(x, y) -> "LOOP (" ^ (string_of_boolean_expression x) ^ ", " ^ (string_of_command y) ^ ")"
   | CSeq(x, y) -> "CSEQ (" ^ (string_of_command x) ^ ", " ^ (string_of_command y) ^ ")"
   | Nop -> "NOP"
-  | Assign(x, y) -> "ASSIGN ( ID(" ^ (x) ^ "), " ^ (string_of_expression y) ^ ")"
+  | Assign(x, y) -> "ASSIGN (" ^ (string_of_expression y) ^ ", " ^ (string_of_expression y) ^ ")"
   | Cond(x, y, z) -> "COND (" ^ (string_of_boolean_expression x) ^ ", " ^ (string_of_command y) ^ ", " ^ (string_of_command z) ^ ")"
 
-and string_of_id id = "ID (" ^ id ^ ")"
 
 and string_of_statement statement =
   match statement with
   | Exp (x) -> string_of_expression x
   | Cmd (x) -> string_of_command x
-  | Id (x)  -> string_of_id x
   
 and string_of_exp_opcode expOc =
   match expOc with
@@ -104,4 +112,19 @@ and string_of_ctn ctn =
 and string_of_pi_list list = 
   "[ " ^ (String.concat ", " (List.map string_of_ctn list)) ^ " ]"
 ;;
+
+(* let  string_of_dictionary_item_type = function
+  | 'String x -> x
+  | 'Int x -> (string_of_int x)
+  | 'Bool x -> if x then "True" else "False"
+;;
+
+let rec string_of_dictionary dictionary = 
+  "[ " ^ (String.concat ", " (List.map string_of_dictionary_item dictionary)) ^ " ]"
+
+and string_of_dictionary_item (x, y) = 
+   "( " ^ (string_of_dictionary_item_type k) ^ ": " ^ (string_of_dictionary_item_type v) ^ " )"
+;; *)
+  
+
 

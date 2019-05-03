@@ -20,21 +20,20 @@
   and expression = 
     | AExp of arithmeticExpression
     | BExp of booleanExpression
+    | Id of string
   
 
   and command = 
     | Loop of booleanExpression * command
     | CSeq of command * command
     | Nop
-    | Assign of id * expression
+    | Assign of expression * expression
     | Cond of booleanExpression * command * command
 
-  and id = string
 
   and statement = 
    | Exp of expression
    | Cmd of command
-   | Id of id
   
   and expOc =
    | OPSUM

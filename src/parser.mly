@@ -14,6 +14,7 @@
         %type <Pi.statement> main
         %type <Pi.statement> statement
         %type <Pi.expression> expression
+        /* %type <Pi.declaration> declaration */
         %type <Pi.arithmeticExpression> arithmeticExpression
         %type <Pi.booleanExpression> booleanExpression
         %type <Pi.command> cmd
@@ -29,13 +30,14 @@
           LOOP booleanExpression DO cmd  END           { Pi.Loop($2, $4)}
           | IF booleanExpression THEN cmd ELSE cmd END  { Pi.Cond($2, $4, $6)}
           | IF booleanExpression THEN cmd END        { Pi.Cond($2, $4, Pi.Nop)}
-          | ID ASSIGN expression                    { Pi.Assign($1, $3) }
+          | ID ASSIGN expression                    { Pi.Assign(Pi.Id($1), $3) }
           | cmd  cmd                             { Pi.CSeq($1, $2) }
 
         ;
         expression: 
             arithmeticExpression                    { Pi.AExp( $1) }
             | booleanExpression                     { Pi.BExp( $1) }
+            | ID                                    { Pi.Id( $1) }
             | LPAREN expression RPAREN              { $2 }
         ;
         arithmeticExpression:  

@@ -5,22 +5,23 @@ exception AutomatonException of string;;
 
 type automatonMemoryValues = 
   | Integer of int
-  | String of string;;
+  | Boolean of bool;;
 
 
 let rec evaluatePi (controlStack : control list) (valueStack : control list) (enviroment : (string * int) list) (memory : (int * automatonMemoryValues) list) =
 
-  print_endline "\n";
   print_endline "Pilha de Controle:";
   print_endline (string_of_pi_list controlStack);
   print_endline "Pilha de Valor:";
   print_endline (string_of_pi_list valueStack);
+  print_endline "--------------------------------------------------------------------------";
 
   match controlStack with 
     | Statement(sta)::tl -> (
       match sta with
       | Exp (exp) -> (
         match exp with 
+        | Id(id) -> ();
         | AExp(aExp) -> (
           match aExp with 
           | Num(x) -> evaluatePi (List.tl controlStack) ((List.hd controlStack)::valueStack) enviroment memory;
@@ -42,12 +43,11 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) (en
           | Not(x) -> evaluatePi  (Statement(Exp(BExp(x)))::ExpOc(OPNOT)::(List.tl controlStack))  ( valueStack ) enviroment memory
         );
       );
-      | Id(id) -> ();
       | Cmd(cmd) -> (
         match cmd with 
         | Loop(x, y) -> evaluatePi  (Statement(Exp(BExp(x)))::CmdOc(OPLOOP)::(List.tl controlStack))  (Statement(Cmd(Loop(x, y)))::valueStack ) enviroment memory
         | CSeq(x, y) -> evaluatePi  (Statement(Cmd(x))::Statement(Cmd(y))::(List.tl controlStack))  ( valueStack ) enviroment memory
-        | Assign(x, y) -> evaluatePi  (Statement(Exp(y))::CmdOc(OPASSIGN)::(List.tl controlStack))  ( Statement(Id(x))::valueStack ) enviroment memory
+        | Assign(x, y) -> evaluatePi  (Statement(Exp(y))::CmdOc(OPASSIGN)::(List.tl controlStack))  ( Statement(Exp(x))::valueStack ) enviroment memory
         | Cond(x, y, z) -> evaluatePi  (Statement(Exp(BExp(x)))::CmdOc(OPCOND)::(List.tl controlStack))  (Statement(Cmd(Cond(x, y, z)))::valueStack ) enviroment memory
         | Nop -> evaluatePi  (List.tl controlStack) (valueStack) enviroment memory
       );
