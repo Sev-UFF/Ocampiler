@@ -30,7 +30,8 @@ let () =
   (* reclamar se nao tiver aberto o arquivo *)
   print_endline !fileContents;
 
-  
   let tree = Parser.main Lexer.token (Lexing.from_string !fileContents) 
-  and enviroment = [] and memory = [] in
-      Automaton.evaluatePi [Statement(tree)] [] enviroment memory;; 
+  and controlStack = (Stack.create()) and valueStack = (Stack.create()) 
+  and environment =  Environment.empty and memory = Memory.empty in
+      (Stack.push (Statement(tree)) controlStack);
+      Automaton.evaluatePi controlStack valueStack environment (Memory.add 24 (Automaton.Integer(9999)) memory);; 

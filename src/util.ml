@@ -7,37 +7,6 @@ let readInputFile file_name =
     close_in ch;
     s;;
 
-(* Dictionaries *)
-let rec lookup (element : 'a) (dictionary : ('a * 'b) list) : 'b = 
-  match dictionary with
-  | [] -> raise Not_found
-  | (key, value)::t -> if element = key then value else lookup element t;;
-
-
-let rec addOrUpdate (key : 'a) (value : 'b) (dictionary : ('a * 'b) list) : ('a * 'b) list = 
-  match dictionary with
-  | [] -> [(key, value)]
-  | (k, v)::t -> if key = k then (key, value)::t else (k, v):: addOrUpdate key value t;;
-
-let rec remove (key : 'a) (dictionary : ('a * 'b) list) : ('a * 'b) list = 
-  match dictionary with 
-  | [] -> []
-  | (k, v)::t -> if k = key then t else (k, v):: remove key t;;
-
-let rec key_exists (key : 'a) (dictionary : ('a * 'b) list) =
-  try let _ = lookup key dictionary in true
-  with Not_found -> false;;
-
-(* Stacks *)
-let push (value : 'a) (stack : 'a list) : 'a list = value::stack;;
-
-let pop (stack : 'a list) : (('a option)* ('a list)) = 
-  match stack with 
-  | [] -> (None, [])
-  | hd::tl -> (Some hd, tl);;
-
-let is_empty (stack : 'a list) = stack = [];;
-
 (* Pi Denotations *)
 let rec string_of_arithmetic_expression arithmetic_expression = 
   match arithmetic_expression with 
@@ -109,9 +78,18 @@ and string_of_ctn ctn =
   | ExpOc(x) -> string_of_exp_opcode x
   | CmdOc(x) -> string_of_cmd_opcode x 
   
-and string_of_pi_list list = 
-  "[ " ^ (String.concat ", " (List.map string_of_ctn list)) ^ " ]"
+(* Stacks *)
+and string_of_stack stack func = 
+"[ " ^ (String.concat ", " (List.map func (List.of_seq (Stack.to_seq stack))) ) ^ " ]"
 ;;
 
+(* Dictionaries *)
+module Environment = Map.Make(String);;
+module Memory = Map.Make(struct type t = int let compare = compare end);;
+
+let string_of_dictionary func =
+  print_endline "{ ";
+  func;
+  print_endline " }";;
 
 

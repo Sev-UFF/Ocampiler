@@ -36,6 +36,9 @@ instalacao ocaml:
     eval `opam env`
     - conferir se ocamlc, ocamllex e ocamlyacc estao instalados
 
+//instalando ocaml 4.07.1
+sudo opam switch create 4.07.1 4.07.1
+
 
 Links importantes: 
     https://github.com/ChristianoBraga/PiFramework/blob/master/doc/pi-in-a-nutshell.md
@@ -51,3 +54,27 @@ Usar Module Stack e Module Map
 
 https://ocaml.org/learn/tutorials/stack.zh.html
 https://caml.inria.fr/pub/docs/manual-ocaml/libref/Stack.html
+
+
+
+  let print_int i = print_endline (string_of_int i);;
+
+let rec test s1 s2 =
+  if not(Stack.is_empty s1) then begin
+    (Stack.push (Stack.pop s1) s2);
+    test s1 s2;
+  end else
+    Stack.iter print_int s2;;
+
+
+
+    module MyUsers = Map.Make(String);;
+    let m = MyUsers.empty;;
+    let m = MyUsers.add "fred" "sugarplums" m;;
+     let m = MyUsers.add "tom" "ilovelucy" m;;
+     let m = MyUsers.add "mark" "ocamlrules" m;;
+     let m = MyUsers.add "pete" "linux" m;;
+
+     let pm k v = k ^ ",  " ^ v;;
+
+    let a = MyUsers.map pm m;;

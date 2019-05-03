@@ -1,17 +1,110 @@
 open Util;;
 open Pi;;
+
 exception AutomatonException of string;;
-type automatonMemoryValues = 
+
+type valueStackOptions = 
+  | Int of int
+  | Str of string
+  | Bool of bool;;
+
+type storable = 
   | Integer of int
   | Boolean of bool;;
 
+type bindable = 
+  | Loc of int
+  | Value of int;;
 
-  type Bindable = 
-    | Lock of int
-    | Value of int;;
+let string_of_value_stack item =
+  match item with
+  | Int(x) -> string_of_int x
+  | Str(x) -> x
+  | Bool(x) -> if x then "True" else "False";;
+
+let string_of_bindable bindable =
+  match bindable with
+  | Loc(x) -> "LOC (" ^ (string_of_int x) ^ ")"
+  | Value(x) -> "VALUE (" ^ (string_of_int x) ^ ")";;
+
+let string_of_storable storable =
+  match storable with
+  | Integer(x) ->  (string_of_int x) 
+  | Boolean(x) -> if x then "True" else "False";;
+
+let string_of_storable_dictionary key value =
+  print_string ("( " ^ (string_of_int key) ^ ": " ^ (string_of_storable value) ^ " )\n")
+
+let string_of_bindable_dictionary key value =
+  print_string ("( " ^ key ^ ": " ^ (string_of_bindable value) ^ " )\n")
+
+let rec evaluatePi controlStack valueStack environment memory = 
+  if not(Stack.is_empty controlStack) then begin
+
+    print_endline "Pilha de Controle:";
+    print_endline (string_of_stack controlStack string_of_ctn);
+    print_endline "Pilha de Valor:";
+    print_endline (string_of_stack valueStack string_of_value_stack);
+    print_endline "Ambiente:";
+    (string_of_dictionary  (Environment.iter string_of_bindable_dictionary environment));
+    print_endline "Memória:";
+     (string_of_dictionary  (Memory.iter string_of_storable_dictionary memory));
+    print_endline "#####################################################################################################################";
+
+    let ctrl = (Stack.pop controlStack) in
+      match ctrl with
+      | Statement(sta)-> (
+        match sta with
+        | Exp (exp) -> (
+          match exp with 
+          | Id(id) -> (
+            let key = Environment.find id environment in
+              match key with 
+                | Value(x) -> ();
+                | Loc(x) -> (
+                  let value = Memory.find x memory in
+                    match value with
+                    | Integer(x) ->   (Stack.push (Int(x)) valueStack);
+                    | Boolean(x) ->  (Stack.push (Bool(x)) valueStack);
+                )
+            );
+          | AExp(aExp) -> (
+              match aExp with 
+              | Num(x) -> (
+                  (Stack.push (Int(x)) valueStack);
+                );
+              | Sum(AExp(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPSUM)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+              );
+              | Sum(Id(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPSUM)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              ); 
+              | Sum(AExp(x), Id(y)) ->  (
+                (Stack.push (ExpOc(OPSUM)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+              ); 
+              | Sum(Id(x), Id(y)) ->  (
+                (Stack.push (ExpOc(OPSUM)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              ); 
+              | Sum(_, _) -> raise (AutomatonException "error on sum");
+            );
+        );
+     
+      );
+    evaluatePi controlStack valueStack environment memory;
+  end else begin
+    print_endline "End of Automaton Evaluation";
+  end;;
 
 
-let rec evaluatePi (controlStack : control list) (valueStack : control list) (enviroment : (string * int) list) (memory : (int * automatonMemoryValues) list) =
+(* let rec evaluatePi2 (controlStack : control list) (valueStack : control list) (enviroment : (string * int) list) (memory : (int * storable) list) =
 
   print_endline "Pilha de Controle:";
   print_endline (string_of_pi_list controlStack);
@@ -223,4 +316,4 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) (en
         | _ -> raise (AutomatonException "error on opcond");
       );
     )
-    | [] -> print_endline "Process Finished";;
+    | [] -> print_endline "Process Finished";; *)
