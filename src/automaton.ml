@@ -1,20 +1,18 @@
 open Util;;
 open Pi;;
-
 exception AutomatonException of string;;
-
 type automatonMemoryValues = 
   | Integer of int
   | String of string;;
 
 
 let rec evaluatePi (controlStack : control list) (valueStack : control list) (enviroment : (string * int) list) (memory : (int * automatonMemoryValues) list) =
-
-  print_endline "\n";
+  print_endline "\n##############################################################################################################";
   print_endline "Pilha de Controle:";
   print_endline (string_of_pi_list controlStack);
-  print_endline "Pilha de Valor:";
+  print_endline "\nPilha de Valor:";
   print_endline (string_of_pi_list valueStack);
+  print_endline "#####################################################################################################################\n";
 
   match controlStack with 
     | Statement(sta)::tl -> (
@@ -95,7 +93,7 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) (en
         | Statement(Exp(AExp(Num(x))))::tl -> (
           match tl with 
           |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
-            evaluatePi (List.tl controlStack) ( Statement(Exp(AExp(Num(x / y)))) :: tl2 ) enviroment memory
+            evaluatePi (List.tl controlStack) ( Statement(Exp(AExp(Num(y / x)))) :: tl2 ) enviroment memory
           );
           | _ -> raise (AutomatonException "error on opdiv")
         )
