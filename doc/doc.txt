@@ -43,6 +43,8 @@ Links importantes:
     https://github.com/ChristianoBraga/PiFramework/blob/master/doc/pi-denotations-for-imp.md
 
     BNF de Imp: http://fsl.cs.illinois.edu/images/0/0d/CS522-Spring-2011-PL-book-imp.pdf
+    
+    Dicionário de OCaml   http://www.ocaml.org/learn/tutorials/map.html
 
 
 Usar Module Stack e Module Map
