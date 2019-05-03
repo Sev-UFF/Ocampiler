@@ -6,11 +6,16 @@ type automatonMemoryValues =
   | Boolean of bool;;
 
 
+  type Bindable = 
+    | Lock of int
+    | Value of int;;
+
+
 let rec evaluatePi (controlStack : control list) (valueStack : control list) (enviroment : (string * int) list) (memory : (int * automatonMemoryValues) list) =
 
   print_endline "Pilha de Controle:";
   print_endline (string_of_pi_list controlStack);
-  print_endline "\nPilha de Valor:";
+  print_endline "Pilha de Valor:";
   print_endline (string_of_pi_list valueStack);
   print_endline "#####################################################################################################################";
 
@@ -24,7 +29,11 @@ let rec evaluatePi (controlStack : control list) (valueStack : control list) (en
         | AExp(aExp) -> (
           match aExp with 
           | Num(x) -> evaluatePi (List.tl controlStack) ((List.hd controlStack)::valueStack) enviroment memory;
-          | Sum(x, y) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPSUM)::(List.tl controlStack))  ( valueStack ) enviroment memory
+          | Sum(AExp(x), AExp(y)) ->  evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPSUM)::(List.tl controlStack))  ( valueStack ) enviroment memory
+          | Sum(Id(x), AExp(y)) -> evaluatePi  (Statement(Exp(Id(x)))::Statement(Exp(AExp(y)))::ExpOc(OPSUM)::(List.tl controlStack))  ( valueStack ) enviroment memory
+          | Sum(AExp(x), Id(y)) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(Id(y)))::ExpOc(OPSUM)::(List.tl controlStack))  ( valueStack ) enviroment memory
+          | Sum(Id(x), Id(y)) -> evaluatePi  (Statement(Exp(Id(x)))::Statement(Exp(Id(y)))::ExpOc(OPSUM)::(List.tl controlStack))  ( valueStack ) enviroment memory
+          | Sum(_, _) -> raise (AutomatonException "error on sum");
           | Sub(x, y) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPSUB)::(List.tl controlStack))  ( valueStack ) enviroment memory
           | Mul(x, y) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPMUL)::(List.tl controlStack))  ( valueStack ) enviroment memory
           | Div(x, y) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPDIV)::(List.tl controlStack))  ( valueStack ) enviroment memory

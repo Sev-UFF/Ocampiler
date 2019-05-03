@@ -41,7 +41,7 @@ let is_empty (stack : 'a list) = stack = [];;
 (* Pi Denotations *)
 let rec string_of_arithmetic_expression arithmetic_expression = 
   match arithmetic_expression with 
-  | Sum (x, y) -> "SUM (" ^ (string_of_arithmetic_expression x) ^ ", " ^ (string_of_arithmetic_expression y) ^ ")"
+  | Sum (x, y) -> "SUM (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
   | Num (x) -> "NUM (" ^ (string_of_int x) ^ ")"
   | Sub (x, y) -> "SUB (" ^ (string_of_arithmetic_expression x) ^ ", " ^ (string_of_arithmetic_expression y) ^ ")"
   | Div (x, y) -> "DIV (" ^ (string_of_arithmetic_expression x) ^ ", " ^ (string_of_arithmetic_expression y) ^ ")"
@@ -71,7 +71,7 @@ and string_of_command command =
   | Loop(x, y) -> "LOOP (" ^ (string_of_boolean_expression x) ^ ", " ^ (string_of_command y) ^ ")"
   | CSeq(x, y) -> "CSEQ (" ^ (string_of_command x) ^ ", " ^ (string_of_command y) ^ ")"
   | Nop -> "NOP"
-  | Assign(x, y) -> "ASSIGN (" ^ (string_of_expression y) ^ ", " ^ (string_of_expression y) ^ ")"
+  | Assign(x, y) -> "ASSIGN (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
   | Cond(x, y, z) -> "COND (" ^ (string_of_boolean_expression x) ^ ", " ^ (string_of_command y) ^ ", " ^ (string_of_command z) ^ ")"
 
 
@@ -113,18 +113,5 @@ and string_of_pi_list list =
   "[ " ^ (String.concat ", " (List.map string_of_ctn list)) ^ " ]"
 ;;
 
-(* let  string_of_dictionary_item_type = function
-  | 'String x -> x
-  | 'Int x -> (string_of_int x)
-  | 'Bool x -> if x then "True" else "False"
-;;
-
-let rec string_of_dictionary dictionary = 
-  "[ " ^ (String.concat ", " (List.map string_of_dictionary_item dictionary)) ^ " ]"
-
-and string_of_dictionary_item (x, y) = 
-   "( " ^ (string_of_dictionary_item_type k) ^ ": " ^ (string_of_dictionary_item_type v) ^ " )"
-;; *)
-  
 
 

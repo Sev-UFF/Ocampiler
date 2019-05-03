@@ -45,32 +45,7 @@ Links importantes:
     BNF de Imp: http://fsl.cs.illinois.edu/images/0/0d/CS522-Spring-2011-PL-book-imp.pdf
 
 
+Usar Module Stack e Module Map
 
-Uso do dicionario:
-    let a = [1, "teste"; 3, "opa"];;
-    val a : (int * string) list = [(1, "teste"); (3, "opa")]
-    # lookup 1 a;;
-    - : string = "teste"
-    # lookup 3 a;;
-    - : string = "opa"
-    # lookup 2 a;;
-    Exception: Not_found.
-    # addOrUpdate 3 "novo" a;;
-    - : (int * string) list = [(1, "teste"); (3, "novo")]
-    # lookup 3 a;;
-    - : string = "opa"
-    # a = addOrUpdate 3 "novo" a;;
-    - : bool = false
-    # lookup 3 a;;
-    - : string = "opa"
-    # addOrUpdate 2 "dois" a;;
-    - : (int * string) list = [(1, "teste"); (3, "opa"); (2, "dois")]
-    # let t = addOrUpdate 2 "dois" a;;
-    val t : (int * string) list = [(1, "teste"); (3, "opa"); (2, "dois")]
-    # remove t a;;
-    Error: This expression has type (int * string) list
-        but an expression was expected of type ((int * string) list * 'a) list
-        Type int is not compatible with type (int * string) list 
-    # remove 2 t;;
-    - : (int * string) list = [(1, "teste"); (3, "opa")]
-    # 
+https://ocaml.org/learn/tutorials/stack.zh.html
+https://caml.inria.fr/pub/docs/manual-ocaml/libref/Stack.html

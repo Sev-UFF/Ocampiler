@@ -1,7 +1,7 @@
 
   type arithmeticExpression = 
     | Num of int
-    | Sum of arithmeticExpression * arithmeticExpression
+    | Sum of expression * expression
     | Sub of arithmeticExpression * arithmeticExpression
     | Mul of arithmeticExpression * arithmeticExpression
     | Div of arithmeticExpression * arithmeticExpression 

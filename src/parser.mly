@@ -42,7 +42,10 @@
         ;
         arithmeticExpression:  
           NUMBER                                                    { Pi.Num($1) }
-          | arithmeticExpression PLUS arithmeticExpression          { Pi.Sum( $1, $3 )  }
+          | arithmeticExpression PLUS arithmeticExpression          { Pi.Sum(Pi.AExp($1), Pi.AExp($3) )  }
+          | arithmeticExpression PLUS ID          { Pi.Sum(Pi.AExp($1), Pi.Id($3) )  }
+          | ID PLUS arithmeticExpression          { Pi.Sum(Pi.Id($1), Pi.AExp($3) )  }
+          | ID PLUS ID          { Pi.Sum(Pi.Id($1), Pi.Id($3) )  }
           | arithmeticExpression MINUS arithmeticExpression         { Pi.Sub( $1, $3 )  }
           | arithmeticExpression TIMES arithmeticExpression         { Pi.Mul( $1, $3 )  }
           | arithmeticExpression DIV arithmeticExpression           { Pi.Div( $1, $3 )  }
