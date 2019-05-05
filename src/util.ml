@@ -12,21 +12,21 @@ let rec string_of_arithmetic_expression arithmetic_expression =
   match arithmetic_expression with 
   | Sum (x, y) -> "SUM (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
   | Num (x) -> "NUM (" ^ (string_of_int x) ^ ")"
-  | Sub (x, y) -> "SUB (" ^ (string_of_arithmetic_expression x) ^ ", " ^ (string_of_arithmetic_expression y) ^ ")"
-  | Div (x, y) -> "DIV (" ^ (string_of_arithmetic_expression x) ^ ", " ^ (string_of_arithmetic_expression y) ^ ")"
-  | Mul (x, y) -> "MUL (" ^ (string_of_arithmetic_expression x) ^ ", " ^ (string_of_arithmetic_expression y) ^ ")"
+  | Sub (x, y) -> "SUB (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
+  | Div (x, y) -> "DIV (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
+  | Mul (x, y) -> "MUL (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
   
 and string_of_boolean_expression boolean_expression =
   match boolean_expression with 
   | Boo(x) -> "BOO (" ^ (string_of_bool x) ^ ")"
   | Eq (x, y) ->  "EQ (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
-  | Lt (x, y) ->  "LT (" ^ (string_of_arithmetic_expression x) ^ ", " ^ (string_of_arithmetic_expression y) ^ ")"
-  | Le (x, y) ->  "LE (" ^ (string_of_arithmetic_expression x) ^ ", " ^ (string_of_arithmetic_expression y) ^ ")"
-  | Gt (x, y) ->  "GT (" ^ (string_of_arithmetic_expression x) ^ ", " ^ (string_of_arithmetic_expression y) ^ ")"
-  | Ge (x, y) ->  "GE (" ^ (string_of_arithmetic_expression x) ^ ", " ^ (string_of_arithmetic_expression y) ^ ")"
-  | And (x, y) ->  "AND (" ^ (string_of_boolean_expression x) ^ ", " ^ (string_of_boolean_expression y) ^ ")"
-  | Or (x, y) ->  "OR (" ^ (string_of_boolean_expression x) ^ ", " ^ (string_of_boolean_expression y) ^ ")"
-  | Not (x) ->  "NOT (" ^ (string_of_boolean_expression x) ^ ")"
+  | Lt (x, y) ->  "LT (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
+  | Le (x, y) ->  "LE (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
+  | Gt (x, y) ->  "GT (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
+  | Ge (x, y) ->  "GE (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
+  | And (x, y) ->  "AND (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
+  | Or (x, y) ->  "OR (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
+  | Not (x) ->  "NOT (" ^ (string_of_expression x) ^ ")"
 
 
 and string_of_expression expression =
@@ -88,8 +88,7 @@ module Environment = Map.Make(String);;
 module Memory = Map.Make(struct type t = int let compare = compare end);;
 
 let string_of_dictionary func =
-  print_endline "{ ";
   func;
-  print_endline " }";;
+  
 
 

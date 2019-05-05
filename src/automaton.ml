@@ -33,10 +33,10 @@ let string_of_storable storable =
   | Boolean(x) -> if x then "True" else "False";;
 
 let string_of_storable_dictionary key value =
-  print_string ("( " ^ (string_of_int key) ^ ": " ^ (string_of_storable value) ^ " )\n")
+  print_string ("( " ^ (string_of_int key) ^ ": " ^ (string_of_storable value) ^ " )")
 
 let string_of_bindable_dictionary key value =
-  print_string ("( " ^ key ^ ": " ^ (string_of_bindable value) ^ " )\n")
+  print_string ("( " ^ key ^ ": " ^ (string_of_bindable value) ^ " )")
 
 let rec evaluatePi controlStack valueStack environment memory = 
   if not(Stack.is_empty controlStack) then begin
@@ -46,14 +46,19 @@ let rec evaluatePi controlStack valueStack environment memory =
     print_endline "Pilha de Valor:";
     print_endline (string_of_stack valueStack string_of_value_stack);
     print_endline "Ambiente:";
+    print_string "{";
     (string_of_dictionary  (Environment.iter string_of_bindable_dictionary environment));
+    print_string "}\n";
     print_endline "Memória:";
-     (string_of_dictionary  (Memory.iter string_of_storable_dictionary memory));
+    print_string "{";
+     (string_of_dictionary  ( Memory.iter string_of_storable_dictionary memory));
+    print_string "}\n";
     print_endline "#####################################################################################################################";
 
     let ctrl = (Stack.pop controlStack) in
       match ctrl with
       | Statement(sta)-> (
+      
         match sta with
         | Exp (exp) -> (
           match exp with 
@@ -92,19 +97,97 @@ let rec evaluatePi controlStack valueStack environment memory =
                 (Stack.push (ExpOc(OPSUM)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              );
+              | Sum(_, _) -> raise (AutomatonException "error on sum");          
+              
+              | Sub(AExp(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPSUB)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+              );
+              | Sub(Id(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPSUB)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
               ); 
-              | Sum(_, _) -> raise (AutomatonException "error on sum");
+              | Sub(AExp(x), Id(y)) ->  (
+                (Stack.push (ExpOc(OPSUB)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+              ); 
+              | Sub(Id(x), Id(y)) ->  (
+                (Stack.push (ExpOc(OPSUB)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              ); 
+              | Sub(_, _) -> raise (AutomatonException "error on sub");
+              | Mul(AExp(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPMUL)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+              );
+              | Mul(Id(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPMUL)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              ); 
+              | Mul(AExp(x), Id(y)) ->  (
+                (Stack.push (ExpOc(OPMUL)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+              ); 
+              | Mul(Id(x), Id(y)) ->  (
+                (Stack.push (ExpOc(OPMUL)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              ); 
+              | Mul(_, _) -> raise (AutomatonException "error on Mul");
+              | Div(AExp(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPDIV)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+              );
+              | Div(Id(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPDIV)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              ); 
+              | Div(AExp(x), Id(y)) ->  (
+                (Stack.push (ExpOc(OPDIV)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+              ); 
+              | Div(Id(x), Id(y)) ->  (
+                (Stack.push (ExpOc(OPDIV)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              ); 
+              | Div(_, _) -> raise (AutomatonException "error on Div");     
+          (*));
+          | BExp(bExp)-> ( 
+            match bExp with 
+              | Boo(x) -> (
+                  (Stack.push (Bool(x)) valueStack);
+                );
+              | _ -> raise (AutomatonException "error boolean");
             );
+          );
         );
-     
+      
+      
+      | ExpOc(expOc) -> print_endline "exp0c"; 
+      | CmdOc(cmdOc) -> print_endline "cmd0c";*)  
+          )
+        )
       );
+      
     evaluatePi controlStack valueStack environment memory;
   end else begin
     print_endline "End of Automaton Evaluation";
   end;;
 
-
-(* let rec evaluatePi2 (controlStack : control list) (valueStack : control list) (enviroment : (string * int) list) (memory : (int * storable) list) =
+(*
+ let rec evaluatePi2 (controlStack : control list) (valueStack : control list) (enviroment : (string * int) list) (memory : (int * storable) list) =
 
   print_endline "Pilha de Controle:";
   print_endline (string_of_pi_list controlStack);

@@ -2,20 +2,20 @@
   type arithmeticExpression = 
     | Num of int
     | Sum of expression * expression
-    | Sub of arithmeticExpression * arithmeticExpression
-    | Mul of arithmeticExpression * arithmeticExpression
-    | Div of arithmeticExpression * arithmeticExpression 
+    | Sub of expression * expression
+    | Mul of expression * expression
+    | Div of expression * expression 
 
   and booleanExpression =
     | Boo of bool  
     | Eq of expression * expression
-    | Lt of arithmeticExpression * arithmeticExpression
-    | Le of arithmeticExpression * arithmeticExpression
-    | Gt of arithmeticExpression * arithmeticExpression
-    | Ge of arithmeticExpression * arithmeticExpression
-    | And of booleanExpression * booleanExpression
-    | Or of booleanExpression * booleanExpression
-    | Not of booleanExpression
+    | Lt of expression * expression
+    | Le of expression * expression
+    | Gt of expression * expression
+    | Ge of expression * expression
+    | And of expression * expression
+    | Or of expression * expression
+    | Not of expression
 
   and expression = 
     | AExp of arithmeticExpression
