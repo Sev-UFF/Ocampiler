@@ -163,22 +163,172 @@ let rec evaluatePi controlStack valueStack environment memory =
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
               ); 
               | Div(_, _) -> raise (AutomatonException "error on Div");     
-          (*));
+            );
           | BExp(bExp)-> ( 
             match bExp with 
               | Boo(x) -> (
-                  (Stack.push (Bool(x)) valueStack);
-                );
+                (Stack.push (Bool(x)) valueStack);
+              );
+              | Eq(BExp(x), BExp(y)) -> (
+                (Stack.push (ExpOc(OPEQ)) controlStack);
+                (Stack.push (Statement(Exp(BExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+              );
+              | Eq(BExp(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPEQ)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+              );
+              | Eq(Id(x), BExp(y)) -> (
+                (Stack.push (ExpOc(OPEQ)) controlStack);
+                (Stack.push (Statement(Exp(BExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              );
+              | Eq(Id(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPEQ)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              );(* equals aritmetico *)
+              | Eq(AExp(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPEQ)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+              );
+              | Eq(AExp(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPEQ)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+              );
+              | Eq(Id(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPEQ)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              );(* fim equals aritmetico *)
+              | Lt(AExp(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPLT)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+              );
+              | Lt(AExp(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPLT)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+              );
+              | Lt(Id(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPLT)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              );
+              | Lt(Id(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPLT)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              );
+              | Le(AExp(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPLE)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+              );
+              | Le(AExp(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPLE)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+              );
+              | Le(Id(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPLE)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              );
+              | Le(Id(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPLE)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              );
+              | Gt(AExp(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPGT)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+              );
+              | Gt(AExp(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPGT)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+              );
+              | Gt(Id(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPGT)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              );
+              | Gt(Id(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPGT)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              );
+              | Ge(AExp(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPGE)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+              );
+              | Ge(AExp(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPGE)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+              );
+              | Ge(Id(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPGE)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              );
+              | Ge(Id(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPGE)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              );
+              | And(BExp(x), BExp(y)) -> (
+                (Stack.push (ExpOc(OPAND)) controlStack);
+                (Stack.push (Statement(Exp(BExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+              );
+              | And(BExp(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPAND)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+              );
+              | And(Id(x), BExp(y)) -> (
+                (Stack.push (ExpOc(OPAND)) controlStack);
+                (Stack.push (Statement(Exp(BExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              );
+              | And(Id(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPAND)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              );
+              | Or(BExp(x), BExp(y)) -> (
+                (Stack.push (ExpOc(OPOR)) controlStack);
+                (Stack.push (Statement(Exp(BExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+              );
+              | Or(BExp(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPOR)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+              );
+              | Or(Id(x), BExp(y)) -> (
+                (Stack.push (ExpOc(OPOR)) controlStack);
+                (Stack.push (Statement(Exp(BExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              );
+              | Or(Id(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPOR)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              );
               | _ -> raise (AutomatonException "error boolean");
             );
-          );
-        );
-      
-      
-      | ExpOc(expOc) -> print_endline "exp0c"; 
-      | CmdOc(cmdOc) -> print_endline "cmd0c";*)  
+  
+          
           )
-        )
       );
       
     evaluatePi controlStack valueStack environment memory;

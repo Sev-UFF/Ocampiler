@@ -69,31 +69,30 @@
           | arithmeticExpression EQUALS arithmeticExpression          { Pi.Eq( Pi.AExp($1), Pi.AExp($3)) }
           | arithmeticExpression EQUALS ID                            { Pi.Eq( Pi.AExp($1), Pi.Id($3)) }
           | ID EQUALS arithmeticExpression                            { Pi.Eq( Pi.Id($1), Pi.AExp($3)) }
-          | ID EQUALS ID                                              { Pi.Eq( Pi.Id($1), Pi.Id($3)) }
           | arithmeticExpression LESS arithmeticExpression            { Pi.Lt( (Pi.AExp($1), Pi.AExp($3))) }
           | arithmeticExpression LESS ID                              { Pi.Lt( (Pi.AExp($1), Pi.Id($3))) }
           | ID LESS arithmeticExpression                              { Pi.Lt( (Pi.Id($1), Pi.AExp($3))) }
           | ID LESS ID                                                { Pi.Lt( (Pi.Id($1), Pi.Id($3))) }
           | arithmeticExpression LESSEQUAL arithmeticExpression       { Pi.Le( Pi.AExp($1), Pi.AExp($3)) }
-          | arithmeticExpression LESSEQUAL ID                         { Pi.Lt( (Pi.AExp($1), Pi.Id($3))) }
-          | ID LESSEQUAL arithmeticExpression                         { Pi.Lt( (Pi.Id($1), Pi.AExp($3))) }
-          | ID LESSEQUAL ID                                           { Pi.Lt( (Pi.Id($1), Pi.Id($3))) }
+          | arithmeticExpression LESSEQUAL ID                         { Pi.Le( (Pi.AExp($1), Pi.Id($3))) }
+          | ID LESSEQUAL arithmeticExpression                         { Pi.Le( (Pi.Id($1), Pi.AExp($3))) }
+          | ID LESSEQUAL ID                                           { Pi.Le( (Pi.Id($1), Pi.Id($3))) }
           | arithmeticExpression GREATER arithmeticExpression         { Pi.Gt( Pi.AExp($1), Pi.AExp($3)) }
-          | arithmeticExpression GREATER ID                           { Pi.Lt( (Pi.AExp($1), Pi.Id($3))) }
-          | ID GREATER arithmeticExpression                           { Pi.Lt( (Pi.Id($1), Pi.AExp($3))) }
-          | ID GREATER ID                                             { Pi.Lt( (Pi.Id($1), Pi.Id($3))) }
+          | arithmeticExpression GREATER ID                           { Pi.Gt( (Pi.AExp($1), Pi.Id($3))) }
+          | ID GREATER arithmeticExpression                           { Pi.Gt( (Pi.Id($1), Pi.AExp($3))) }
+          | ID GREATER ID                                             { Pi.Gt( (Pi.Id($1), Pi.Id($3))) }
           | arithmeticExpression GREATEREQUAL arithmeticExpression    { Pi.Ge( (Pi.AExp($1), Pi.AExp($3))) }
-          | arithmeticExpression GREATEREQUAL ID                      { Pi.Lt( (Pi.AExp($1), Pi.Id($3))) }
-          | ID GREATEREQUAL arithmeticExpression                      { Pi.Lt( (Pi.Id($1), Pi.AExp($3))) }
-          | ID GREATEREQUAL ID                                        { Pi.Lt( (Pi.Id($1), Pi.Id($3))) }
+          | arithmeticExpression GREATEREQUAL ID                      { Pi.Ge( (Pi.AExp($1), Pi.Id($3))) }
+          | ID GREATEREQUAL arithmeticExpression                      { Pi.Ge( (Pi.Id($1), Pi.AExp($3))) }
+          | ID GREATEREQUAL ID                                        { Pi.Ge( (Pi.Id($1), Pi.Id($3))) }
           | booleanExpression AND booleanExpression                   { Pi.And( Pi.BExp($1), Pi.BExp($3)) }
-          | booleanExpression AND ID                                  { Pi.Lt( (Pi.BExp($1), Pi.Id($3))) }
-          | ID AND booleanExpression                                  { Pi.Lt( (Pi.Id($1), Pi.BExp($3))) }
-          | ID AND ID                                                 { Pi.Lt( (Pi.Id($1), Pi.Id($3))) }
+          | booleanExpression AND ID                                  { Pi.And( (Pi.BExp($1), Pi.Id($3))) }
+          | ID AND booleanExpression                                  { Pi.And( (Pi.Id($1), Pi.BExp($3))) }
+          | ID AND ID                                                 { Pi.And( (Pi.Id($1), Pi.Id($3))) }
           | booleanExpression OR booleanExpression                    { Pi.Or( Pi.BExp($1), Pi.BExp($3)) }
-          | booleanExpression OR ID                                   { Pi.Lt( (Pi.BExp($1), Pi.Id($3))) }
-          | ID OR booleanExpression                                   { Pi.Lt( (Pi.Id($1), Pi.BExp($3))) }
-          | ID OR ID                                                  { Pi.Lt( (Pi.Id($1), Pi.Id($3))) }
+          | booleanExpression OR ID                                   { Pi.Or( (Pi.BExp($1), Pi.Id($3))) }
+          | ID OR booleanExpression                                   { Pi.Or( (Pi.Id($1), Pi.BExp($3))) }
+          | ID OR ID                                                  { Pi.Or( (Pi.Id($1), Pi.Id($3))) }
           | NEGATION LPAREN booleanExpression RPAREN                  { Pi.Not( Pi.BExp($3) )}
           | NEGATION LPAREN ID RPAREN                                 { Pi.Not( Pi.Id($3) )}
           | LPAREN booleanExpression RPAREN                           { $2 }

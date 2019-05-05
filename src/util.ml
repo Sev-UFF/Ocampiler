@@ -88,7 +88,7 @@ module Environment = Map.Make(String);;
 module Memory = Map.Make(struct type t = int let compare = compare end);;
 
 let string_of_dictionary func =
-  func;
+  func;;
   
 
 
