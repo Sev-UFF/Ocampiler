@@ -324,12 +324,19 @@ let rec evaluatePi controlStack valueStack environment memory =
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
               );
+              | Not(BExp(x)) -> (
+                (Stack.push (ExpOc(OPNOT)) controlStack);
+                (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+              );
+              | Not(Id(x)) -> (
+                (Stack.push (ExpOc(OPNOT)) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              );                                          
               | _ -> raise (AutomatonException "error boolean");
-            );
-  
-          
+            );       
           )
-      );
+
+        );
       
     evaluatePi controlStack valueStack environment memory;
   end else begin
