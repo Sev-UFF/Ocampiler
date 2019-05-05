@@ -1,0 +1,2 @@
+if (True) then x:=3 end
+if (5<4) then x:=3 else y:=4 end
