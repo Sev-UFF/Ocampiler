@@ -34,4 +34,4 @@ let () =
   and controlStack = (Stack.create()) and valueStack = (Stack.create()) 
   and environment =  Environment.empty and memory = Memory.empty in
       (Stack.push (Statement(tree)) controlStack);
-      Automaton.evaluatePi controlStack valueStack environment (Memory.add 24 (Automaton.Integer(9999)) memory);; 
+      Automaton.evaluatePi controlStack valueStack (Environment.add "x" (Automaton.Loc(24)) environment) (Memory.add 24 (Automaton.Integer(9999)) memory);; 

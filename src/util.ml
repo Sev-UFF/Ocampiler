@@ -80,15 +80,17 @@ and string_of_ctn ctn =
   
 (* Stacks *)
 and string_of_stack stack func = 
-"[ " ^ (String.concat ", " (List.map func (List.of_seq (Stack.to_seq stack))) ) ^ " ]"
+  "[ " ^ (String.concat ", " (List.map func (List.of_seq (Stack.to_seq stack))) ) ^ " ]"
 ;;
 
 (* Dictionaries *)
 module Environment = Map.Make(String);;
 module Memory = Map.Make(struct type t = int let compare = compare end);;
 
-let string_of_dictionary func =
-  func;;
+let string_of_dictionary fnc =
+  print_endline "{";
+  (fnc);
+  print_endline "}";;
   
 
 
