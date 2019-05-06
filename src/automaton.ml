@@ -39,6 +39,7 @@ let string_of_bindable_dictionary key value =
   print_string ("( " ^ key ^ ": " ^ (string_of_bindable value) ^ " )")
 
 let rec evaluatePi controlStack valueStack environment memory = 
+  
   if not(Stack.is_empty controlStack) then begin
 
     print_endline "Pilha de Controle:";
@@ -76,27 +77,32 @@ let rec evaluatePi controlStack valueStack environment memory =
           | AExp(aExp) -> (
               match aExp with 
               | Num(x) -> (
-                  (Stack.push (Int(x)) valueStack);
+                (Stack.push (Int(x)) valueStack);
+                evaluatePi controlStack valueStack environment memory;
                 );
               | Sum(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPSUM)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | Sum(Id(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPSUM)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               ); 
               | Sum(AExp(x), Id(y)) ->  (
                 (Stack.push (ExpOc(OPSUM)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               ); 
               | Sum(Id(x), Id(y)) ->  (
                 (Stack.push (ExpOc(OPSUM)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | Sum(_, _) -> raise (AutomatonException "error on sum");          
               
@@ -104,245 +110,335 @@ let rec evaluatePi controlStack valueStack environment memory =
                 (Stack.push (ExpOc(OPSUB)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | Sub(Id(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPSUB)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               ); 
               | Sub(AExp(x), Id(y)) ->  (
                 (Stack.push (ExpOc(OPSUB)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               ); 
               | Sub(Id(x), Id(y)) ->  (
                 (Stack.push (ExpOc(OPSUB)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               ); 
               | Sub(_, _) -> raise (AutomatonException "error on sub");
               | Mul(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPMUL)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | Mul(Id(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPMUL)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               ); 
               | Mul(AExp(x), Id(y)) ->  (
                 (Stack.push (ExpOc(OPMUL)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               ); 
               | Mul(Id(x), Id(y)) ->  (
                 (Stack.push (ExpOc(OPMUL)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               ); 
               | Mul(_, _) -> raise (AutomatonException "error on Mul");
               | Div(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPDIV)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | Div(Id(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPDIV)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               ); 
               | Div(AExp(x), Id(y)) ->  (
                 (Stack.push (ExpOc(OPDIV)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               ); 
               | Div(Id(x), Id(y)) ->  (
                 (Stack.push (ExpOc(OPDIV)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               ); 
               | Div(_, _) -> raise (AutomatonException "error on Div");     
-            );
+            )
           | BExp(bExp)-> ( 
             match bExp with 
               | Boo(x) -> (
                 (Stack.push (Bool(x)) valueStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | Eq(BExp(x), BExp(y)) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(BExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | Eq(BExp(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | Eq(Id(x), BExp(y)) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(BExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | Eq(Id(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );(* equals aritmetico *)
               | Eq(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | Eq(AExp(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | Eq(Id(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );(* fim equals aritmetico *)
+              | Eq(_, _) -> raise (AutomatonException "error on Equals"); 
               | Lt(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPLT)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | Lt(AExp(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPLT)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | Lt(Id(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPLT)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | Lt(Id(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPLT)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
+              | Lt(_, _) -> raise (AutomatonException "error on <"); 
               | Le(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPLE)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | Le(AExp(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPLE)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | Le(Id(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPLE)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | Le(Id(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPLE)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
+              | Le(_, _) -> raise (AutomatonException "error on Lowerequals =<");
               | Gt(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPGT)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | Gt(AExp(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPGT)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | Gt(Id(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPGT)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | Gt(Id(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPGT)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
+              | Gt(_, _) -> raise (AutomatonException "error on Greather than >");
               | Ge(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPGE)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | Ge(AExp(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPGE)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | Ge(Id(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPGE)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | Ge(Id(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPGE)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
+              | Ge(_, _) -> raise (AutomatonException "error on Greaterequals >=");
               | And(BExp(x), BExp(y)) -> (
                 (Stack.push (ExpOc(OPAND)) controlStack);
                 (Stack.push (Statement(Exp(BExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | And(BExp(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPAND)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | And(Id(x), BExp(y)) -> (
                 (Stack.push (ExpOc(OPAND)) controlStack);
                 (Stack.push (Statement(Exp(BExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | And(Id(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPAND)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
+              | And(_, _) -> raise (AutomatonException "error on And");
               | Or(BExp(x), BExp(y)) -> (
                 (Stack.push (ExpOc(OPOR)) controlStack);
                 (Stack.push (Statement(Exp(BExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | Or(BExp(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPOR)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | Or(Id(x), BExp(y)) -> (
                 (Stack.push (ExpOc(OPOR)) controlStack);
                 (Stack.push (Statement(Exp(BExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | Or(Id(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPOR)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
+              | Or(_, _) -> raise (AutomatonException "error on Or");
               | Not(BExp(x)) -> (
                 (Stack.push (ExpOc(OPNOT)) controlStack);
                 (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+                evaluatePi controlStack valueStack environment memory;
               );
               | Not(Id(x)) -> (
                 (Stack.push (ExpOc(OPNOT)) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-              );                                          
-              | _ -> raise (AutomatonException "error boolean");
+                evaluatePi controlStack valueStack environment memory;
+              );
+              | Not( _) -> raise (AutomatonException "error on Not");
+              
             );       
-          )
-
+          );
+        | Cmd(cmd) -> (
+          match cmd with 
+          | Loop(x, y) -> (
+            (Stack.push (CmdOc(OPLOOP)) controlStack);
+            (Stack.push (Statement(Exp(BExp(x)))) controlStack );
+            (*(Stack.push (Statement(Cmd(Loop(x, y)))) valueStack ); *)
+            evaluatePi controlStack valueStack environment memory;
+          );
+          | CSeq(x, y) -> (
+            (Stack.push (Statement(Cmd(y))) controlStack );
+            (Stack.push (Statement(Cmd(x))) controlStack );
+            evaluatePi controlStack valueStack environment memory;
+          );
+          | Assign(Id(x), y) -> (
+             (Stack.push (CmdOc(OPASSIGN)) controlStack );
+             (Stack.push (Statement(Exp(y))) controlStack );
+             (*(Stack.push (Stattement(Exp(Id(x)))) valueStack);*)
+             evaluatePi controlStack valueStack environment memory;
+          );
+          | Cond(x, y, z) -> (
+            (Stack.push (CmdOc(OPCOND)) controlStack);
+            (Stack.push (Statement(Exp(BExp(x)))) controlStack );
+            (*(Stack.push (Statement(Cmd(Cond(x, y, z)))) valueStack );*)
+            evaluatePi controlStack valueStack environment memory;
+          );
+          | Nop -> (
+            (Stack.pop controlStack);
+            evaluatePi controlStack valueStack environment memory;
+          );
         );
-      
+      );   
+    | ExpOc(expOc) -> (
+      print_endline "chegou em ExpOc"; 
+    );
+    
+    | CmdOc(cmdOc) -> (
+      print_endline "chegou em CmdOc";
+    );
+    print_endline "chegou aqui";
     evaluatePi controlStack valueStack environment memory;
   end else begin
     print_endline "End of Automaton Evaluation";
   end;;
-
+print_endline "\n--->>> BEGIN <<<---";
 (*
  let rec evaluatePi2 (controlStack : control list) (valueStack : control list) (enviroment : (string * int) list) (memory : (int * storable) list) =
 

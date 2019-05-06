@@ -1,1 +1,1 @@
-True == True
+if (True) then x:=2 end
