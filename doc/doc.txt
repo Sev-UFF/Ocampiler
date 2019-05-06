@@ -71,10 +71,10 @@ let rec test s1 s2 =
     module MyUsers = Map.Make(String);;
     let m = MyUsers.empty;;
     let m = MyUsers.add "fred" "sugarplums" m;;
-     let m = MyUsers.add "tom" "ilovelucy" m;;
-     let m = MyUsers.add "mark" "ocamlrules" m;;
-     let m = MyUsers.add "pete" "linux" m;;
+    let m = MyUsers.add "tom" "ilovelucy" m;;
+    let m = MyUsers.add "mark" "ocamlrules" m;;
+    let m = MyUsers.add "pete" "linux" m;;
 
-     let pm k v = k ^ ",  " ^ v;;
+    let pm k v = k ^ ",  " ^ v;;
 
     let a = MyUsers.map pm m;;

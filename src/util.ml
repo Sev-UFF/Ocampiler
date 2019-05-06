@@ -37,11 +37,11 @@ and string_of_expression expression =
 
 and string_of_command command = 
   match command with
-  | Loop(x, y) -> "LOOP (" ^ (string_of_boolean_expression x) ^ ", " ^ (string_of_command y) ^ ")"
+  | Loop(x, y) -> "LOOP (" ^ (string_of_expression x) ^ ", " ^ (string_of_command y) ^ ")"
   | CSeq(x, y) -> "CSEQ (" ^ (string_of_command x) ^ ", " ^ (string_of_command y) ^ ")"
   | Nop -> "NOP"
   | Assign(x, y) -> "ASSIGN (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
-  | Cond(x, y, z) -> "COND (" ^ (string_of_boolean_expression x) ^ ", " ^ (string_of_command y) ^ ", " ^ (string_of_command z) ^ ")"
+  | Cond(x, y, z) -> "COND (" ^ (string_of_expression x) ^ ", " ^ (string_of_command y) ^ ", " ^ (string_of_command z) ^ ")"
 
 
 and string_of_statement statement =

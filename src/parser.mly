@@ -27,10 +27,11 @@
           | cmd      {Pi.Cmd($1)}
         ;
         cmd:
-          LOOP booleanExpression DO cmd  END            { Pi.Loop($2, $4)}
-          | IF booleanExpression THEN cmd ELSE cmd END  { Pi.Cond($2, $4, $6)}
+          LOOP booleanExpression DO cmd  END            { Pi.Loop(Pi.BExp($2), $4)}
+          | LOOP ID DO cmd END                          { Pi.Loop(Pi.Id($2), $4)}
+          | IF booleanExpression THEN cmd ELSE cmd END  { Pi.Cond(Pi.BExp($2), $4, $6)}
           | IF ID THEN cmd ELSE cmd END                 { Pi.Cond(Pi.Id($2), $4, $6)}
-          | IF booleanExpression THEN cmd END           { Pi.Cond($2, $4, Pi.Nop)}
+          | IF booleanExpression THEN cmd END           { Pi.Cond(Pi.BExp($2), $4, Pi.Nop)}
           | IF ID THEN cmd END                          { Pi.Cond(Pi.Id($2), $4, Pi.Nop)}
           | ID ASSIGN expression                        { Pi.Assign(Pi.Id($1), $3) }
           | cmd  cmd                                    { Pi.CSeq($1, $2) }

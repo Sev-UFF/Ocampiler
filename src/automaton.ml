@@ -7,7 +7,7 @@ type valueStackOptions =
   | Int of int
   | Str of string
   | Bool of bool
-  | Loo of control;;
+  | Cmd_to_vstack of control;;
 
 type storable = 
   | Integer of int
@@ -21,7 +21,8 @@ let string_of_value_stack item =
   match item with
   | Int(x) -> string_of_int x
   | Str(x) -> x
-  | Bool(x) -> if x then "True" else "False";;
+  | Bool(x) -> if x then "True" else "False"
+  | Cmd_to_vstack (x) -> (string_of_ctn x);;
 
 let string_of_bindable bindable =
   match bindable with
@@ -55,7 +56,7 @@ let rec evaluatePi controlStack valueStack environment memory =
     print_string "{";
      (string_of_dictionary  ( Memory.iter string_of_storable_dictionary memory));
     print_string "}\n";
-    print_endline "#####################################################################################################################";
+    print_endline "#############################################################################################################################################################";
 
     let ctrl = (Stack.pop controlStack) in
       match ctrl with
@@ -398,10 +399,16 @@ let rec evaluatePi controlStack valueStack environment memory =
           );
         | Cmd(cmd) -> (
           match cmd with 
-          | Loop(x, y) -> (
+          | Loop( BExp(x), y) -> (
             (Stack.push (CmdOc(OPLOOP)) controlStack);
             (Stack.push (Statement(Exp(BExp(x)))) controlStack );
-            (Stack.push (Loo(Statement(Cmd(Loop(x, y))))) valueStack ); 
+            (Stack.push (Cmd_to_vstack(Statement(Cmd(Loop(BExp(x), y))))) valueStack ); 
+            evaluatePi controlStack valueStack environment memory;
+          );
+          | Loop(Id(x), y) -> (
+            (Stack.push (CmdOc(OPLOOP)) controlStack);
+            (Stack.push (Statement(Exp(Id(x)))) controlStack );
+            (Stack.push (Cmd_to_vstack(Statement(Cmd(Loop(Id(x), y))))) valueStack );
             evaluatePi controlStack valueStack environment memory;
           );
           | CSeq(x, y) -> (
@@ -412,13 +419,19 @@ let rec evaluatePi controlStack valueStack environment memory =
           | Assign(Id(x), y) -> (
              (Stack.push (CmdOc(OPASSIGN)) controlStack );
              (Stack.push (Statement(Exp(y))) controlStack );
-             (*(Stack.push (Stattement(Exp(Id(x)))) valueStack);*)
+             (Stack.push (Cmd_to_vstack(Statement(Exp(Id(x))))) valueStack);
              evaluatePi controlStack valueStack environment memory;
           );
-          | Cond(x, y, z) -> (
+          | Cond(BExp(x), y, z) -> (
             (Stack.push (CmdOc(OPCOND)) controlStack);
             (Stack.push (Statement(Exp(BExp(x)))) controlStack );
-            (*(Stack.push (Statement(Cmd(Cond(x, y, z)))) valueStack );*)
+            (Stack.push (Cmd_to_vstack(Statement(Cmd(Cond(BExp(x), y, z))))) valueStack );
+            evaluatePi controlStack valueStack environment memory;
+          );
+          | Cond(Id(x), y, z) -> (
+            (Stack.push (CmdOc(OPCOND)) controlStack);
+            (Stack.push (Statement(Exp(Id(x)))) controlStack );
+            (Stack.push (Cmd_to_vstack(Statement(Cmd(Cond(Id(x), y, z))))) valueStack );
             evaluatePi controlStack valueStack environment memory;
           );
           | Nop -> (
@@ -439,7 +452,7 @@ let rec evaluatePi controlStack valueStack environment memory =
   end else begin
     print_endline "End of Automaton Evaluation";
   end;;
-print_endline "\n--->>> BEGIN <<<---";
+print_endline "\n---------->>>>>  |||BEGIN|||  <<<<<----------\n";
 (*
  let rec evaluatePi2 (controlStack : control list) (valueStack : control list) (enviroment : (string * int) list) (memory : (int * storable) list) =
 

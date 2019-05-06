@@ -24,11 +24,11 @@
   
 
   and command = 
-    | Loop of booleanExpression * command
+    | Loop of expression * command
     | CSeq of command * command
     | Nop
     | Assign of expression * expression
-    | Cond of booleanExpression * command * command
+    | Cond of expression * command * command
 
 
   and statement = 
