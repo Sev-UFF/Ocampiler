@@ -6,7 +6,8 @@ exception AutomatonException of string;;
 type valueStackOptions = 
   | Int of int
   | Str of string
-  | Bool of bool;;
+  | Bool of bool
+  | Loo of control;;
 
 type storable = 
   | Integer of int
@@ -400,7 +401,7 @@ let rec evaluatePi controlStack valueStack environment memory =
           | Loop(x, y) -> (
             (Stack.push (CmdOc(OPLOOP)) controlStack);
             (Stack.push (Statement(Exp(BExp(x)))) controlStack );
-            (*(Stack.push (Statement(Cmd(Loop(x, y)))) valueStack ); *)
+            (Stack.push (Loo(Statement(Cmd(Loop(x, y))))) valueStack ); 
             evaluatePi controlStack valueStack environment memory;
           );
           | CSeq(x, y) -> (
