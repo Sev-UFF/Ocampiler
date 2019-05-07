@@ -563,7 +563,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                 let y = (Stack.pop valueStack) in
                 match y with
                   | Bool(j) -> (
-                    (Stack.push (Bool(i < j)) valueStack);
+                    (Stack.push (Bool(j < i)) valueStack);
                     
                   );
                   | _ -> raise (AutomatonException "erro on #OPLT");
@@ -572,7 +572,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                 let y = (Stack.pop valueStack) in
                 match y with
                   | Int(j) -> (
-                    (Stack.push ( Bool ( i < j)) valueStack);
+                    (Stack.push ( Bool ( j < i)) valueStack);
                     
                   );
                   | _ -> raise (AutomatonException "erro on #OPLT");
@@ -586,7 +586,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                 let y = (Stack.pop valueStack) in
                 match y with
                   | Bool(j) -> (
-                    (Stack.push (Bool(i <= j)) valueStack);
+                    (Stack.push (Bool(j <= i)) valueStack);
                     
                   );
                   | _ -> raise (AutomatonException "erro on #EQ");
@@ -595,7 +595,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                 let y = (Stack.pop valueStack) in
                 match y with
                   | Int(j) -> (
-                    (Stack.push ( Bool ( i >= j)) valueStack);
+                    (Stack.push ( Bool ( j <= i)) valueStack);
                     
                   );
                   | _ -> raise (AutomatonException "erro on #EQ");
@@ -609,7 +609,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                 let y = (Stack.pop valueStack) in
                 match y with
                   | Bool(j) -> (
-                    (Stack.push (Bool(i > j)) valueStack);
+                    (Stack.push (Bool(j > i)) valueStack);
                     
                   );
                   | _ -> raise (AutomatonException "erro on #EQ");
@@ -618,7 +618,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                 let y = (Stack.pop valueStack) in
                 match y with
                   | Int(j) -> (
-                    (Stack.push ( Bool ( i > j)) valueStack);
+                    (Stack.push ( Bool ( j > i)) valueStack);
                     
                   );
                   | _ -> raise (AutomatonException "erro on #EQ");
@@ -632,7 +632,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                 let y = (Stack.pop valueStack) in
                 match y with
                   | Bool(j) -> (
-                    (Stack.push (Bool(i >= j)) valueStack);
+                    (Stack.push (Bool(j >= i)) valueStack);
                     
                   );
                   | _ -> raise (AutomatonException "erro on #EQ");
@@ -641,12 +641,21 @@ let rec evaluatePi controlStack valueStack environment memory =
                 let y = (Stack.pop valueStack) in
                 match y with
                   | Int(j) -> (
-                    (Stack.push ( Bool ( i >= j)) valueStack);
+                    (Stack.push ( Bool ( j >= i)) valueStack);
                     
                   );
                   | _ -> raise (AutomatonException "erro on #EQ");
               );
               | _ -> raise (AutomatonException "erro on #EQ");
+            );
+        | OPNOT -> (
+          let x = (Stack.pop valueStack) in
+            match x with
+              | Bool(i) -> (
+                (Stack.push (Bool(not(i))) valueStack);
+              );
+              
+              | _ -> raise (AutomatonException "erro on #NOT");
             );                                                                      
       );
       | CmdOc(cmdOc) -> (
