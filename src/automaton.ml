@@ -26,7 +26,7 @@ let string_of_value_stack item =
 
 let string_of_bindable bindable =
   match bindable with
-  | Loc(x) -> "LOC (" ^ (string_of_int x) ^ ")"
+  | Loc(x) -> "LOC [" ^ (string_of_int x) ^ "]"
   | Value(x) -> "VALUE (" ^ (string_of_int x) ^ ")";;
 
 let string_of_storable storable =
@@ -35,26 +35,39 @@ let string_of_storable storable =
   | Boolean(x) -> if x then "True" else "False";;
 
 let string_of_storable_dictionary key value =
-  print_string ("\t( " ^ (string_of_int key) ^ ": " ^ (string_of_storable value) ^ " )\n")
+  print_string ("   (   [" ^ (string_of_int key) ^ "]: " ^ (string_of_storable value) ^ "   )")
 
 let string_of_bindable_dictionary key value =
-  print_string ("\t( " ^ key ^ ": " ^ (string_of_bindable value) ^ " )\n")
+  print_string ("   ( " ^ key ^ ": " ^ (string_of_bindable value) ^ " )")
 
 let rec evaluatePi controlStack valueStack environment memory = 
-  
-  if not(Stack.is_empty controlStack) then begin
 
+  print_endline "Ambiente:";
+  print_string "{";
+  (string_of_dictionary  (Environment.iter string_of_bindable_dictionary environment));
+  print_string "}\n";
+  print_endline "Memória:";
+  print_string "{";
+  (string_of_dictionary  ( Memory.iter string_of_storable_dictionary memory));
+  print_string "}\n";
+  print_endline "Pilha de Valor:";
+  print_endline (string_of_stack valueStack string_of_value_stack);
+  if not(Stack.is_empty controlStack) then begin
     print_endline "Pilha de Controle:";
     print_endline (string_of_stack controlStack string_of_ctn);
-    print_endline "Pilha de Valor:";
+    print_endline "*****************************************************************************************************************";
+    (*print_endline "Pilha de Valor:";
     print_endline (string_of_stack valueStack string_of_value_stack);
     print_endline "Ambiente:";
-    string_of_dictionary ( fun _ -> Environment.iter string_of_bindable_dictionary environment);
+    print_string "{";
+    (string_of_dictionary  (Environment.iter string_of_bindable_dictionary environment));
+    print_string "}\n";
     print_endline "Memória:";
-    print_endline "{";
-     Memory.iter string_of_storable_dictionary memory;
-     print_endline "}";
-    print_endline "#############################################################################################################################################################";
+    print_string "{";
+    (string_of_dictionary  ( Memory.iter string_of_storable_dictionary memory));
+    print_string "}";
+    print_endline "#############################################################################################################################################################";*)
+
 
     let ctrl = (Stack.pop controlStack) in
       (match ctrl with
@@ -436,7 +449,205 @@ let rec evaluatePi controlStack valueStack environment memory =
         );
       );   
       | ExpOc(expOc) -> (
-        print_endline "chegou em ExpOc"; 
+        match expOc with
+        | OPSUM -> (
+          let x = (Stack.pop valueStack) in
+            match x with
+              | Int(i) -> (
+                let y = (Stack.pop valueStack) in
+                match y with
+                  | Int(j) -> (
+                    (Stack.push (Int(i + j)) valueStack);
+                    
+                  );
+                  | _ -> raise (AutomatonException "error on #SUM");
+              );
+            );
+          
+        | OPMUL -> (
+          let x = (Stack.pop valueStack) in
+            match x with
+              | Int(i) -> (
+                let y = (Stack.pop valueStack) in
+                match y with
+                  | Int(j) -> (
+                    (Stack.push (Int(i * j)) valueStack);
+                    
+                  );
+                  | _ -> raise (AutomatonException "error on #MUL");
+              );
+            );
+          
+        | OPDIV -> (
+          let x = (Stack.pop valueStack) in
+            match x with
+              | Int(i) -> (
+                let y = (Stack.pop valueStack) in
+                match y with
+                  | Int(j) -> (
+                    (Stack.push (Int(i / j)) valueStack);
+                    
+                  )
+                  | _ -> raise (AutomatonException "erro on #DIV");
+              );
+            );
+          
+        | OPSUB -> (
+          let x = (Stack.pop valueStack) in
+            match x with
+              | Int(i) -> (
+                let y = (Stack.pop valueStack) in
+                match y with
+                  | Int(j) -> (
+                    (Stack.push (Int(i - j)) valueStack);
+                    
+                  );
+                  | _ -> raise (AutomatonException "erro on #SUB");
+              );
+            );
+        | OPEQ -> (
+          let x = (Stack.pop valueStack) in
+            match x with
+              | Bool(i) -> (
+                let y = (Stack.pop valueStack) in
+                match y with
+                  | Bool(j) -> (
+                    (Stack.push (Bool(i == j)) valueStack);
+                    
+                  );
+                  | _ -> raise (AutomatonException "erro on #EQ");
+              );
+              | Int(i) -> (
+                let y = (Stack.pop valueStack) in
+                match y with
+                  | Int(j) -> (
+                    (Stack.push ( Bool ( i == j)) valueStack);
+                    
+                  );
+                  | _ -> raise (AutomatonException "erro on #EQ");
+              );
+              | _ -> raise (AutomatonException "erro on #EQ");
+            );
+        | OPAND -> (
+          let x = (Stack.pop valueStack) in
+            match x with
+              | Bool(i) -> (
+                let y = (Stack.pop valueStack) in
+                match y with
+                  | Bool(j) -> (
+                    (Stack.push (Bool(i && j)) valueStack);
+                    
+                  );
+                  | _ -> raise (AutomatonException "erro on #AND");
+              );
+              | _ -> raise (AutomatonException "erro on #AND");
+            );
+        | OPOR -> (
+          let x = (Stack.pop valueStack) in
+            match x with
+              | Bool(i) -> (
+                let y = (Stack.pop valueStack) in
+                match y with
+                  | Bool(j) -> (
+                    (Stack.push (Bool(i || j)) valueStack);
+                    
+                  );
+                  | _ -> raise (AutomatonException "erro on #OR");
+              );
+              | _ -> raise (AutomatonException "erro on #OR");
+            );
+        | OPLT -> (
+          let x = (Stack.pop valueStack) in
+            match x with
+              | Bool(i) -> (
+                let y = (Stack.pop valueStack) in
+                match y with
+                  | Bool(j) -> (
+                    (Stack.push (Bool(i < j)) valueStack);
+                    
+                  );
+                  | _ -> raise (AutomatonException "erro on #OPLT");
+              );
+              | Int(i) -> (
+                let y = (Stack.pop valueStack) in
+                match y with
+                  | Int(j) -> (
+                    (Stack.push ( Bool ( i < j)) valueStack);
+                    
+                  );
+                  | _ -> raise (AutomatonException "erro on #OPLT");
+              );
+              | _ -> raise (AutomatonException "erro on #OPLT");
+            );
+        | OPLE -> (
+          let x = (Stack.pop valueStack) in
+            match x with
+              | Bool(i) -> (
+                let y = (Stack.pop valueStack) in
+                match y with
+                  | Bool(j) -> (
+                    (Stack.push (Bool(i <= j)) valueStack);
+                    
+                  );
+                  | _ -> raise (AutomatonException "erro on #EQ");
+              );
+              | Int(i) -> (
+                let y = (Stack.pop valueStack) in
+                match y with
+                  | Int(j) -> (
+                    (Stack.push ( Bool ( i >= j)) valueStack);
+                    
+                  );
+                  | _ -> raise (AutomatonException "erro on #EQ");
+              );
+              | _ -> raise (AutomatonException "erro on #EQ");
+            );
+        | OPGT -> (
+          let x = (Stack.pop valueStack) in
+            match x with
+              | Bool(i) -> (
+                let y = (Stack.pop valueStack) in
+                match y with
+                  | Bool(j) -> (
+                    (Stack.push (Bool(i > j)) valueStack);
+                    
+                  );
+                  | _ -> raise (AutomatonException "erro on #EQ");
+              );
+              | Int(i) -> (
+                let y = (Stack.pop valueStack) in
+                match y with
+                  | Int(j) -> (
+                    (Stack.push ( Bool ( i > j)) valueStack);
+                    
+                  );
+                  | _ -> raise (AutomatonException "erro on #EQ");
+              );
+              | _ -> raise (AutomatonException "erro on #EQ");
+            );
+        | OPGE -> (
+          let x = (Stack.pop valueStack) in
+            match x with
+              | Bool(i) -> (
+                let y = (Stack.pop valueStack) in
+                match y with
+                  | Bool(j) -> (
+                    (Stack.push (Bool(i >= j)) valueStack);
+                    
+                  );
+                  | _ -> raise (AutomatonException "erro on #EQ");
+              );
+              | Int(i) -> (
+                let y = (Stack.pop valueStack) in
+                match y with
+                  | Int(j) -> (
+                    (Stack.push ( Bool ( i >= j)) valueStack);
+                    
+                  );
+                  | _ -> raise (AutomatonException "erro on #EQ");
+              );
+              | _ -> raise (AutomatonException "erro on #EQ");
+            );                                                                      
       );
       | CmdOc(cmdOc) -> (
         match cmdOc with 
@@ -471,224 +682,11 @@ let rec evaluatePi controlStack valueStack environment memory =
         | OPCOND -> (
 
         );
-      ););
-    evaluatePi controlStack valueStack environment memory;
-    
-  end else begin
-    print_endline "End of Automaton Evaluation";
-    (* printar memorias no final *)
-  end;;
-(*
- let rec evaluatePi2 (controlStack : control list) (valueStack : control list) (enviroment : (string * int) list) (memory : (int * storable) list) =
-
-  print_endline "Pilha de Controle:";
-  print_endline (string_of_pi_list controlStack);
-  print_endline "Pilha de Valor:";
-  print_endline (string_of_pi_list valueStack);
-  print_endline "#####################################################################################################################";
-
-
-  match controlStack with 
-    | Statement(sta)::tl -> (
-      match sta with
-      | Exp (exp) -> (
-        match exp with 
-        | Id(id) -> ();
-        | AExp(aExp) -> (
-          match aExp with 
-          | Num(x) -> evaluatePi (List.tl controlStack) ((List.hd controlStack)::valueStack) enviroment memory;
-          | Sum(AExp(x), AExp(y)) ->  evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPSUM)::(List.tl controlStack))  ( valueStack ) enviroment memory
-          | Sum(Id(x), AExp(y)) -> evaluatePi  (Statement(Exp(Id(x)))::Statement(Exp(AExp(y)))::ExpOc(OPSUM)::(List.tl controlStack))  ( valueStack ) enviroment memory
-          | Sum(AExp(x), Id(y)) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(Id(y)))::ExpOc(OPSUM)::(List.tl controlStack))  ( valueStack ) enviroment memory
-          | Sum(Id(x), Id(y)) -> evaluatePi  (Statement(Exp(Id(x)))::Statement(Exp(Id(y)))::ExpOc(OPSUM)::(List.tl controlStack))  ( valueStack ) enviroment memory
-          | Sum(_, _) -> raise (AutomatonException "error on sum");
-          | Sub(x, y) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPSUB)::(List.tl controlStack))  ( valueStack ) enviroment memory
-          | Mul(x, y) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPMUL)::(List.tl controlStack))  ( valueStack ) enviroment memory
-          | Div(x, y) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPDIV)::(List.tl controlStack))  ( valueStack ) enviroment memory
-        );
-        | BExp(bExp) -> (
-          match bExp with 
-          | Boo(x) -> evaluatePi (List.tl controlStack) ((List.hd controlStack)::valueStack) enviroment memory;
-          | Eq(x, y) -> evaluatePi  (Statement(Exp(x))::Statement(Exp(y))::ExpOc(OPEQ)::(List.tl controlStack))  ( valueStack ) enviroment memory
-          | Lt(x, y) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPLT)::(List.tl controlStack))  ( valueStack ) enviroment memory
-          | Le(x, y) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPLE)::(List.tl controlStack))  ( valueStack ) enviroment memory
-          | Gt(x, y) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPGT)::(List.tl controlStack))  ( valueStack ) enviroment memory
-          | Ge(x, y) -> evaluatePi  (Statement(Exp(AExp(x)))::Statement(Exp(AExp(y)))::ExpOc(OPGE)::(List.tl controlStack))  ( valueStack ) enviroment memory
-          | And(x, y) -> evaluatePi  (Statement(Exp(BExp(x)))::Statement(Exp(BExp(y)))::ExpOc(OPAND)::(List.tl controlStack))  ( valueStack ) enviroment memory
-          | Or(x, y) -> evaluatePi  (Statement(Exp(BExp(x)))::Statement(Exp(BExp(y)))::ExpOc(OPOR)::(List.tl controlStack))  ( valueStack ) enviroment memory
-          | Not(x) -> evaluatePi  (Statement(Exp(BExp(x)))::ExpOc(OPNOT)::(List.tl controlStack))  ( valueStack ) enviroment memory
-        );
-      );
-      | Cmd(cmd) -> (
-        match cmd with 
-        | Loop(x, y) -> evaluatePi  (Statement(Exp(BExp(x)))::CmdOc(OPLOOP)::(List.tl controlStack))  (Statement(Cmd(Loop(x, y)))::valueStack ) enviroment memory
-        | CSeq(x, y) -> evaluatePi  (Statement(Cmd(x))::Statement(Cmd(y))::(List.tl controlStack))  ( valueStack ) enviroment memory
-        | Assign(x, y) -> evaluatePi  (Statement(Exp(y))::CmdOc(OPASSIGN)::(List.tl controlStack))  ( Statement(Exp(x))::valueStack ) enviroment memory
-        | Cond(x, y, z) -> evaluatePi  (Statement(Exp(BExp(x)))::CmdOc(OPCOND)::(List.tl controlStack))  (Statement(Cmd(Cond(x, y, z)))::valueStack ) enviroment memory
-        | Nop -> evaluatePi  (List.tl controlStack) (valueStack) enviroment memory
-      );
-    )
-    | ExpOc(expOc)::tl -> (
-      match expOc with 
-      | OPSUM -> (
-        match valueStack with
-        | Statement(Exp(AExp(Num(x))))::tl -> (
-          match tl with 
-          |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
-            evaluatePi (List.tl controlStack) ( Statement(Exp(AExp(Num(x + y)))) :: tl2 ) enviroment memory
-          );
-          | _ -> raise (AutomatonException "error on opsum")
-        )
-        | _ -> raise (AutomatonException "error on opsum");
-
-      );
-      | OPMUL -> (
-        match valueStack with
-        | Statement(Exp(AExp(Num(x))))::tl -> (
-          match tl with 
-          |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
-            evaluatePi (List.tl controlStack) ( Statement(Exp(AExp(Num(x * y)))) :: tl2 ) enviroment memory
-          );
-          | _ -> raise (AutomatonException "error on opmul")
-        )
-        | _ -> raise (AutomatonException "error on opmul");
-
-      );
-      | OPSUB -> (
-        match valueStack with
-        | Statement(Exp(AExp(Num(x))))::tl -> (
-          match tl with 
-          |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
-            evaluatePi (List.tl controlStack) ( Statement(Exp(AExp(Num(y - x)))) :: tl2 ) enviroment memory
-          );
-          | _ -> raise (AutomatonException "error on opsub")
-        )
-        | _ -> raise (AutomatonException "error on opsub");
-
-      );
-      | OPDIV -> (
-        match valueStack with
-        | Statement(Exp(AExp(Num(x))))::tl -> (
-          match tl with 
-          |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
-            evaluatePi (List.tl controlStack) ( Statement(Exp(AExp(Num(y / x)))) :: tl2 ) enviroment memory
-          );
-          | _ -> raise (AutomatonException "error on opdiv")
-        )
-        | _ -> raise (AutomatonException "error on opdiv");
-      );
-      | OPEQ -> (
-        match valueStack with
-        | Statement(Exp(AExp(Num(x))))::tl -> (
-          match tl with 
-          |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
-            evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y == x)))) :: tl2 ) enviroment memory
-          );
-          | _ -> raise (AutomatonException "error on opeq")
-        )
-        | _ -> raise (AutomatonException "error on opeq");
-
-      );
-      | OPLT -> (
-        match valueStack with
-        | Statement(Exp(AExp(Num(x))))::tl -> (
-          match tl with 
-          |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
-            evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y < x)))) :: tl2 ) enviroment memory
-          );
-          | _ -> raise (AutomatonException "error on oplt")
-        )
-        | _ -> raise (AutomatonException "error on oplt");
-
-      );
-      | OPLE -> (
-        match valueStack with
-        | Statement(Exp(AExp(Num(x))))::tl -> (
-          match tl with 
-          |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
-            evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y <= x)))) :: tl2 ) enviroment memory
-          );
-          | _ -> raise (AutomatonException "error on ople")
-        )
-        | _ -> raise (AutomatonException "error on opsle");
-
-      );
-      | OPGT -> (
-        match valueStack with
-        | Statement(Exp(AExp(Num(x))))::tl -> (
-          match tl with 
-          |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
-            evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y > x)))) :: tl2 ) enviroment memory
-          );
-          | _ -> raise (AutomatonException "error on opgt")
-        )
-        | _ -> raise (AutomatonException "error on opgt");
-
-      );
-      | OPGE -> (
-        match valueStack with
-        | Statement(Exp(AExp(Num(x))))::tl -> (
-          match tl with 
-          |  Statement(Exp(AExp(Num(y))))::tl2 -> ( 
-            evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y >= x)))) :: tl2 ) enviroment memory
-          );
-          | _ -> raise (AutomatonException "error on opge")
-        )
-        | _ -> raise (AutomatonException "error on opge");
-
-      );
-      | OPAND -> (
-        match valueStack with
-        | Statement(Exp(BExp(Boo(x))))::tl -> (
-          match tl with 
-          |  Statement(Exp(BExp(Boo(y))))::tl2 -> ( 
-            evaluatePi (List.tl controlStack) ( Statement(Exp(BExp (Boo(y && x)))) :: tl2 ) enviroment memory
-          );
-          | _ -> raise (AutomatonException "error on opand")
-        )
-        | _ -> raise (AutomatonException "error on opand");
-      );
-      | OPOR -> (
-        match valueStack with
-        | Statement(Exp(BExp(Boo(x))))::tl -> (
-          match tl with 
-          |  Statement(Exp(BExp(Boo(y))))::tl2 -> ( 
-            evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(y || x)))) :: tl2 ) enviroment memory
-          );
-          | _ -> raise (AutomatonException "error on opor")
-        )
-        | _ -> raise (AutomatonException "error on opor");
-      );
-      | OPNOT -> (
-        match valueStack with
-          Statement(Exp(BExp(Boo(x))))::tl -> evaluatePi (List.tl controlStack) ( Statement(Exp(BExp(Boo(not (x))))) :: tl ) enviroment memory
-        | _ -> raise (AutomatonException "error on opnot");
       );
     );
-    | CmdOc(cmdOc)::tl -> (
-      match cmdOc with 
-      | OPASSIGN -> print_endline "teste"; print_endline "OPASSIGN";
-      | OPLOOP -> (
-        match valueStack with
-        | Statement(Exp(BExp(Boo(x))))::tl -> (
-          match tl with 
-          |  Statement(Cmd(Loop(y, z)))::tl2 -> ( 
-            if x == true then (evaluatePi (Statement(Cmd(z)) :: Statement(Cmd(Loop(y, z))) :: (List.tl controlStack)) (tl2)  enviroment memory) else (evaluatePi (List.tl controlStack) (tl2) enviroment memory)
-          );
-          | _ -> raise (AutomatonException "error on oploop")
-        )
-        | _ -> raise (AutomatonException "error on oploop");
-      );
-      | OPCOND -> (
-        match valueStack with
-        | Statement(Exp(BExp(Boo(x))))::tl -> (
-          match tl with 
-          |  Statement(Cmd(Cond(y, z, w)))::tl2 -> ( 
-            if x == true then (evaluatePi (Statement(Cmd(z)) :: (List.tl controlStack)) (tl2) enviroment memory) else (evaluatePi (Statement(Cmd(w)) :: (List.tl controlStack)) (tl2) enviroment memory)
-          );
-          | _ -> raise (AutomatonException "error on opcond")
-        )
-        | _ -> raise (AutomatonException "error on opcond");
-      );
-    )
-    | [] -> print_endline "Process Finished";; *)
+    evaluatePi controlStack valueStack environment memory;
+  end else begin
+    print_endline "\nEnd of Automaton Evaluation";
+    (* printar memorias no final *)
+    
+  end;;
