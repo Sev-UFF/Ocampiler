@@ -1,2 +1,2 @@
 y := True
-if (True) then x:=3 else x:=99 end
+if (y) then x:=3 else x:=99 end

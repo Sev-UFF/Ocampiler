@@ -17,22 +17,22 @@
         /* %type <Pi.declaration> declaration */
         %type <Pi.arithmeticExpression> arithmeticExpression
         %type <Pi.booleanExpression> booleanExpression
-        %type <Pi.command> cmd
+        %type <Pi.command> command
         %%
         main:
             statement EOF     { $1 }
         ;
         statement:
           expression { Pi.Exp($1)}
-          | cmd      {Pi.Cmd($1)}
+          | command      {Pi.Cmd($1)}
         ;
-        cmd:
-          LOOP expression DO cmd  END            { Pi.Loop(($2), $4)}
-          | IF expression THEN cmd ELSE cmd END  { Pi.Cond(($2), $4, $6)}
-          | IF expression THEN cmd END           { Pi.Cond(($2), $4, Pi.Nop)}
+        command:
+          LOOP expression DO command  END            { Pi.Loop(($2), $4)}
+          | IF expression THEN command ELSE command END  { Pi.Cond(($2), $4, $6)}
+          | IF expression THEN command END           { Pi.Cond(($2), $4, Pi.Nop)}
           | ID ASSIGN expression                        { Pi.Assign(Pi.Id($1), $3) }
-          | cmd  cmd                                    { Pi.CSeq($1, $2) }
-          | LPAREN cmd RPAREN                     { $2 }
+          | command  command                                    { Pi.CSeq($1, $2) }
+          | LPAREN command RPAREN                     { $2 }
 
         ;
         expression: 
