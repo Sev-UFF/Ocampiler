@@ -31,7 +31,11 @@ install:
 	sudo add-apt-repository ppa:avsm/ppa
 	sudo apt update
 	sudo apt install opam
+	$(MAKE) update
 	$(MAKE) run
+
+update:
+	eval 'opam env'
 
 # Building the world
 run: depend $(EXEC)
