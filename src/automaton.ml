@@ -34,40 +34,36 @@ let string_of_storable storable =
   | Integer(x) ->  (string_of_int x) 
   | Boolean(x) -> if x then "True" else "False";;
 
-let string_of_storable_dictionary key value =
-  print_string ("   (   [" ^ (string_of_int key) ^ "]: " ^ (string_of_storable value) ^ "   )")
+let string_of_storable_dictionary (key, value) =
+  match (key, value) with
+  | (int, storable) -> "\t( [" ^ (string_of_int key) ^ "]: " ^ (string_of_storable value) ^ " )"
+  | _ -> "Undefined";;
 
-let string_of_bindable_dictionary key value =
-  print_string ("   ( " ^ key ^ ": " ^ (string_of_bindable value) ^ " )")
+let string_of_bindable_dictionary (key, value) =
+  match (key, value) with
+  | (string, bindable) -> "\t( " ^ key ^ ": " ^ (string_of_bindable value) ^ " )"
+  | _ -> "Undefined";;
+
+
+let print_stacks controlStack valueStack = 
+  print_endline "Pilha de Controle:";
+  print_endline (string_of_stack controlStack string_of_ctn);
+  print_endline "Pilha de Valor:";
+  print_endline (string_of_stack valueStack string_of_value_stack);;
+
+let print_dictionaries environment memory = 
+  print_endline "Ambiente:";
+  print_endline (string_of_dictionary environment string_of_bindable_dictionary);
+  print_endline "Memória:";
+  print_endline (string_of_dictionary memory string_of_storable_dictionary);;
 
 let rec evaluatePi controlStack valueStack environment memory = 
 
-  print_endline "Ambiente:";
-  print_string "{";
-  (string_of_dictionary  (Environment.iter string_of_bindable_dictionary environment));
-  print_string "}\n";
-  print_endline "Memória:";
-  print_string "{";
-  (string_of_dictionary  ( Memory.iter string_of_storable_dictionary memory));
-  print_string "}\n";
-  print_endline "Pilha de Valor:";
-  print_endline (string_of_stack valueStack string_of_value_stack);
   if not(Stack.is_empty controlStack) then begin
-    print_endline "Pilha de Controle:";
-    print_endline (string_of_stack controlStack string_of_ctn);
-    print_endline "*****************************************************************************************************************";
-    (*print_endline "Pilha de Valor:";
-    print_endline (string_of_stack valueStack string_of_value_stack);
-    print_endline "Ambiente:";
-    print_string "{";
-    (string_of_dictionary  (Environment.iter string_of_bindable_dictionary environment));
-    print_string "}\n";
-    print_endline "Memória:";
-    print_string "{";
-    (string_of_dictionary  ( Memory.iter string_of_storable_dictionary memory));
-    print_string "}";
-    print_endline "#############################################################################################################################################################";*)
-
+    
+    print_stacks controlStack valueStack;
+    print_dictionaries environment memory;
+    print_endline "------------------------------------------------------------------------------------------------------------";
 
     let ctrl = (Stack.pop controlStack) in
       (match ctrl with
@@ -76,11 +72,11 @@ let rec evaluatePi controlStack valueStack environment memory =
         | Exp (exp) -> (
           match exp with 
           | Id(id) -> (
-            let key = Environment.find id environment in
+            let key = Hashtbl.find environment id  in
               match key with 
                 | Value(x) -> ();
                 | Loc(x) -> (
-                  let value = Memory.find x memory in
+                  let value = Hashtbl.find memory x  in
                     match value with
                     | Integer(x) ->   (Stack.push (Int(x)) valueStack);
                     | Boolean(x) ->  (Stack.push (Bool(x)) valueStack);
@@ -665,15 +661,15 @@ let rec evaluatePi controlStack valueStack environment memory =
             let id = (Stack.pop valueStack) in 
               match id with 
               | Str(x) -> (
-                let env = (Environment.find x environment) in
+                let env = (Hashtbl.find environment x ) in
                   match env with 
                   | Loc(l) -> (
                     match value with
                     | Int(i) -> (
-                      evaluatePi controlStack valueStack environment (Memory.update l (fun _ -> Some (Integer(i)))  memory);
+                      (Hashtbl.replace memory l (Integer(i)));
                     );
                     | Bool(b) -> (
-                      evaluatePi controlStack valueStack environment (Memory.update l (fun _ -> Some (Boolean(b))) memory);
+                      (Hashtbl.replace memory l (Boolean(b)));
                     );
                     | _ -> raise (AutomatonException "erro on #assign")
                     
@@ -695,7 +691,7 @@ let rec evaluatePi controlStack valueStack environment memory =
     );
     evaluatePi controlStack valueStack environment memory;
   end else begin
-    print_endline "\nEnd of Automaton Evaluation";
-    (* printar memorias no final *)
+    print_endline "\nFim da execução do autômato\n";
+    print_dictionaries environment memory;
     
   end;;

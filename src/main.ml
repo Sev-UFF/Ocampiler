@@ -31,14 +31,23 @@ let () =
   print_endline !fileContents;
 
   let tree = Parser.main Lexer.token (Lexing.from_string !fileContents) 
-  and controlStack = (Stack.create()) and valueStack = (Stack.create()) 
-  and environment =  Environment.empty and memory = Memory.empty  in
+  and controlStack = (Stack.create()) 
+  and valueStack = (Stack.create()) 
+  and environment = (Hashtbl.create 10)
+  and memory = (Hashtbl.create 10)  in
         (Stack.push (Statement(tree)) controlStack);
         (*inicialização de y*)
-        let environment = (Environment.add "y" (Automaton.Loc(23)) environment) in 
-        let memory = (Memory.add 23 (Automaton.Integer(19)) memory) in
+        (Hashtbl.add environment "y" (Automaton.Loc(23)) );
+        (Hashtbl.add  memory 23 (Automaton.Integer(19)) );
         (*inicialização de z*)
-        let environment = (Environment.add "z" (Automaton.Loc(1)) environment) in 
-        let memory = (Memory.add 1 (Automaton.Integer(77)) memory) in
-        (*inicialização de x direto no argumento*)
-        Automaton.evaluatePi controlStack valueStack (Environment.add "x" (Automaton.Loc(24)) environment )  (Memory.add 24 (Automaton.Integer(13)) memory);;
+         (Hashtbl.add environment "z" (Automaton.Loc(1)) );
+        (Hashtbl.add memory 1 (Automaton.Integer(77)) );
+        (*inicialização de x *)
+        (Hashtbl.add environment "x" (Automaton.Loc(24))  );
+        (Hashtbl.add memory 24 (Automaton.Integer(13)) );
+        Automaton.evaluatePi controlStack valueStack environment memory;;
+
+
+        (* Not_Found
+        Invalid_argument
+        Failure *)

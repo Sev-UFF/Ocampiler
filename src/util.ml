@@ -83,13 +83,13 @@ and string_of_stack stack func =
   "[ " ^ (String.concat ", " (List.map func (List.of_seq (Stack.to_seq stack))) ) ^ " ]"
 ;;
 
+(* 
 (* Dictionaries *)
 module Environment = Map.Make(String);;
-module Memory = Map.Make(struct type t = int let compare = compare end);;
+module Memory = Map.Make(struct type t = int let compare = compare end);; *)
 
-let string_of_dictionary fnc =
-  (fnc)
-  ;;
+let string_of_dictionary dict func =
+  "{\n " ^ (String.concat ",\n" (List.map func (List.of_seq (Hashtbl.to_seq dict))) ) ^ "\n }"
   
 
 

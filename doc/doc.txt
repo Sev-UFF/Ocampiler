@@ -34,6 +34,7 @@ instalacao ocaml:
     eval `opam env`
     opam switch create 4.06.1
     eval `opam env`
+    eval $(opam env) 
     - conferir se ocamlc, ocamllex e ocamlyacc estao instalados
 
 //instalando ocaml 4.07.1
