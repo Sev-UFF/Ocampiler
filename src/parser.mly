@@ -27,12 +27,9 @@
           | cmd      {Pi.Cmd($1)}
         ;
         cmd:
-          LOOP booleanExpression DO cmd  END            { Pi.Loop(Pi.BExp($2), $4)}
-          | LOOP ID DO cmd END                          { Pi.Loop(Pi.Id($2), $4)}
-          | IF booleanExpression THEN cmd ELSE cmd END  { Pi.Cond(Pi.BExp($2), $4, $6)}
-          | IF ID THEN cmd ELSE cmd END                 { Pi.Cond(Pi.Id($2), $4, $6)}
-          | IF booleanExpression THEN cmd END           { Pi.Cond(Pi.BExp($2), $4, Pi.Nop)}
-          | IF ID THEN cmd END                          { Pi.Cond(Pi.Id($2), $4, Pi.Nop)}
+          LOOP expression DO cmd  END            { Pi.Loop(($2), $4)}
+          | IF expression THEN cmd ELSE cmd END  { Pi.Cond(($2), $4, $6)}
+          | IF expression THEN cmd END           { Pi.Cond(($2), $4, Pi.Nop)}
           | ID ASSIGN expression                        { Pi.Assign(Pi.Id($1), $3) }
           | cmd  cmd                                    { Pi.CSeq($1, $2) }
 
@@ -42,6 +39,7 @@
             | booleanExpression                     { Pi.BExp( $1) }
             | ID                                    { Pi.Id( $1) }
             | LPAREN expression RPAREN              { $2 }
+            
         ;
         arithmeticExpression:  
           NUMBER                                              { Pi.Num($1) }
@@ -61,7 +59,7 @@
           | arithmeticExpression DIV ID                       { Pi.Div(Pi.AExp($1), Pi.Id($3) )  }
           | ID DIV arithmeticExpression                       { Pi.Div(Pi.Id($1), Pi.AExp($3) )  }
           | ID DIV ID                                         { Pi.Div(Pi.Id($1), Pi.Id($3) )  }
-          | LPAREN arithmeticExpression RPAREN                { $2 }
+         
         ;
         booleanExpression:
           BOOLEAN                                                     { Pi.Boo($1) }
@@ -98,5 +96,5 @@
           | ID OR ID                                                  { Pi.Or( (Pi.Id($1), Pi.Id($3))) }
           | NEGATION LPAREN booleanExpression RPAREN                  { Pi.Not( Pi.BExp($3) )}
           | NEGATION LPAREN ID RPAREN                                 { Pi.Not( Pi.Id($3) )}
-          | LPAREN booleanExpression RPAREN                           { $2 }
+          
 ;
