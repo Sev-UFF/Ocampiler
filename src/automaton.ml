@@ -492,6 +492,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                   )
                   | _ -> raise (AutomatonException "erro on #DIV");
               );
+              | _ -> raise (AutomatonException "erro on #DIV");
             );
           
         | OPSUB -> (

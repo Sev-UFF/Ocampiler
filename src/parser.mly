@@ -32,6 +32,7 @@
           | IF expression THEN cmd END           { Pi.Cond(($2), $4, Pi.Nop)}
           | ID ASSIGN expression                        { Pi.Assign(Pi.Id($1), $3) }
           | cmd  cmd                                    { Pi.CSeq($1, $2) }
+          | LPAREN cmd RPAREN                     { $2 }
 
         ;
         expression: 
@@ -59,6 +60,7 @@
           | arithmeticExpression DIV ID                       { Pi.Div(Pi.AExp($1), Pi.Id($3) )  }
           | ID DIV arithmeticExpression                       { Pi.Div(Pi.Id($1), Pi.AExp($3) )  }
           | ID DIV ID                                         { Pi.Div(Pi.Id($1), Pi.Id($3) )  }
+          | LPAREN arithmeticExpression RPAREN                { $2 }
          
         ;
         booleanExpression:
@@ -96,5 +98,6 @@
           | ID OR ID                                                  { Pi.Or( (Pi.Id($1), Pi.Id($3))) }
           | NEGATION LPAREN booleanExpression RPAREN                  { Pi.Not( Pi.BExp($3) )}
           | NEGATION LPAREN ID RPAREN                                 { Pi.Not( Pi.Id($3) )}
+          | LPAREN booleanExpression RPAREN                           { $2 }
           
 ;

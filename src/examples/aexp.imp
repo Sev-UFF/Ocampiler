@@ -1,1 +1,1 @@
-y:= 4 - 1
+(if(not(True))then(x:=1)else(x:=2)end)
