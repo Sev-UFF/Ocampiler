@@ -415,6 +415,7 @@ let rec evaluatePi controlStack valueStack environment memory =
             (Stack.push (Cmd_to_vstack(Statement(Cmd(Loop(Id(x), y))))) valueStack );
             
           );
+          | Loop(_, _) -> raise (AutomatonException "error on Loop");
           | CSeq(x, y) -> (
             (Stack.push (Statement(Cmd(y))) controlStack );
             (Stack.push (Statement(Cmd(x))) controlStack );
@@ -438,6 +439,7 @@ let rec evaluatePi controlStack valueStack environment memory =
             (Stack.push (Cmd_to_vstack(Statement(Cmd(Cond(Id(x), y, z))))) valueStack );
             
           );
+          | Cond(_, _, _) -> raise (AutomatonException "error on Cond");
           | Nop -> (
             (* (Stack.pop controlStack); *)
             (* Next iteration *)
@@ -682,10 +684,44 @@ let rec evaluatePi controlStack valueStack environment memory =
               | _ -> raise (AutomatonException "error on #assign")
         );
         | OPLOOP -> (
+          let condloop = (Stack.pop valueStack) in 
+            let loopV = (Stack.pop valueStack) in
+            match condloop with
+              | Bool(true) -> (
+                match loopV with
+                  | Cmd_to_vstack(Statement(Cmd(Loop(x,m)))) -> (
+
+                    (Stack.push (Statement(Cmd(Loop(x,m)))) controlStack);
+                    (Stack.push (Statement(Cmd(m))) controlStack);
+                    
+                  )
+
+              );
+              | _ -> ();
 
         );
         | OPCOND -> (
-
+          let ifcond = (Stack.pop valueStack) in
+            let condV = (Stack.pop valueStack) in
+            match ifcond with
+              | Bool(true) -> (
+                match condV with
+                  | Cmd_to_vstack(cond) ->(
+                    match cond with
+                    | (Statement(Cmd(Cond(x,m1,m2)))) -> (
+                      (Stack.push (Statement(Cmd(m1))) controlStack); 
+                    )
+                  )
+              );
+              | Bool(false) -> (
+                match condV with
+                  | Cmd_to_vstack(cond) ->(
+                    match cond with
+                    | (Statement(Cmd(Cond(x,m1,m2)))) -> (
+                      (Stack.push (Statement(Cmd(m2))) controlStack); 
+                    )
+                  )
+              );
         );
       );
     );
