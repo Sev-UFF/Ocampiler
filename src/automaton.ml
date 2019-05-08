@@ -483,7 +483,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                 let y = (Stack.pop valueStack) in
                 match y with
                   | Int(j) -> (
-                    (Stack.push (Int(i / j)) valueStack);
+                    (Stack.push (Int(j / i)) valueStack);
                     
                   )
                   | _ -> raise (AutomatonException "erro on #DIV");
@@ -497,7 +497,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                 let y = (Stack.pop valueStack) in
                 match y with
                   | Int(j) -> (
-                    (Stack.push (Int(i - j)) valueStack);
+                    (Stack.push (Int(j - i)) valueStack);
                     
                   );
                   | _ -> raise (AutomatonException "erro on #SUB");
