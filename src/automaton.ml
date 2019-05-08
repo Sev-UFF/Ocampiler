@@ -1,6 +1,8 @@
 open Util;;
 open Pi;;
 
+let willPrintStackTrace = ref false;;
+
 exception AutomatonException of string;;
 
 type valueStackOptions = 
@@ -61,10 +63,12 @@ let rec evaluatePi controlStack valueStack environment memory =
 
   if not(Stack.is_empty controlStack) then begin
     
-    print_stacks controlStack valueStack;
-    print_dictionaries environment memory;
-    print_endline "------------------------------------------------------------------------------------------------------------";
-
+    if !willPrintStackTrace then begin
+      print_stacks controlStack valueStack;
+      print_dictionaries environment memory;
+      print_endline "------------------------------------------------------------------------------------------------------------";
+    end;
+    
     let ctrl = (Stack.pop controlStack) in
       (match ctrl with
       | Statement(sta)-> (

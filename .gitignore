@@ -26,8 +26,5 @@ setup.log
 .merlin
 
 
-#programas de teste imp
-*.imp
-
 #source code
 src/ocampiler
