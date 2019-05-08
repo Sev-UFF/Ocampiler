@@ -1,6 +1,6 @@
  z := 1
-y := 10
-while not (y == 0)
+y := 3
+while (y > 0)
 do
     z := z * y
     y := y - 1
