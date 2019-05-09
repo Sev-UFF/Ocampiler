@@ -499,7 +499,7 @@ let yyact = [|
     let _1 = (Parsing.peek_val __caml_parser_env 0 : Pi.command) in
     Obj.repr(
 # 27 "parser.mly"
-                     (Pi.Cmd(_1))
+                         (Pi.Cmd(_1))
 # 504 "parser.ml"
                : Pi.statement))
 ; (fun __caml_parser_env ->
@@ -507,7 +507,7 @@ let yyact = [|
     let _4 = (Parsing.peek_val __caml_parser_env 1 : Pi.command) in
     Obj.repr(
 # 30 "parser.mly"
-                                                 ( Pi.Loop((_2), _4))
+                                                     ( Pi.Loop((_2), _4))
 # 512 "parser.ml"
                : Pi.command))
 ; (fun __caml_parser_env ->
@@ -516,7 +516,7 @@ let yyact = [|
     let _6 = (Parsing.peek_val __caml_parser_env 1 : Pi.command) in
     Obj.repr(
 # 31 "parser.mly"
-                                                 ( Pi.Cond((_2), _4, _6))
+                                                         ( Pi.Cond((_2), _4, _6))
 # 521 "parser.ml"
                : Pi.command))
 ; (fun __caml_parser_env ->
@@ -524,7 +524,7 @@ let yyact = [|
     let _4 = (Parsing.peek_val __caml_parser_env 1 : Pi.command) in
     Obj.repr(
 # 32 "parser.mly"
-                                                 ( Pi.Cond((_2), _4, Pi.Nop))
+                                                     ( Pi.Cond((_2), _4, Pi.Nop))
 # 529 "parser.ml"
                : Pi.command))
 ; (fun __caml_parser_env ->
@@ -540,14 +540,14 @@ let yyact = [|
     let _2 = (Parsing.peek_val __caml_parser_env 0 : Pi.command) in
     Obj.repr(
 # 34 "parser.mly"
-                                                        ( Pi.CSeq(_1, _2) )
+                                                                ( Pi.CSeq(_1, _2) )
 # 545 "parser.ml"
                : Pi.command))
 ; (fun __caml_parser_env ->
     let _2 = (Parsing.peek_val __caml_parser_env 1 : Pi.command) in
     Obj.repr(
 # 35 "parser.mly"
-                                                  ( _2 )
+                                                      ( _2 )
 # 552 "parser.ml"
                : Pi.command))
 ; (fun __caml_parser_env ->

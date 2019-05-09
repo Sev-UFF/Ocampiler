@@ -30,7 +30,10 @@ EXEC = ocampiler
 install:
 	sudo add-apt-repository ppa:avsm/ppa
 	sudo apt update
-	sudo apt install opam
+	sudo apt-get install ocaml opam
+	sudo opam switch create 4.07.1 4.07.1
+	sudo opam switch remove system
+	sudo opam init
 	$(MAKE) update
 	$(MAKE) run
 
@@ -38,7 +41,10 @@ update:
 	eval 'opam env'
 
 # Building the world
-run: depend $(EXEC)
+run: update depend $(EXEC)
+
+# ev:
+# 	eval 'opam config env'
 
 repair:
 	opam init --yes
