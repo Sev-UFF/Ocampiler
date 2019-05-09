@@ -23,40 +23,19 @@ OBJS = util.cmo pi.cmo lexer.cmo parser.cmo automaton.cmo  main.cmo
 # Name of executable file to generate
 EXEC = ocampiler
 
-# This part should be generic
-# Don't forget to create (touch) the file ./.depend at first use.
-
 #install package dependencies
 install:
 	sudo add-apt-repository ppa:avsm/ppa
 	sudo apt update
-	sudo apt-get install ocaml opam
-	sudo opam switch create 4.07.1 4.07.1
-	sudo opam switch remove system
-	sudo opam init
-	$(MAKE) update
-	$(MAKE) run
-
-update:
-	eval 'opam env'
-
-# Building the world
-run: depend $(EXEC)
-
-repair:
-	sudo add-apt-repository ppa:avsm/ppa
-	sudo apt update
 	sudo apt install opam
-	$(MAKE) update
-	$(MAKE) run
-	opam init --yes
 	sudo opam instal ocaml-base-compiler
+	opam init --yes
+	eval 'opam env'
 	$(MAKE) clear
 	$(MAKE) run
 
-
-	
-
+# Building the world
+run: depend $(EXEC)
 
 # Clean up
 clear:
