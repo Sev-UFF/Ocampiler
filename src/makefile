@@ -34,13 +34,17 @@ install:
 	sudo opam switch create 4.07.1 4.07.1
 	sudo opam switch remove system
 	sudo opam init
+	$(MAKE) update
 	$(MAKE) run
 
-# Building the world
-run: ev depend $(EXEC)
+update:
+	eval 'opam env'
 
-ev:
-	eval 'opam config env'
+# Building the world
+run: update depend $(EXEC)
+
+# ev:
+# 	eval 'opam config env'
 
 # Clean up
 clear:
