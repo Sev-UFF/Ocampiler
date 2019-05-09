@@ -25,12 +25,15 @@ EXEC = ocampiler
 
 #install package dependencies
 install:
+	sudo apt install gcc
 	sudo add-apt-repository ppa:avsm/ppa
 	sudo apt update
 	sudo apt install opam
+	opam init --yes
 	sudo opam instal ocaml-base-compiler
 	opam init --yes
-	eval 'opam env'
+	sudo apt install ocaml
+	eval 'opam env' #eval $(opam env)
 	$(MAKE) clear
 	$(MAKE) run
 
