@@ -41,13 +41,20 @@ update:
 	eval 'opam env'
 
 # Building the world
-run: update depend $(EXEC)
-
-# ev:
-# 	eval 'opam config env'
+run: depend $(EXEC)
 
 repair:
+	sudo add-apt-repository ppa:avsm/ppa
+	sudo apt update
+	sudo apt install opam
+	$(MAKE) update
+	$(MAKE) run
 	opam init --yes
+	sudo opam instal ocaml-base-compiler
+	$(MAKE) clear
+	$(MAKE) run
+
+
 	
 
 
