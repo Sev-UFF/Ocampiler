@@ -40,6 +40,11 @@ update:
 # Building the world
 run: depend $(EXEC)
 
+repair:
+	opam init --yes
+	
+
+
 # Clean up
 clear:
 	rm -f *.cm[io] *.cmx *~ .*~ #*#

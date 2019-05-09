@@ -114,8 +114,8 @@ let rec evaluatePi controlStack valueStack environment memory =
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
                 
               );
-              | Sum(_, _) -> raise (AutomatonException "error on sum");          
-              
+              | Sum(_, _) -> raise (AutomatonException "\027[31merror on sum");          
+              (*print_string "\027[31m blabla";*)
               | Sub(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPSUB)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
@@ -484,7 +484,10 @@ let rec evaluatePi controlStack valueStack environment memory =
           let x = (Stack.pop valueStack) in
             match x with
               | Int(i) -> (
-                let y = (Stack.pop valueStack) in
+                if (i == 0) then  
+                  raise (AutomatonException "\027[31merro on #DIV by 0") 
+                else
+                  let y = (Stack.pop valueStack) in
                 match y with
                   | Int(j) -> (
                     (Stack.push (Int(j / i)) valueStack);
@@ -733,6 +736,7 @@ let rec evaluatePi controlStack valueStack environment memory =
     evaluatePi controlStack valueStack environment memory;
   end else begin
     print_endline "\nFim da execução do autômato\n";
+    
     print_dictionaries environment memory;
     
   end;;
