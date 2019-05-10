@@ -25,25 +25,21 @@ EXEC = ocampiler
 
 #install package dependencies
 install:
-	sudo apt install gcc
+	sudo apt install gcc 
 	sudo add-apt-repository ppa:avsm/ppa
 	sudo apt update
 	sudo apt install opam
 	opam init --yes
-	sudo opam instal ocaml-base-compiler
-	#opam init --yes
+	sudo opam install ocaml-base-compiler
 	sudo apt install ocaml-nox
 	#sudo apt install ocaml
 	#eval 'opam env' #eval $(opam env)
-	#ev
-	#clear
-	#run
+	$(MAKE) clear
+	$(MAKE) run
 
 # Building the world
-run: ev depend $(EXEC)
-
-ev:
-	eval $(opam env)
+run:  depend $(EXEC)
+	
 
 # Clean up
 clear:
@@ -57,7 +53,7 @@ depend: $(SOURCES) $(GENERATED) $(LEXSOURCES) $(YACCSOURCES)
 
 
 $(EXEC): $(GENERATED) $(OBJS)
-	$(CAMLC) $(OBJS) -o $(EXEC)
+	eval $$(opam env) && $(CAMLC) $(OBJS) -o $(EXEC)
 
 %.ml: %.mll
 	$(CAMLLEX) $<
@@ -69,10 +65,10 @@ $(EXEC): $(GENERATED) $(OBJS)
 	$(CAMLYACC) $<
 
 %.cmi: %.mli
-	$(CAMLC) -c $<
+	eval $$(opam env) &&  $(CAMLC) -c $<
 
 %.cmo: %.ml
-	$(CAMLC) -c $<
+	eval $$(opam env) &&  $(CAMLC) -c $<
 
 
 include .depend
