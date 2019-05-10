@@ -31,17 +31,19 @@ install:
 	sudo apt install opam
 	opam init --yes
 	sudo opam instal ocaml-base-compiler
-	opam init --yes
+	#opam init --yes
+	sudo apt install ocaml-nox
 	#sudo apt install ocaml
-	eval 'opam env' #eval $(opam env)
-	$(MAKE) clear
-	$(MAKE) run
+	#eval 'opam env' #eval $(opam env)
+	#ev
+	#clear
+	#run
 
 # Building the world
 run: ev depend $(EXEC)
 
 ev:
-	eval `opam config env`
+	eval $(opam env)
 
 # Clean up
 clear:
