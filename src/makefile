@@ -32,13 +32,16 @@ install:
 	opam init --yes
 	sudo opam instal ocaml-base-compiler
 	opam init --yes
-	sudo apt install ocaml
+	#sudo apt install ocaml
 	eval 'opam env' #eval $(opam env)
 	$(MAKE) clear
 	$(MAKE) run
 
 # Building the world
-run: depend $(EXEC)
+run: ev depend $(EXEC)
+
+ev:
+	eval `opam config env`
 
 # Clean up
 clear:
