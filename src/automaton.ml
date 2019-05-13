@@ -448,6 +448,7 @@ let rec evaluatePi controlStack valueStack environment memory =
             (* (Stack.pop controlStack); *)
             (* Next iteration *)
           );
+          | _ -> ();
         );
       );   
       | ExpOc(expOc) -> (
@@ -464,6 +465,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                   );
                   | _ -> raise (AutomatonException "error on #SUM");
               );
+              | _ -> ();
             );
           
         | OPMUL -> (
@@ -478,6 +480,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                   );
                   | _ -> raise (AutomatonException "error on #MUL");
               );
+              | _ -> ();
             );
           
         | OPDIV -> (
@@ -510,6 +513,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                   );
                   | _ -> raise (AutomatonException "erro on #SUB");
               );
+              | _ -> ();
             );
         | OPEQ -> (
           let x = (Stack.pop valueStack) in
@@ -703,7 +707,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                     (Stack.push (Statement(Cmd(m))) controlStack);
                     
                   )
-
+                  | _ -> ();
               );
               | _ -> ();
 
@@ -719,7 +723,9 @@ let rec evaluatePi controlStack valueStack environment memory =
                     | (Statement(Cmd(Cond(x,m1,m2)))) -> (
                       (Stack.push (Statement(Cmd(m1))) controlStack); 
                     )
+                    | _ -> ();
                   )
+                  | _ -> ();
               );
               | Bool(false) -> (
                 match condV with
@@ -727,9 +733,12 @@ let rec evaluatePi controlStack valueStack environment memory =
                     match cond with
                     | (Statement(Cmd(Cond(x,m1,m2)))) -> (
                       (Stack.push (Statement(Cmd(m2))) controlStack); 
-                    )
-                  )
+                    );
+                    | _ -> ();
+                  );
+                  | _ -> ();
               );
+              | _ -> ();
         );
       );
     );
