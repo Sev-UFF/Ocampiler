@@ -38,13 +38,13 @@ let string_of_storable storable =
 
 let string_of_storable_dictionary (key, value) =
   match (key, value) with
-  | (int, storable) -> "\t( [" ^ (string_of_int key) ^ "]: " ^ (string_of_storable value) ^ " )"
-  | _ -> "Undefined";;
+  | (int, storable) -> "\t( [" ^ (string_of_int key) ^ "]: " ^ (string_of_storable value) ^ " )";;
+  (*| _ -> "Undefined";;*)
 
 let string_of_bindable_dictionary (key, value) =
   match (key, value) with
-  | (string, bindable) -> "\t( " ^ key ^ ": " ^ (string_of_bindable value) ^ " )"
-  | _ -> "Undefined";;
+  | (string, bindable) -> "\t( " ^ key ^ ": " ^ (string_of_bindable value) ^ " )";;
+  (*| _ -> "Undefined";;*)
 
 
 let print_stacks controlStack valueStack = 
