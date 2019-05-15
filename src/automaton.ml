@@ -734,10 +734,10 @@ let rec evaluatePi controlStack valueStack environment memory =
                       (Stack.push (Statement(Cmd(m2))) controlStack); 
                     );
                     | _ -> raise (AutomatonException "erro on #COND 3");
-                  );
+                  )
                   | _ -> raise (AutomatonException "erro on #COND 4");
               );
-              | _ -> raise (AutomatonException "erro on #COND" 5);
+              | _ -> raise (AutomatonException "erro on #COND 5" );
         );
       );
     );
