@@ -1,5 +1,4 @@
-# The Caml compilers. You may have to add various -I options.
-
+# The Caml compilers.
 CAMLC = ocamlc
 CAMLDEP = ocamldep
 CAMLLEX = ocamllex
@@ -19,6 +18,8 @@ GENERATED = $(LEXGENERATED) $(YACCGENERATED)
 SOURCES = util.ml pi.ml $(GENERATED) automaton.ml  main.ml 
 # Caml object files to link
 OBJS = util.cmo pi.cmo lexer.cmo parser.cmo automaton.cmo  main.cmo
+# Library files not linked by default
+LINKS = unix.cma
 
 # Name of executable file to generate
 EXEC = ocampiler
@@ -32,14 +33,11 @@ install:
 	opam init --yes
 	sudo opam install ocaml-base-compiler
 	sudo apt install ocaml-nox
-	#sudo apt install ocaml
-	#eval 'opam env' #eval $(opam env)
 	$(MAKE) clear
 	$(MAKE) run
 
 # Building the world
 run:  depend $(EXEC)
-	
 
 # Clean up
 clear:
@@ -53,7 +51,7 @@ depend: $(SOURCES) $(GENERATED) $(LEXSOURCES) $(YACCSOURCES)
 
 
 $(EXEC): $(GENERATED) $(OBJS)
-	eval $$(opam env) && $(CAMLC) $(OBJS) -o $(EXEC)
+	eval $$(opam env) && $(CAMLC) $(LINKS) $(OBJS) -o $(EXEC)
 
 %.ml: %.mll
 	$(CAMLLEX) $<

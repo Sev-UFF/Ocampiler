@@ -10,6 +10,8 @@ open Printf;;
 let willReadFile = ref false;;
 let willPrintSourceCode = ref false;;
 let willPrintTree = ref false;;
+let willPrintStats = ref false;;
+let willReadSpecificState = ref false;;
 let fileContents = ref "";;
   
     
@@ -20,16 +22,24 @@ let () =
 
       if arg = "-f" then begin
         willReadFile := true;
+      end else if arg = "--state" then begin
+        willReadSpecificState := true;
+        Automaton.willPrintSpecificState := true;
       end else if arg = "-a" then begin
         willPrintTree := true;
       end else if arg = "-t" then begin 
         Automaton.willPrintStackTrace := true;
       end else if arg = "-s" then begin 
         willPrintSourceCode := true;
+      end else if arg = "--stats" then begin 
+        willPrintStats := true;
       end else begin
         if !willReadFile then begin 
           fileContents := readInputFile arg;
           willReadFile := false;
+        end else if !willReadSpecificState then begin
+          Automaton.displayState := int_of_string arg;
+          willReadSpecificState := false;
         end else begin
           printf "%s is not a valid argument\n" arg;
         end
@@ -38,7 +48,7 @@ let () =
 
   if !fileContents = "" then raise (Invalid_argument "Arquivo não inserido");
 
-  if !willPrintSourceCode then print_endline ("Código fonte:\n" ^ !fileContents  ^ "\n");
+  if !willPrintSourceCode then print_endline ("Código fonte Imπ:\n" ^ !fileContents  ^ "\n");
 
   
   let tree = Statement(Parser.main Lexer.token (Lexing.from_string !fileContents) )
@@ -62,9 +72,15 @@ let () =
         (*inicialização de i *)
         (Hashtbl.add environment "i" (Automaton.Loc(456))  );
         (Hashtbl.add memory 456 (Automaton.Integer(0)) );
-        Automaton.evaluatePi controlStack valueStack environment memory;;
 
 
-        (* Not_Found
-        Invalid_argument
-        Failure *)
+        let t0 = Unix.gettimeofday () in
+        Automaton.evaluatePi controlStack valueStack environment memory;
+        let t1 = Unix.gettimeofday () in
+        
+        if !willPrintStats then begin
+          print_endline("\nStatus do autômato");
+          print_endline("Número de passos: " ^ string_of_int( !(Automaton.steps)) );
+          print_endline("Tempo de execução (em segundos): " ^ string_of_float(t1 -. t0));
+        end;;
+

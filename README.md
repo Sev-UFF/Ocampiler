@@ -19,8 +19,10 @@ Esse comando também gerará o compilador, Ocampiler, na pasta src.
 
 # Uso e Opções da Linha de Comando
 ```
-ocampiler -f <impfile> [-s | -a | -t ]
+ocampiler -f <impfile> [-s | -a | -t | --state n | --stats]
 -s : Exibe o código fonte.
 -a : Exibe a árvore síntática.
 -t : Exibe o traço completo de execução do autômato.
+--state n : Exibe o n-ésimo estado de execução do autômato
+--stats: Exibe o número de passos e o tempo de execução do autômato.
 ```

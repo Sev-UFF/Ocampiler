@@ -2,6 +2,9 @@ open Util;;
 open Pi;;
 
 let willPrintStackTrace = ref false;;
+let steps = ref 0;;
+let willPrintSpecificState = ref false;;
+let displayState = ref 0;;
 
 exception AutomatonException of string;;
 
@@ -63,7 +66,10 @@ let rec evaluatePi controlStack valueStack environment memory =
 
   if not(Stack.is_empty controlStack) then begin
     
-    if !willPrintStackTrace then begin
+    steps := !steps + 1;
+
+    if !willPrintStackTrace || (!willPrintSpecificState && (!displayState = !steps)) then begin
+      print_endline( "Estado #" ^ (string_of_int(!steps)) ^ " do π autômato\n");
       print_stacks controlStack valueStack;
       print_dictionaries environment memory;
       print_endline "------------------------------------------------------------------------------------------------------------";
@@ -709,7 +715,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                   )
                   | _ -> raise (AutomatonException "erro on #LOOP");
               );
-              | _ -> raise (AutomatonException "erro on #LOOP");
+              | _ -> ();  (* Não faz nada já que o pop foi feito antes *)
         );
         | OPCOND -> (
           let ifcond = (Stack.pop valueStack) in
