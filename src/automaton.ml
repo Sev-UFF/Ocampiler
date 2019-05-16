@@ -715,7 +715,8 @@ let rec evaluatePi controlStack valueStack environment memory =
                   )
                   | _ -> raise (AutomatonException "erro on #LOOP");
               );
-              | _ -> ();  (* Não faz nada já que o pop foi feito antes *)
+              | Bool(false) -> ();  (* Não faz nada já que o pop foi feito antes *)
+              | _ -> raise (AutomatonException "error on #loop")
         );
         | OPCOND -> (
           let ifcond = (Stack.pop valueStack) in
