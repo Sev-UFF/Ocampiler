@@ -4,7 +4,7 @@ open Pi;;
 let willPrintStackTrace = ref false;;
 let steps = ref 0;;
 let willPrintSpecificState = ref false;;
-let displayState = ref 0;;
+let displayState = ref (-1);;
 
 exception AutomatonException of string;;
 
@@ -12,7 +12,7 @@ type valueStackOptions =
   | Int of int
   | Str of string
   | Bool of bool
-  | Cmd_to_vstack of control;;
+  | Control of control;;
 
 type storable = 
   | Integer of int
@@ -27,7 +27,7 @@ let string_of_value_stack item =
   | Int(x) -> string_of_int x
   | Str(x) -> x
   | Bool(x) -> if x then "True" else "False"
-  | Cmd_to_vstack (x) -> (string_of_ctn x);;
+  | Control (x) -> (string_of_ctn x);;
 
 let string_of_bindable bindable =
   match bindable with
@@ -40,14 +40,10 @@ let string_of_storable storable =
   | Boolean(x) -> if x then "True" else "False";;
 
 let string_of_storable_dictionary (key, value) =
-  match (key, value) with
-  | (int, storable) -> "\t( [" ^ (string_of_int key) ^ "]: " ^ (string_of_storable value) ^ " )";;
-  (*| _ -> "Undefined";;*)
+  "\t( [" ^ (string_of_int key) ^ "]: " ^ (string_of_storable value) ^ " )";;
 
 let string_of_bindable_dictionary (key, value) =
-  match (key, value) with
-  | (string, bindable) -> "\t( " ^ key ^ ": " ^ (string_of_bindable value) ^ " )";;
-  (*| _ -> "Undefined";;*)
+   "\t( " ^ key ^ ": " ^ (string_of_bindable value) ^ " )";;
 
 
 let print_stacks controlStack valueStack = 
@@ -62,7 +58,7 @@ let print_dictionaries environment memory =
   print_endline "Memória:";
   print_endline (string_of_dictionary memory string_of_storable_dictionary);;
 
-let rec evaluatePi controlStack valueStack environment memory = 
+let rec delta controlStack valueStack environment memory = 
 
   if not(Stack.is_empty controlStack) then begin
     
@@ -120,8 +116,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
                 
               );
-              | Sum(_, _) -> raise (AutomatonException "\027[31merror on sum");          
-              (*print_string "\027[31m blabla";*)
+              | Sum(_, _) -> raise (AutomatonException "Error on Sum"); 
               | Sub(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPSUB)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
@@ -146,7 +141,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
                 
               ); 
-              | Sub(_, _) -> raise (AutomatonException "error on sub");
+              | Sub(_, _) -> raise (AutomatonException "Error on Sub");
               | Mul(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPMUL)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
@@ -171,7 +166,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
                 
               ); 
-              | Mul(_, _) -> raise (AutomatonException "error on Mul");
+              | Mul(_, _) -> raise (AutomatonException "Error on Mul");
               | Div(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPDIV)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
@@ -196,7 +191,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
                 
               ); 
-              | Div(_, _) -> raise (AutomatonException "error on Div");     
+              | Div(_, _) -> raise (AutomatonException "Error on Div");     
             )
           | BExp(bExp)-> ( 
             match bExp with 
@@ -227,7 +222,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
                 
-              );(* equals aritmetico *)
+              );
               | Eq(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
@@ -245,8 +240,8 @@ let rec evaluatePi controlStack valueStack environment memory =
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
                 
-              );(* fim equals aritmetico *)
-              | Eq(_, _) -> raise (AutomatonException "error on Equals"); 
+              );
+              | Eq(_, _) -> raise (AutomatonException "Error on Eq"); 
               | Lt(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPLT)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
@@ -271,7 +266,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
                 
               );
-              | Lt(_, _) -> raise (AutomatonException "error on <"); 
+              | Lt(_, _) -> raise (AutomatonException "Error on Lt"); 
               | Le(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPLE)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
@@ -296,7 +291,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
                 
               );
-              | Le(_, _) -> raise (AutomatonException "error on Lowerequals =<");
+              | Le(_, _) -> raise (AutomatonException "Error on Le");
               | Gt(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPGT)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
@@ -321,7 +316,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
                 
               );
-              | Gt(_, _) -> raise (AutomatonException "error on Greather than >");
+              | Gt(_, _) -> raise (AutomatonException "Error on Gt");
               | Ge(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPGE)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
@@ -346,7 +341,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
                 
               );
-              | Ge(_, _) -> raise (AutomatonException "error on Greaterequals >=");
+              | Ge(_, _) -> raise (AutomatonException "Error on Ge");
               | And(BExp(x), BExp(y)) -> (
                 (Stack.push (ExpOc(OPAND)) controlStack);
                 (Stack.push (Statement(Exp(BExp(y)))) controlStack);
@@ -371,7 +366,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
                 
               );
-              | And(_, _) -> raise (AutomatonException "error on And");
+              | And(_, _) -> raise (AutomatonException "Error on And");
               | Or(BExp(x), BExp(y)) -> (
                 (Stack.push (ExpOc(OPOR)) controlStack);
                 (Stack.push (Statement(Exp(BExp(y)))) controlStack);
@@ -396,7 +391,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
                 
               );
-              | Or(_, _) -> raise (AutomatonException "error on Or");
+              | Or(_, _) -> raise (AutomatonException "Error on Or");
               | Not(BExp(x)) -> (
                 (Stack.push (ExpOc(OPNOT)) controlStack);
                 (Stack.push (Statement(Exp(BExp(x)))) controlStack);
@@ -407,7 +402,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
                 
               );
-              | Not( _) -> raise (AutomatonException "error on Not");
+              | Not( _) -> raise (AutomatonException "Error on Not");
               
             );       
           );
@@ -416,16 +411,16 @@ let rec evaluatePi controlStack valueStack environment memory =
           | Loop( BExp(x), y) -> (
             (Stack.push (CmdOc(OPLOOP)) controlStack);
             (Stack.push (Statement(Exp(BExp(x)))) controlStack );
-            (Stack.push (Cmd_to_vstack(Statement(Cmd(Loop(BExp(x), y))))) valueStack ); 
+            (Stack.push (Control(Statement(Cmd(Loop(BExp(x), y))))) valueStack ); 
             
           );
           | Loop(Id(x), y) -> (
             (Stack.push (CmdOc(OPLOOP)) controlStack);
             (Stack.push (Statement(Exp(Id(x)))) controlStack );
-            (Stack.push (Cmd_to_vstack(Statement(Cmd(Loop(Id(x), y))))) valueStack );
+            (Stack.push (Control(Statement(Cmd(Loop(Id(x), y))))) valueStack );
             
           );
-          | Loop(_, _) -> raise (AutomatonException "error on Loop");
+          | Loop(_, _) -> raise (AutomatonException "Error on Loop");
           | CSeq(x, y) -> (
             (Stack.push (Statement(Cmd(y))) controlStack );
             (Stack.push (Statement(Cmd(x))) controlStack );
@@ -437,24 +432,21 @@ let rec evaluatePi controlStack valueStack environment memory =
              (Stack.push (Str(x)) valueStack);
              
           );
+          | Assign(_, _) -> raise (AutomatonException "Error on Assign");
           | Cond(BExp(x), y, z) -> (
             (Stack.push (CmdOc(OPCOND)) controlStack);
             (Stack.push (Statement(Exp(BExp(x)))) controlStack );
-            (Stack.push (Cmd_to_vstack(Statement(Cmd(Cond(BExp(x), y, z))))) valueStack );
+            (Stack.push (Control(Statement(Cmd(Cond(BExp(x), y, z))))) valueStack );
             
           );
           | Cond(Id(x), y, z) -> (
             (Stack.push (CmdOc(OPCOND)) controlStack);
             (Stack.push (Statement(Exp(Id(x)))) controlStack );
-            (Stack.push (Cmd_to_vstack(Statement(Cmd(Cond(Id(x), y, z))))) valueStack );
+            (Stack.push (Control(Statement(Cmd(Cond(Id(x), y, z))))) valueStack );
             
           );
-          | Cond(_, _, _) -> raise (AutomatonException "error on Cond");
-          | Nop -> (
-            (* (Stack.pop controlStack); *)
-            (* Next iteration *)
-          );
-          | _ -> raise (AutomatonException "erro on Cmd(cmd)");
+          | Cond(_, _, _) -> raise (AutomatonException "Error on Cond");
+          | Nop -> ();
         );
       );   
       | ExpOc(expOc) -> (
@@ -469,9 +461,9 @@ let rec evaluatePi controlStack valueStack environment memory =
                     (Stack.push (Int(i + j)) valueStack);
                     
                   );
-                  | _ -> raise (AutomatonException "error on #SUM");
+                  | _ -> raise (AutomatonException "Error on #SUM");
               );
-              | _ -> raise (AutomatonException "erro on #SUM");
+              | _ -> raise (AutomatonException "Error on #SUM");
             );
           
         | OPMUL -> (
@@ -484,9 +476,9 @@ let rec evaluatePi controlStack valueStack environment memory =
                     (Stack.push (Int(i * j)) valueStack);
                     
                   );
-                  | _ -> raise (AutomatonException "error on #MUL");
+                  | _ -> raise (AutomatonException "Error on #MUL");
               );
-              | _ -> raise (AutomatonException "erro on #MUL");
+              | _ -> raise (AutomatonException "Error on #MUL");
             );
           
         | OPDIV -> (
@@ -494,7 +486,7 @@ let rec evaluatePi controlStack valueStack environment memory =
             match x with
               | Int(i) -> (
                 if (i == 0) then  
-                  raise (AutomatonException "\027[31merro on #DIV by 0") 
+                  raise (AutomatonException "Error on #DIV. Division by 0") 
                 else
                   let y = (Stack.pop valueStack) in
                 match y with
@@ -502,9 +494,9 @@ let rec evaluatePi controlStack valueStack environment memory =
                     (Stack.push (Int(j / i)) valueStack);
                     
                   )
-                  | _ -> raise (AutomatonException "erro on #DIV");
+                  | _ -> raise (AutomatonException "Error on #DIV");
               );
-              | _ -> raise (AutomatonException "erro on #DIV");
+              | _ -> raise (AutomatonException "Error on #DIV");
             );
           
         | OPSUB -> (
@@ -517,9 +509,9 @@ let rec evaluatePi controlStack valueStack environment memory =
                     (Stack.push (Int(j - i)) valueStack);
                     
                   );
-                  | _ -> raise (AutomatonException "erro on #SUB");
+                  | _ -> raise (AutomatonException "Error on #SUB");
               );
-              | _ -> raise (AutomatonException "erro on #SUB");
+              | _ -> raise (AutomatonException "Error on #SUB");
             );
         | OPEQ -> (
           let x = (Stack.pop valueStack) in
@@ -531,7 +523,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                     (Stack.push (Bool(i == j)) valueStack);
                     
                   );
-                  | _ -> raise (AutomatonException "erro on #EQ");
+                  | _ -> raise (AutomatonException "Error on #EQ");
               );
               | Int(i) -> (
                 let y = (Stack.pop valueStack) in
@@ -540,9 +532,9 @@ let rec evaluatePi controlStack valueStack environment memory =
                     (Stack.push ( Bool ( i == j)) valueStack);
                     
                   );
-                  | _ -> raise (AutomatonException "erro on #EQ");
+                  | _ -> raise (AutomatonException "Error on #EQ");
               );
-              | _ -> raise (AutomatonException "erro on #EQ");
+              | _ -> raise (AutomatonException "Error on #EQ");
             );
         | OPAND -> (
           let x = (Stack.pop valueStack) in
@@ -554,9 +546,9 @@ let rec evaluatePi controlStack valueStack environment memory =
                     (Stack.push (Bool(i && j)) valueStack);
                     
                   );
-                  | _ -> raise (AutomatonException "erro on #AND");
+                  | _ -> raise (AutomatonException "Error on #AND");
               );
-              | _ -> raise (AutomatonException "erro on #AND");
+              | _ -> raise (AutomatonException "Error on #AND");
             );
         | OPOR -> (
           let x = (Stack.pop valueStack) in
@@ -568,22 +560,13 @@ let rec evaluatePi controlStack valueStack environment memory =
                     (Stack.push (Bool(i || j)) valueStack);
                     
                   );
-                  | _ -> raise (AutomatonException "erro on #OR");
+                  | _ -> raise (AutomatonException "Error on #OR");
               );
-              | _ -> raise (AutomatonException "erro on #OR");
+              | _ -> raise (AutomatonException "Error on #OR");
             );
         | OPLT -> (
           let x = (Stack.pop valueStack) in
             match x with
-              | Bool(i) -> (
-                let y = (Stack.pop valueStack) in
-                match y with
-                  | Bool(j) -> (
-                    (Stack.push (Bool(j < i)) valueStack);
-                    
-                  );
-                  | _ -> raise (AutomatonException "erro on #OPLT");
-              );
               | Int(i) -> (
                 let y = (Stack.pop valueStack) in
                 match y with
@@ -591,22 +574,13 @@ let rec evaluatePi controlStack valueStack environment memory =
                     (Stack.push ( Bool ( j < i)) valueStack);
                     
                   );
-                  | _ -> raise (AutomatonException "erro on #OPLT");
+                  | _ -> raise (AutomatonException "Error on #LT");
               );
-              | _ -> raise (AutomatonException "erro on #OPLT");
+              | _ -> raise (AutomatonException "Error on #LT");
             );
         | OPLE -> (
           let x = (Stack.pop valueStack) in
             match x with
-              | Bool(i) -> (
-                let y = (Stack.pop valueStack) in
-                match y with
-                  | Bool(j) -> (
-                    (Stack.push (Bool(j <= i)) valueStack);
-                    
-                  );
-                  | _ -> raise (AutomatonException "erro on #EQ");
-              );
               | Int(i) -> (
                 let y = (Stack.pop valueStack) in
                 match y with
@@ -614,22 +588,13 @@ let rec evaluatePi controlStack valueStack environment memory =
                     (Stack.push ( Bool ( j <= i)) valueStack);
                     
                   );
-                  | _ -> raise (AutomatonException "erro on #EQ");
+                  | _ -> raise (AutomatonException "Error on #LE");
               );
-              | _ -> raise (AutomatonException "erro on #EQ");
+              | _ -> raise (AutomatonException "Error on #LE");
             );
         | OPGT -> (
           let x = (Stack.pop valueStack) in
             match x with
-              | Bool(i) -> (
-                let y = (Stack.pop valueStack) in
-                match y with
-                  | Bool(j) -> (
-                    (Stack.push (Bool(j > i)) valueStack);
-                    
-                  );
-                  | _ -> raise (AutomatonException "erro on #EQ");
-              );
               | Int(i) -> (
                 let y = (Stack.pop valueStack) in
                 match y with
@@ -637,22 +602,13 @@ let rec evaluatePi controlStack valueStack environment memory =
                     (Stack.push ( Bool ( j > i)) valueStack);
                     
                   );
-                  | _ -> raise (AutomatonException "erro on #EQ");
+                  | _ -> raise (AutomatonException "Error on #GT");
               );
-              | _ -> raise (AutomatonException "erro on #EQ");
+              | _ -> raise (AutomatonException "Error on #GT");
             );
         | OPGE -> (
           let x = (Stack.pop valueStack) in
             match x with
-              | Bool(i) -> (
-                let y = (Stack.pop valueStack) in
-                match y with
-                  | Bool(j) -> (
-                    (Stack.push (Bool(j >= i)) valueStack);
-                    
-                  );
-                  | _ -> raise (AutomatonException "erro on #EQ");
-              );
               | Int(i) -> (
                 let y = (Stack.pop valueStack) in
                 match y with
@@ -660,9 +616,9 @@ let rec evaluatePi controlStack valueStack environment memory =
                     (Stack.push ( Bool ( j >= i)) valueStack);
                     
                   );
-                  | _ -> raise (AutomatonException "erro on #EQ");
+                  | _ -> raise (AutomatonException "Error on #GE");
               );
-              | _ -> raise (AutomatonException "erro on #EQ");
+              | _ -> raise (AutomatonException "Error on #GE");
             );
         | OPNOT -> (
           let x = (Stack.pop valueStack) in
@@ -671,7 +627,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                 (Stack.push (Bool(not(i))) valueStack);
               );
               
-              | _ -> raise (AutomatonException "erro on #NOT");
+              | _ -> raise (AutomatonException "Error on #NOT");
             );                                                                      
       );
       | CmdOc(cmdOc) -> (
@@ -691,7 +647,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                     | Bool(b) -> (
                       (Hashtbl.replace memory l (Boolean(b)));
                     );
-                    | _ -> raise (AutomatonException "erro on #assign")
+                    | _ -> raise (AutomatonException "Error on #ASSIGN")
                     
                   );
                   | Value(v) -> (
@@ -699,7 +655,7 @@ let rec evaluatePi controlStack valueStack environment memory =
                   );
                   
               );
-              | _ -> raise (AutomatonException "error on #assign")
+              | _ -> raise (AutomatonException "Error on #ASSIGN")
         );
         | OPLOOP -> (
           let condloop = (Stack.pop valueStack) in 
@@ -707,48 +663,36 @@ let rec evaluatePi controlStack valueStack environment memory =
             match condloop with
               | Bool(true) -> (
                 match loopV with
-                  | Cmd_to_vstack(Statement(Cmd(Loop(x,m)))) -> (
+                  | Control(Statement(Cmd(Loop(x,m)))) -> (
 
                     (Stack.push (Statement(Cmd(Loop(x,m)))) controlStack);
                     (Stack.push (Statement(Cmd(m))) controlStack);
                     
                   )
-                  | _ -> raise (AutomatonException "erro on #LOOP");
+                  | _ -> raise (AutomatonException "Error on #LOOP");
               );
               | Bool(false) -> ();  (* Não faz nada já que o pop foi feito antes *)
-              | _ -> raise (AutomatonException "error on #loop")
+              | _ -> raise (AutomatonException "Error on #LOOP")
         );
         | OPCOND -> (
           let ifcond = (Stack.pop valueStack) in
             let condV = (Stack.pop valueStack) in
             match ifcond with
-              | Bool(true) -> (
+              | Bool(condition) -> (
                 match condV with
-                  | Cmd_to_vstack(cond) ->(
-                    match cond with
-                    | (Statement(Cmd(Cond(x,m1,m2)))) -> (
-                      (Stack.push (Statement(Cmd(m1))) controlStack); 
-                    )
-                    | _ -> raise (AutomatonException "erro on #COND 1");
+                  | Control(Statement(Cmd(Cond(x,m1,m2)))) ->(
+                    if condition then
+                    (Stack.push (Statement(Cmd(m1))) controlStack)
+                    else
+                    (Stack.push (Statement(Cmd(m2))) controlStack);
                   )
-                  | _ -> raise (AutomatonException "erro on #COND 2");
+                  | _ -> raise (AutomatonException "Error on #COND");
               );
-              | Bool(false) -> (
-                match condV with
-                  | Cmd_to_vstack(cond) ->(
-                    match cond with
-                    | (Statement(Cmd(Cond(x,m1,m2)))) -> (
-                      (Stack.push (Statement(Cmd(m2))) controlStack); 
-                    );
-                    | _ -> raise (AutomatonException "erro on #COND 3");
-                  )
-                  | _ -> raise (AutomatonException "erro on #COND 4");
-              );
-              | _ -> raise (AutomatonException "erro on #COND 5" );
+              | _ -> raise (AutomatonException "Error on #COND" );
         );
       );
     );
-    evaluatePi controlStack valueStack environment memory;
+    delta controlStack valueStack environment memory;
   end else begin
     print_endline "\nFim da execução do autômato\n";
     

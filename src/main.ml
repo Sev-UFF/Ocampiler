@@ -46,7 +46,9 @@ let () =
       end
   done;
 
-  if !fileContents = "" then raise (Invalid_argument "Arquivo não inserido");
+  if !fileContents = "" then raise (Invalid_argument "Arquivo não inserido.");
+
+  if !(Automaton.willPrintSpecificState) && !(Automaton.displayState) == -1 then raise (Invalid_argument "Estado a ser analisado não especificado."); 
 
   if !willPrintSourceCode then print_endline ("Código fonte Imπ:\n" ^ !fileContents  ^ "\n");
 
@@ -75,7 +77,7 @@ let () =
 
 
         let t0 = Unix.gettimeofday () in
-        Automaton.evaluatePi controlStack valueStack environment memory;
+        Automaton.delta controlStack valueStack environment memory;
         let t1 = Unix.gettimeofday () in
         
         if !willPrintStats then begin
