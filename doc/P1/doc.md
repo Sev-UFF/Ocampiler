@@ -600,3 +600,152 @@ OPNOT -> (
               | _ -> raise (AutomatonException "Error on #NOT");
             );   
 ```
+
+
+
+```
+_δ(Id(W) :: C, V, E, S) = δ(C, B :: V, E, S), where E[W] = l ∧ S[l] = B_
+
+```
+Id(id) -> (
+            let key = Hashtbl.find environment id  in
+              match key with 
+                | Value(x) -> ();
+                | Loc(x) -> (
+                  let value = Hashtbl.find memory x  in
+                    match value with
+                    | Integer(x) ->   (Stack.push (Int(x)) valueStack);
+                    | Boolean(x) ->  (Stack.push (Bool(x)) valueStack);
+                )
+            );
+```
+
+_δ(Assign(W, X) :: C, V, E, S) = δ(X :: #ASSIGN :: C, W :: V, E, S')_
+
+```
+Assign(Id(x), y) -> (
+             (Stack.push (CmdOc(OPASSIGN)) controlStack );
+             (Stack.push (Statement(Exp(y))) controlStack );
+             (Stack.push (Str(x)) valueStack);
+             
+          );
+```
+
+_δ(#ASSIGN :: C, T :: W :: V, E, S) = δ(C, V, E, S'), where E[W] = l ∧ S' = S/[l ↦ T]_
+
+```
+OPASSIGN -> (
+          let value = (Stack.pop valueStack) in
+            let id = (Stack.pop valueStack) in 
+              match id with 
+              | Str(x) -> (
+                let env = (Hashtbl.find environment x ) in
+                  match env with 
+                  | Loc(l) -> (
+                    match value with
+                    | Int(i) -> (
+                      (Hashtbl.replace memory l (Integer(i)));
+                    );
+                    | Bool(b) -> (
+                      (Hashtbl.replace memory l (Boolean(b)));
+                    );
+                    | _ -> raise (AutomatonException "Error on #ASSIGN")
+                    
+                  );
+                  | Value(v) -> (
+
+                  );
+                  
+              );
+              | _ -> raise (AutomatonException "Error on #ASSIGN")
+            );
+```
+
+_δ(Loop(X, M) :: C, V, E, S) = δ(X :: #LOOP :: C, Loop(X, M) :: V, E, S)_
+
+```
+Loop( BExp(x), y) -> (
+            (Stack.push (CmdOc(OPLOOP)) controlStack);
+            (Stack.push (Statement(Exp(BExp(x)))) controlStack );
+            (Stack.push (Control(Statement(Cmd(Loop(BExp(x), y))))) valueStack ); 
+            
+          );
+          | Loop(Id(x), y) -> (
+            (Stack.push (CmdOc(OPLOOP)) controlStack);
+            (Stack.push (Statement(Exp(Id(x)))) controlStack );
+            (Stack.push (Control(Statement(Cmd(Loop(Id(x), y))))) valueStack );
+            
+          );
+```
+
+_δ(#LOOP :: C, Boo(true) :: Loop(X, M) :: V, E, S) = δ(M :: Loop(X, M) :: C, V, E, S)_
+_δ(#LOOP :: C, Boo(false) :: Loop(X, M) :: V, E, S) = δ(C, V, E, S)_
+
+```
+OPLOOP -> (
+          let condloop = (Stack.pop valueStack) in 
+            let loopV = (Stack.pop valueStack) in
+            match condloop with
+              | Bool(true) -> (
+                match loopV with
+                  | Control(Statement(Cmd(Loop(x,m)))) -> (
+
+                    (Stack.push (Statement(Cmd(Loop(x,m)))) controlStack);
+                    (Stack.push (Statement(Cmd(m))) controlStack);
+                    
+                  )
+                  | _ -> raise (AutomatonException "Error on #LOOP");
+              );
+              | Bool(false) -> ();  (* Não faz nada já que o pop foi feito antes *)
+              | _ -> raise (AutomatonException "Error on #LOOP")
+        );
+```
+
+_δ(Cond(X, M₁, M₂) :: C, V, E, S) = δ(X :: #COND :: C, Cond(X, M₁, M₂) :: V, E, S)_
+
+```
+Cond(BExp(x), y, z) -> (
+            (Stack.push (CmdOc(OPCOND)) controlStack);
+            (Stack.push (Statement(Exp(BExp(x)))) controlStack );
+            (Stack.push (Control(Statement(Cmd(Cond(BExp(x), y, z))))) valueStack );
+            
+          );
+          | Cond(Id(x), y, z) -> (
+            (Stack.push (CmdOc(OPCOND)) controlStack);
+            (Stack.push (Statement(Exp(Id(x)))) controlStack );
+            (Stack.push (Control(Statement(Cmd(Cond(Id(x), y, z))))) valueStack );
+            
+          );
+```
+
+_δ(#COND :: C, Boo(true) :: Cond(X, M₁, M₂) :: V, E, S) = δ(M₁ :: C, V, E, S)_
+_δ(#COND :: C, Boo(false) :: Cond(X, M₁, M₂) :: V, E, S) = δ(M₂ :: C, V, E, S)_
+
+```
+OPCOND -> (
+          let ifcond = (Stack.pop valueStack) in
+            let condV = (Stack.pop valueStack) in
+            match ifcond with
+              | Bool(condition) -> (
+                match condV with
+                  | Control(Statement(Cmd(Cond(x,m1,m2)))) ->(
+                    if condition then
+                    (Stack.push (Statement(Cmd(m1))) controlStack)
+                    else
+                    (Stack.push (Statement(Cmd(m2))) controlStack);
+                  )
+                  | _ -> raise (AutomatonException "Error on #COND");
+              );
+              | _ -> raise (AutomatonException "Error on #COND" );
+        );
+```
+
+_δ(CSeq(M₁, M₂) :: C, V, E, S) = δ(M₁ :: M₂ :: C, V, E, S)_
+
+```
+CSeq(x, y) -> (
+            (Stack.push (Statement(Cmd(y))) controlStack );
+            (Stack.push (Statement(Cmd(x))) controlStack );
+            
+          );
+```
