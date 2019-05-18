@@ -8,10 +8,11 @@ _δ(Num(N) :: C, V, S) = δ(C, N :: V, S)_
 Num(x) -> (
                 (Stack.push (Int(x)) valueStack);
                 );
-
 ```
 
 _δ(Sum(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #SUM :: C, V, S)_   
+
+
 ```
 Sum(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPSUM)) controlStack);
@@ -39,6 +40,8 @@ Sum(AExp(x), AExp(y)) -> (
 ```
 
 _δ(#SUM :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ + N₂ :: V, S)_
+
+
 ```
 OPSUM -> (
           let x = (Stack.pop valueStack) in
@@ -56,9 +59,8 @@ OPSUM -> (
             );
 ```
 
-
-
 _δ(Sub(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #SUB :: C, V, S)_  
+
 
 ```
 Sub(AExp(x), AExp(y)) -> (
@@ -87,7 +89,6 @@ Sub(AExp(x), AExp(y)) -> (
               ); 
 ```
 
-
 _δ(#SUB :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ - N₂ :: V, S)_
 
 ```            
@@ -105,8 +106,6 @@ OPSUB -> (
               );
               | _ -> raise (AutomatonException "Error on #SUB");
             );
-
-
 ```            
 
 _δ(Mul(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #MUL :: C, V, S)_  
@@ -140,9 +139,7 @@ Mul(AExp(x), AExp(y)) -> (
 
 _δ(#MUL :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ * N₂ :: V, S)_
 
-
 ```
-
 OPMUL -> (
           let x = (Stack.pop valueStack) in
             match x with
@@ -157,11 +154,9 @@ OPMUL -> (
               );
               | _ -> raise (AutomatonException "Error on #MUL");
             );
-
 ```
 
 _δ(Div(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #DIV :: C, V, S)_  
-
 
 ```              
 Div(AExp(x), AExp(y)) -> (
@@ -210,12 +205,9 @@ OPDIV -> (
               );
               | _ -> raise (AutomatonException "Error on #DIV");
             );
-
-
 ```
 
 _δ(Eq(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #EQ :: C, V, S)_
-
 
 ```
 Eq(BExp(x), BExp(y)) -> (
@@ -260,15 +252,11 @@ Eq(BExp(x), BExp(y)) -> (
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
                 
               );
-
 ```
 
 _δ(#EQ :: C, Boo(B₁) :: Boo(B₂) :: V, S) = δ(C, B₁ = B₂ :: V, S)_
 
-
 ```
-
-
 OPEQ -> (
           let x = (Stack.pop valueStack) in
             match x with
@@ -292,14 +280,11 @@ OPEQ -> (
               );
               | _ -> raise (AutomatonException "Error on #EQ");
             );
-
-
 ```
 
 _δ(Lt(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #LT :: C, V, S)_
 
 ```
-   
 Lt(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPLT)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
@@ -329,7 +314,6 @@ Lt(AExp(x), AExp(y)) -> (
 _δ(#LT :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ < N₂ :: V, S)_
 
 ```
-
 OPLT -> (
           let x = (Stack.pop valueStack) in
             match x with
@@ -344,8 +328,6 @@ OPLT -> (
               );
               | _ -> raise (AutomatonException "Error on #LT");
             );
-
-
 ```
 
 _δ(Le(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #LE :: C, V, S)_
@@ -380,7 +362,6 @@ Le(AExp(x), AExp(y)) -> (
 _δ(#LE :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ ≤ N₂ :: V, S)_
 
 ```
-
 OPLE -> (
           let x = (Stack.pop valueStack) in
             match x with
@@ -395,15 +376,9 @@ OPLE -> (
               );
               | _ -> raise (AutomatonException "Error on #LE");
             );
-
-
-
 ```
 
 _δ(Gt(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #GT :: C, V, S)_
-
-
-
 
 ```
 Gt(AExp(x), AExp(y)) -> (
@@ -436,7 +411,6 @@ _δ(#GT :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ > N₂ :: V, S)_
 
 
 ```
-
 OPGT -> (
           let x = (Stack.pop valueStack) in
             match x with
@@ -451,13 +425,9 @@ OPGT -> (
               );
               | _ -> raise (AutomatonException "Error on #GT");
             );
-
-
 ```
 
 _δ(Ge(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #GE :: C, V, S)_
-
-
 
 ```
 Ge(AExp(x), AExp(y)) -> (
@@ -489,8 +459,6 @@ Ge(AExp(x), AExp(y)) -> (
 _δ(#GE :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ ≥ N₂ :: V, S)_
 
 ```
-
-
 OPGE -> (
           let x = (Stack.pop valueStack) in
             match x with
@@ -505,12 +473,9 @@ OPGE -> (
               );
               | _ -> raise (AutomatonException "Error on #GE");
             );
-
 ```
 
 _δ(And(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #AND :: C, V, S)_
-
-
 
 ```
 And(BExp(x), BExp(y)) -> (
@@ -556,16 +521,9 @@ OPAND -> (
               );
               | _ -> raise (AutomatonException "Error on #AND");
             );
-
 ```
 
 _δ(Or(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #OR :: C, V, S)_
-
-
-
-
-
-
 
 ```
 Or(BExp(x), BExp(y)) -> (
@@ -597,7 +555,6 @@ Or(BExp(x), BExp(y)) -> (
 _δ(#OR :: C, Boo(B₁) :: Boo(B₂) :: V, S) = δ(C, B₁ ∨ B₂ :: V, S)_
 
 ```
-
 OPOR -> (
           let x = (Stack.pop valueStack) in
             match x with
@@ -612,11 +569,9 @@ OPOR -> (
               );
               | _ -> raise (AutomatonException "Error on #OR");
             );
-
 ```
 
 _δ(Not(E) :: C, V, S) = δ(E :: #NOT :: C, V, S)_
-
 
 ```
 Not(BExp(x)) -> (
@@ -624,18 +579,15 @@ Not(BExp(x)) -> (
                 (Stack.push (Statement(Exp(BExp(x)))) controlStack);
                 
               );
-              | Not(Id(x)) -> (
+| Not(Id(x)) -> (
                 (Stack.push (ExpOc(OPNOT)) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
                 
               );
-
 ```
-
 
 _δ(#NOT :: C, Boo(True) :: V, S) = δ(C, False :: V, S)_
 _δ(#NOT :: C, Boo(False) :: V, S) = δ(C, True :: V, S)_
-
 
 ```
 OPNOT -> (
@@ -647,5 +599,4 @@ OPNOT -> (
               
               | _ -> raise (AutomatonException "Error on #NOT");
             );   
-
 ```
