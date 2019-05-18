@@ -213,3 +213,439 @@ OPDIV -> (
 
 
 ```
+
+_δ(Eq(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #EQ :: C, V, S)_
+
+
+```
+Eq(BExp(x), BExp(y)) -> (
+                (Stack.push (ExpOc(OPEQ)) controlStack);
+                (Stack.push (Statement(Exp(BExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+                
+              );
+              | Eq(BExp(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPEQ)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+                
+              );
+              | Eq(Id(x), BExp(y)) -> (
+                (Stack.push (ExpOc(OPEQ)) controlStack);
+                (Stack.push (Statement(Exp(BExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                
+              );
+              | Eq(Id(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPEQ)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                
+              );
+              | Eq(AExp(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPEQ)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                
+              );
+              | Eq(AExp(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPEQ)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                
+              );
+              | Eq(Id(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPEQ)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                
+              );
+
+```
+
+_δ(#EQ :: C, Boo(B₁) :: Boo(B₂) :: V, S) = δ(C, B₁ = B₂ :: V, S)_
+
+
+```
+
+
+OPEQ -> (
+          let x = (Stack.pop valueStack) in
+            match x with
+              | Bool(i) -> (
+                let y = (Stack.pop valueStack) in
+                match y with
+                  | Bool(j) -> (
+                    (Stack.push (Bool(i == j)) valueStack);
+                    
+                  );
+                  | _ -> raise (AutomatonException "Error on #EQ");
+              );
+              | Int(i) -> (
+                let y = (Stack.pop valueStack) in
+                match y with
+                  | Int(j) -> (
+                    (Stack.push ( Bool ( i == j)) valueStack);
+                    
+                  );
+                  | _ -> raise (AutomatonException "Error on #EQ");
+              );
+              | _ -> raise (AutomatonException "Error on #EQ");
+            );
+
+
+```
+
+_δ(Lt(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #LT :: C, V, S)_
+
+```
+   
+Lt(AExp(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPLT)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                
+              );
+              | Lt(AExp(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPLT)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                
+              );
+              | Lt(Id(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPLT)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                
+              );
+              | Lt(Id(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPLT)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                
+              );
+```
+
+_δ(#LT :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ < N₂ :: V, S)_
+
+```
+
+OPLT -> (
+          let x = (Stack.pop valueStack) in
+            match x with
+              | Int(i) -> (
+                let y = (Stack.pop valueStack) in
+                match y with
+                  | Int(j) -> (
+                    (Stack.push ( Bool ( j < i)) valueStack);
+                    
+                  );
+                  | _ -> raise (AutomatonException "Error on #LT");
+              );
+              | _ -> raise (AutomatonException "Error on #LT");
+            );
+
+
+```
+
+_δ(Le(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #LE :: C, V, S)_
+
+```
+Le(AExp(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPLE)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                
+              );
+              | Le(AExp(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPLE)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                
+              );
+              | Le(Id(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPLE)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                
+              );
+              | Le(Id(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPLE)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                
+              );
+```
+
+_δ(#LE :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ ≤ N₂ :: V, S)_
+
+```
+
+OPLE -> (
+          let x = (Stack.pop valueStack) in
+            match x with
+              | Int(i) -> (
+                let y = (Stack.pop valueStack) in
+                match y with
+                  | Int(j) -> (
+                    (Stack.push ( Bool ( j <= i)) valueStack);
+                    
+                  );
+                  | _ -> raise (AutomatonException "Error on #LE");
+              );
+              | _ -> raise (AutomatonException "Error on #LE");
+            );
+
+
+
+```
+
+_δ(Gt(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #GT :: C, V, S)_
+
+
+
+
+```
+Gt(AExp(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPGT)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                
+              );
+              | Gt(AExp(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPGT)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                
+              );
+              | Gt(Id(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPGT)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                
+              );
+              | Gt(Id(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPGT)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                
+              );
+```
+
+_δ(#GT :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ > N₂ :: V, S)_
+
+
+```
+
+OPGT -> (
+          let x = (Stack.pop valueStack) in
+            match x with
+              | Int(i) -> (
+                let y = (Stack.pop valueStack) in
+                match y with
+                  | Int(j) -> (
+                    (Stack.push ( Bool ( j > i)) valueStack);
+                    
+                  );
+                  | _ -> raise (AutomatonException "Error on #GT");
+              );
+              | _ -> raise (AutomatonException "Error on #GT");
+            );
+
+
+```
+
+_δ(Ge(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #GE :: C, V, S)_
+
+
+
+```
+Ge(AExp(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPGE)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                
+              );
+              | Ge(AExp(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPGE)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                
+              );
+              | Ge(Id(x), AExp(y)) -> (
+                (Stack.push (ExpOc(OPGE)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                
+              );
+              | Ge(Id(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPGE)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                
+              );
+```
+
+_δ(#GE :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ ≥ N₂ :: V, S)_
+
+```
+
+
+OPGE -> (
+          let x = (Stack.pop valueStack) in
+            match x with
+              | Int(i) -> (
+                let y = (Stack.pop valueStack) in
+                match y with
+                  | Int(j) -> (
+                    (Stack.push ( Bool ( j >= i)) valueStack);
+                    
+                  );
+                  | _ -> raise (AutomatonException "Error on #GE");
+              );
+              | _ -> raise (AutomatonException "Error on #GE");
+            );
+
+```
+
+_δ(And(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #AND :: C, V, S)_
+
+
+
+```
+And(BExp(x), BExp(y)) -> (
+                (Stack.push (ExpOc(OPAND)) controlStack);
+                (Stack.push (Statement(Exp(BExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+                
+              );
+              | And(BExp(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPAND)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+                
+              );
+              | And(Id(x), BExp(y)) -> (
+                (Stack.push (ExpOc(OPAND)) controlStack);
+                (Stack.push (Statement(Exp(BExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                
+              );
+              | And(Id(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPAND)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                
+              );
+```
+
+_δ(#AND :: C, Boo(B₁) :: Boo(B₂) :: V, S) = δ(C, B₁ ∧ B₂ :: V, S)_
+
+```
+OPAND -> (
+          let x = (Stack.pop valueStack) in
+            match x with
+              | Bool(i) -> (
+                let y = (Stack.pop valueStack) in
+                match y with
+                  | Bool(j) -> (
+                    (Stack.push (Bool(i && j)) valueStack);
+                    
+                  );
+                  | _ -> raise (AutomatonException "Error on #AND");
+              );
+              | _ -> raise (AutomatonException "Error on #AND");
+            );
+
+```
+
+_δ(Or(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #OR :: C, V, S)_
+
+
+
+
+
+
+
+```
+Or(BExp(x), BExp(y)) -> (
+                (Stack.push (ExpOc(OPOR)) controlStack);
+                (Stack.push (Statement(Exp(BExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+                
+              );
+              | Or(BExp(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPOR)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+                
+              );
+              | Or(Id(x), BExp(y)) -> (
+                (Stack.push (ExpOc(OPOR)) controlStack);
+                (Stack.push (Statement(Exp(BExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                
+              );
+              | Or(Id(x), Id(y)) -> (
+                (Stack.push (ExpOc(OPOR)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                
+              );
+```
+
+_δ(#OR :: C, Boo(B₁) :: Boo(B₂) :: V, S) = δ(C, B₁ ∨ B₂ :: V, S)_
+
+```
+
+OPOR -> (
+          let x = (Stack.pop valueStack) in
+            match x with
+              | Bool(i) -> (
+                let y = (Stack.pop valueStack) in
+                match y with
+                  | Bool(j) -> (
+                    (Stack.push (Bool(i || j)) valueStack);
+                    
+                  );
+                  | _ -> raise (AutomatonException "Error on #OR");
+              );
+              | _ -> raise (AutomatonException "Error on #OR");
+            );
+
+```
+
+_δ(Not(E) :: C, V, S) = δ(E :: #NOT :: C, V, S)_
+
+
+```
+Not(BExp(x)) -> (
+                (Stack.push (ExpOc(OPNOT)) controlStack);
+                (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+                
+              );
+              | Not(Id(x)) -> (
+                (Stack.push (ExpOc(OPNOT)) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                
+              );
+
+```
+
+
+_δ(#NOT :: C, Boo(True) :: V, S) = δ(C, False :: V, S)_
+_δ(#NOT :: C, Boo(False) :: V, S) = δ(C, True :: V, S)_
+
+
+```
+OPNOT -> (
+          let x = (Stack.pop valueStack) in
+            match x with
+              | Bool(i) -> (
+                (Stack.push (Bool(not(i))) valueStack);
+              );
+              
+              | _ -> raise (AutomatonException "Error on #NOT");
+            );   
+
+```
