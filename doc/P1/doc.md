@@ -19,23 +19,20 @@ Sum(AExp(x), AExp(y)) -> (
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
               );
-              | Sum(Id(x), AExp(y)) -> (
+| Sum(Id(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPSUM)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               ); 
-              | Sum(AExp(x), Id(y)) ->  (
+| Sum(AExp(x), Id(y)) ->  (
                 (Stack.push (ExpOc(OPSUM)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
               ); 
-              | Sum(Id(x), Id(y)) ->  (
+| Sum(Id(x), Id(y)) ->  (
                 (Stack.push (ExpOc(OPSUM)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
 ```
 
@@ -67,25 +64,21 @@ Sub(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPSUB)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
               );
-              | Sub(Id(x), AExp(y)) -> (
+| Sub(Id(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPSUB)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               ); 
-              | Sub(AExp(x), Id(y)) ->  (
+| Sub(AExp(x), Id(y)) ->  (
                 (Stack.push (ExpOc(OPSUB)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
               ); 
-              | Sub(Id(x), Id(y)) ->  (
+| Sub(Id(x), Id(y)) ->  (
                 (Stack.push (ExpOc(OPSUB)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               ); 
 ```
 
@@ -115,25 +108,21 @@ Mul(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPMUL)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
               );
-              | Mul(Id(x), AExp(y)) -> (
+| Mul(Id(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPMUL)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
-                (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);              
               ); 
-              | Mul(AExp(x), Id(y)) ->  (
+| Mul(AExp(x), Id(y)) ->  (
                 (Stack.push (ExpOc(OPMUL)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
               ); 
-              | Mul(Id(x), Id(y)) ->  (
+| Mul(Id(x), Id(y)) ->  (
                 (Stack.push (ExpOc(OPMUL)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
-                (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);                
               );
 ```
 
@@ -163,25 +152,21 @@ Div(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPDIV)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
               );
-              | Div(Id(x), AExp(y)) -> (
+| Div(Id(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPDIV)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               ); 
-              | Div(AExp(x), Id(y)) ->  (
+| Div(AExp(x), Id(y)) ->  (
                 (Stack.push (ExpOc(OPDIV)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
               ); 
-              | Div(Id(x), Id(y)) ->  (
+| Div(Id(x), Id(y)) ->  (
                 (Stack.push (ExpOc(OPDIV)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               ); 
 ```
 
@@ -214,43 +199,36 @@ Eq(BExp(x), BExp(y)) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(BExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(BExp(x)))) controlStack);
-                
               );
-              | Eq(BExp(x), Id(y)) -> (
+| Eq(BExp(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(BExp(x)))) controlStack);
-                
               );
-              | Eq(Id(x), BExp(y)) -> (
+| Eq(Id(x), BExp(y)) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(BExp(y)))) controlStack);
-                (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
+                (Stack.push (Statement(Exp(Id(x)))) controlStack); 
               );
-              | Eq(Id(x), Id(y)) -> (
+| Eq(Id(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
-              | Eq(AExp(x), AExp(y)) -> (
+| Eq(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
               );
-              | Eq(AExp(x), Id(y)) -> (
+| Eq(AExp(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
               );
-              | Eq(Id(x), AExp(y)) -> (
+| Eq(Id(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
 ```
 
@@ -288,26 +266,22 @@ _δ(Lt(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #LT :: C, V, S)_
 Lt(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPLT)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
-                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack); 
               );
-              | Lt(AExp(x), Id(y)) -> (
+| Lt(AExp(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPLT)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
               );
-              | Lt(Id(x), AExp(y)) -> (
+| Lt(Id(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPLT)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
-              | Lt(Id(x), Id(y)) -> (
+| Lt(Id(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPLT)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
 ```
 
@@ -337,25 +311,21 @@ Le(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPLE)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
               );
-              | Le(AExp(x), Id(y)) -> (
+| Le(AExp(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPLE)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
-                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack); 
               );
-              | Le(Id(x), AExp(y)) -> (
+| Le(Id(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPLE)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
-              | Le(Id(x), Id(y)) -> (
+| Le(Id(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPLE)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
 ```
 
@@ -385,25 +355,21 @@ Gt(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPGT)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
               );
-              | Gt(AExp(x), Id(y)) -> (
+| Gt(AExp(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPGT)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
-                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);                
               );
-              | Gt(Id(x), AExp(y)) -> (
+| Gt(Id(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPGT)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
-                (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);                
               );
-              | Gt(Id(x), Id(y)) -> (
+| Gt(Id(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPGT)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
-                (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);                
               );
 ```
 
@@ -434,25 +400,21 @@ Ge(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPGE)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
               );
-              | Ge(AExp(x), Id(y)) -> (
+| Ge(AExp(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPGE)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
-                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);                
               );
-              | Ge(Id(x), AExp(y)) -> (
+| Ge(Id(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPGE)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
-                (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);                
               );
-              | Ge(Id(x), Id(y)) -> (
+| Ge(Id(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPGE)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
-                (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);                
               );
 ```
 
@@ -467,7 +429,6 @@ OPGE -> (
                 match y with
                   | Int(j) -> (
                     (Stack.push ( Bool ( j >= i)) valueStack);
-                    
                   );
                   | _ -> raise (AutomatonException "Error on #GE");
               );
@@ -482,25 +443,21 @@ And(BExp(x), BExp(y)) -> (
                 (Stack.push (ExpOc(OPAND)) controlStack);
                 (Stack.push (Statement(Exp(BExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(BExp(x)))) controlStack);
-                
               );
-              | And(BExp(x), Id(y)) -> (
+| And(BExp(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPAND)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(BExp(x)))) controlStack);
-                
               );
-              | And(Id(x), BExp(y)) -> (
+| And(Id(x), BExp(y)) -> (
                 (Stack.push (ExpOc(OPAND)) controlStack);
                 (Stack.push (Statement(Exp(BExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
-              | And(Id(x), Id(y)) -> (
+| And(Id(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPAND)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
 ```
 
@@ -530,25 +487,21 @@ Or(BExp(x), BExp(y)) -> (
                 (Stack.push (ExpOc(OPOR)) controlStack);
                 (Stack.push (Statement(Exp(BExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(BExp(x)))) controlStack);
-                
               );
-              | Or(BExp(x), Id(y)) -> (
+| Or(BExp(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPOR)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(BExp(x)))) controlStack);
-                
               );
-              | Or(Id(x), BExp(y)) -> (
+| Or(Id(x), BExp(y)) -> (
                 (Stack.push (ExpOc(OPOR)) controlStack);
                 (Stack.push (Statement(Exp(BExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
-              | Or(Id(x), Id(y)) -> (
+| Or(Id(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPOR)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
 ```
 
@@ -576,13 +529,11 @@ _δ(Not(E) :: C, V, S) = δ(E :: #NOT :: C, V, S)_
 ```
 Not(BExp(x)) -> (
                 (Stack.push (ExpOc(OPNOT)) controlStack);
-                (Stack.push (Statement(Exp(BExp(x)))) controlStack);
-                
+                (Stack.push (Statement(Exp(BExp(x)))) controlStack); 
               );
 | Not(Id(x)) -> (
                 (Stack.push (ExpOc(OPNOT)) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
 ```
 
@@ -601,9 +552,6 @@ OPNOT -> (
             );   
 ```
 
-
-
-```
 _δ(Id(W) :: C, V, E, S) = δ(C, B :: V, E, S), where E[W] = l ∧ S[l] = B_
 
 ```
@@ -627,7 +575,6 @@ Assign(Id(x), y) -> (
              (Stack.push (CmdOc(OPASSIGN)) controlStack );
              (Stack.push (Statement(Exp(y))) controlStack );
              (Stack.push (Str(x)) valueStack);
-             
           );
 ```
 
@@ -668,13 +615,11 @@ Loop( BExp(x), y) -> (
             (Stack.push (CmdOc(OPLOOP)) controlStack);
             (Stack.push (Statement(Exp(BExp(x)))) controlStack );
             (Stack.push (Control(Statement(Cmd(Loop(BExp(x), y))))) valueStack ); 
-            
           );
-          | Loop(Id(x), y) -> (
+| Loop(Id(x), y) -> (
             (Stack.push (CmdOc(OPLOOP)) controlStack);
             (Stack.push (Statement(Exp(Id(x)))) controlStack );
             (Stack.push (Control(Statement(Cmd(Loop(Id(x), y))))) valueStack );
-            
           );
 ```
 
@@ -708,13 +653,11 @@ Cond(BExp(x), y, z) -> (
             (Stack.push (CmdOc(OPCOND)) controlStack);
             (Stack.push (Statement(Exp(BExp(x)))) controlStack );
             (Stack.push (Control(Statement(Cmd(Cond(BExp(x), y, z))))) valueStack );
-            
           );
-          | Cond(Id(x), y, z) -> (
+| Cond(Id(x), y, z) -> (
             (Stack.push (CmdOc(OPCOND)) controlStack);
             (Stack.push (Statement(Exp(Id(x)))) controlStack );
             (Stack.push (Control(Statement(Cmd(Cond(Id(x), y, z))))) valueStack );
-            
           );
 ```
 
@@ -746,6 +689,5 @@ _δ(CSeq(M₁, M₂) :: C, V, E, S) = δ(M₁ :: M₂ :: C, V, E, S)_
 CSeq(x, y) -> (
             (Stack.push (Statement(Cmd(y))) controlStack );
             (Stack.push (Statement(Cmd(x))) controlStack );
-            
           );
 ```
