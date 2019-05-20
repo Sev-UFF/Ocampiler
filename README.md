@@ -16,7 +16,7 @@ make install
 ```
 Fará com que o Opam seja instalado na sua máquina, gerenciando as dependências usadas pelo Ocampiler.
 Esse comando também gerará o compilador, Ocampiler, na pasta src. 
-O comando de instalação do opam poderá levar alguns minutos, aprecie seu café enquanto isso. 
+O comando de instalação do opam poderá levar alguns minutos, aprecie seu café enquanto isso. ☕
 
 # Uso e Opções da Linha de Comando
 ```
