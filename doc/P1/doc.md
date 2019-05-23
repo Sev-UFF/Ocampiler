@@ -291,6 +291,9 @@ Eq(BExp(x), BExp(y)) -> (
               );
 ```
 
+Ao ler o #EQ, fazemos um pop na pilha de valores para ler o valor X(B1) e verificamos se ele é do tipo Bool ou Int. Depois fazemos outro POP para ler o valor Y(B2) e verificamos se este também é do tipo Bool ou Int. Sendo que só se permitem dois POPs consecultivos de valores iguais (dois Bool ou dois Int). Depois verificamos se os valores contidos são iguais, retornando True ou diferentes, retornando False.
+
+
 ```
 δ(#EQ :: C, Boo(B₁) :: Boo(B₂) :: V, S) = δ(C, B₁ = B₂ :: V, S)
 ```
@@ -321,6 +324,11 @@ OPEQ -> (
             );
 ```
 
+Quando lê-se um LT(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou ID(x)) podendo haver uma combinação 2 a 2 entre eles. Por exemplo, podemos fazer os 4 tipos de desigualdades: 2 < 5; 3 < x; x < 4; x < y; 
+
+Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #LT, depois o E2 e por fim o E1 na pilha de controle.
+
+
 ```
 δ(Lt(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #LT :: C, V, S)
 ```
@@ -348,6 +356,9 @@ Lt(AExp(x), AExp(y)) -> (
               );
 ```
 
+Ao ler o #LT, fazemos um pop na pilha de valores para ler o valor Num(N1) e verificamos se ele é do tipo Int. Depois fazemos outro POP para ler o valor Num(N2) e verificamos se este também é do tipo Int. Caso não sejam, cairemmos em uma Exception. Depois verificamos se N2 < N1, retornando True ou False. 
+
+
 ```
 δ(#LT :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ < N₂ :: V, S)
 ```
@@ -372,6 +383,9 @@ OPLT -> (
 ```
 δ(Le(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #LE :: C, V, S)
 ```
+Quando lê-se um LE(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou ID(x)) podendo haver uma combinação 2 a 2 entre eles. Por exemplo, podemos fazer os 4 tipos de desigualdades: 2 <= 5; 3 <= x; x <= 4; x <= y; 
+
+Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #LE, depois o E2 e por fim o E1 na pilha de controle.
 
 ```
 Le(AExp(x), AExp(y)) -> (
@@ -396,6 +410,8 @@ Le(AExp(x), AExp(y)) -> (
               );
 ```
 
+Ao ler o #LE, fazemos um pop na pilha de valores para ler o valor Num(N1) e verificamos se ele é do tipo Int. Depois fazemos outro POP para ler o valor Num(N2) e verificamos se este também é do tipo Int. Caso não sejam, cairemmos em uma Exception. Depois verificamos se N2 <= N1, retornando True ou False. 
+
 ```
 δ(#LE :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ ≤ N₂ :: V, S)
 ```
@@ -416,6 +432,11 @@ OPLE -> (
               | _ -> raise (AutomatonException "Error on #LE");
             );
 ```
+
+Quando lê-se um GT(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou ID(x)) podendo haver uma combinação 2 a 2 entre eles. Por exemplo, podemos fazer os 4 tipos de desigualdades: 2 > 5; 3 > x; x > 4; x > y; 
+
+Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #GT, depois o E2 e por fim o E1 na pilha de controle.
+
 
 ```
 δ(Gt(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #GT :: C, V, S)
@@ -444,6 +465,8 @@ Gt(AExp(x), AExp(y)) -> (
               );
 ```
 
+Ao ler o #GT, fazemos um pop na pilha de valores para ler o valor Num(N1) e verificamos se ele é do tipo Int. Depois fazemos outro POP para ler o valor Num(N2) e verificamos se este também é do tipo Int. Caso não sejam, cairemmos em uma Exception. Depois verificamos se N2 > N1, retornando True ou False. 
+
 ```
 δ(#GT :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ > N₂ :: V, S)
 ```
@@ -464,6 +487,11 @@ OPGT -> (
               | _ -> raise (AutomatonException "Error on #GT");
             );
 ```
+
+Quando lê-se um GE(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou ID(x)) podendo haver uma combinação 2 a 2 entre eles. Por exemplo, podemos fazer os 4 tipos de desigualdades: 6 >= 1; 2 >= x; x >= 7; x >= y; 
+
+Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #GE, depois o E2 e por fim o E1 na pilha de controle.
+
 
 ```
 δ(Ge(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #GE :: C, V, S)
@@ -491,6 +519,8 @@ Ge(AExp(x), AExp(y)) -> (
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);                
               );
 ```
+
+Ao ler o #GE, fazemos um pop na pilha de valores para ler o valor Num(N1) e verificamos se ele é do tipo Int. Depois fazemos outro POP para ler o valor Num(N2) e verificamos se este também é do tipo Int. Caso não sejam, cairemmos em uma Exception. Depois verificamos se N2 >= N1, retornando True ou False. 
 
 ```
 δ(#GE :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ ≥ N₂ :: V, S)
