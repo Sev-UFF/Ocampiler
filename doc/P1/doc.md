@@ -24,8 +24,9 @@ Quando lê-se um SUM(E1, E2), devemos antes verificar a qual tipo pertencem os d
 Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #SUM, depois a Expressão Y e por fim a Expressão X na pilha de valores.
 
 
+```
 _δ(Sum(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #SUM :: C, V, S)_   
-
+```
 
 ```
 Sum(AExp(x), AExp(y)) -> (
@@ -52,8 +53,9 @@ Sum(AExp(x), AExp(y)) -> (
 
 Ao ler o #SUM, fazemos um pop para ler o valor X e depois outro para ler o valor Y, logo após verificamos que ambos são do tipo inteiro e somamos eles, colocando o resultado na pilha de valores. Caso não sejam, cairíamos em uma Exception.
 
+```
 _δ(#SUM :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ + N₂ :: V, S)_
-
+```
 
 ```
 OPSUM -> (
@@ -72,8 +74,9 @@ OPSUM -> (
             );
 ```
 
+```
 _δ(Sub(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #SUB :: C, V, S)_  
-
+```
 
 ```
 Sub(AExp(x), AExp(y)) -> (
@@ -98,7 +101,9 @@ Sub(AExp(x), AExp(y)) -> (
               ); 
 ```
 
+```
 _δ(#SUB :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ - N₂ :: V, S)_
+```
 
 ```            
 OPSUB -> (
@@ -117,7 +122,9 @@ OPSUB -> (
             );
 ```            
 
+```
 _δ(Mul(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #MUL :: C, V, S)_  
+```
 
 ```            
 Mul(AExp(x), AExp(y)) -> (
@@ -142,7 +149,9 @@ Mul(AExp(x), AExp(y)) -> (
               );
 ```
 
+```
 _δ(#MUL :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ * N₂ :: V, S)_
+```
 
 ```
 OPMUL -> (
@@ -161,7 +170,9 @@ OPMUL -> (
             );
 ```
 
+```
 _δ(Div(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #DIV :: C, V, S)_  
+```
 
 ```              
 Div(AExp(x), AExp(y)) -> (
@@ -186,7 +197,9 @@ Div(AExp(x), AExp(y)) -> (
               ); 
 ```
 
+```
 _δ(#DIV :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ / N₂ :: V, S) if N₂ ≠ 0_
+```
 
 ```
 OPDIV -> (
@@ -208,7 +221,9 @@ OPDIV -> (
             );
 ```
 
+```
 _δ(Eq(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #EQ :: C, V, S)_
+```
 
 ```
 Eq(BExp(x), BExp(y)) -> (
@@ -248,7 +263,9 @@ Eq(BExp(x), BExp(y)) -> (
               );
 ```
 
+```
 _δ(#EQ :: C, Boo(B₁) :: Boo(B₂) :: V, S) = δ(C, B₁ = B₂ :: V, S)_
+```
 
 ```
 OPEQ -> (
@@ -276,7 +293,9 @@ OPEQ -> (
             );
 ```
 
+```
 _δ(Lt(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #LT :: C, V, S)_
+```
 
 ```
 Lt(AExp(x), AExp(y)) -> (
@@ -301,7 +320,9 @@ Lt(AExp(x), AExp(y)) -> (
               );
 ```
 
+```
 _δ(#LT :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ < N₂ :: V, S)_
+```
 
 ```
 OPLT -> (
@@ -320,7 +341,9 @@ OPLT -> (
             );
 ```
 
+```
 _δ(Le(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #LE :: C, V, S)_
+```
 
 ```
 Le(AExp(x), AExp(y)) -> (
@@ -345,7 +368,9 @@ Le(AExp(x), AExp(y)) -> (
               );
 ```
 
+```
 _δ(#LE :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ ≤ N₂ :: V, S)_
+```
 
 ```
 OPLE -> (
@@ -364,7 +389,9 @@ OPLE -> (
             );
 ```
 
+```
 _δ(Gt(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #GT :: C, V, S)_
+```
 
 ```
 Gt(AExp(x), AExp(y)) -> (
@@ -389,8 +416,9 @@ Gt(AExp(x), AExp(y)) -> (
               );
 ```
 
+```
 _δ(#GT :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ > N₂ :: V, S)_
-
+```
 
 ```
 OPGT -> (
@@ -409,7 +437,9 @@ OPGT -> (
             );
 ```
 
+```
 _δ(Ge(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #GE :: C, V, S)_
+```
 
 ```
 Ge(AExp(x), AExp(y)) -> (
@@ -434,7 +464,9 @@ Ge(AExp(x), AExp(y)) -> (
               );
 ```
 
+```
 _δ(#GE :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ ≥ N₂ :: V, S)_
+```
 
 ```
 OPGE -> (
@@ -452,7 +484,9 @@ OPGE -> (
             );
 ```
 
+```
 _δ(And(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #AND :: C, V, S)_
+```
 
 ```
 And(BExp(x), BExp(y)) -> (
@@ -477,7 +511,9 @@ And(BExp(x), BExp(y)) -> (
               );
 ```
 
+```
 _δ(#AND :: C, Boo(B₁) :: Boo(B₂) :: V, S) = δ(C, B₁ ∧ B₂ :: V, S)_
+```
 
 ```
 OPAND -> (
@@ -496,7 +532,9 @@ OPAND -> (
             );
 ```
 
+```
 _δ(Or(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #OR :: C, V, S)_
+```
 
 ```
 Or(BExp(x), BExp(y)) -> (
@@ -521,7 +559,9 @@ Or(BExp(x), BExp(y)) -> (
               );
 ```
 
+```
 _δ(#OR :: C, Boo(B₁) :: Boo(B₂) :: V, S) = δ(C, B₁ ∨ B₂ :: V, S)_
+```
 
 ```
 OPOR -> (
@@ -540,7 +580,9 @@ OPOR -> (
             );
 ```
 
+```
 _δ(Not(E) :: C, V, S) = δ(E :: #NOT :: C, V, S)_
+```
 
 ```
 Not(BExp(x)) -> (
@@ -553,8 +595,10 @@ Not(BExp(x)) -> (
               );
 ```
 
+```
 _δ(#NOT :: C, Boo(True) :: V, S) = δ(C, False :: V, S)_
 _δ(#NOT :: C, Boo(False) :: V, S) = δ(C, True :: V, S)_
+```
 
 ```
 OPNOT -> (
@@ -568,7 +612,9 @@ OPNOT -> (
             );   
 ```
 
+```
 _δ(Id(W) :: C, V, E, S) = δ(C, B :: V, E, S), where E[W] = l ∧ S[l] = B_
+```
 
 ```
 Id(id) -> (
@@ -584,7 +630,9 @@ Id(id) -> (
             );
 ```
 
+```
 _δ(Assign(W, X) :: C, V, E, S) = δ(X :: #ASSIGN :: C, W :: V, E, S')_
+```
 
 ```
 Assign(Id(x), y) -> (
@@ -594,7 +642,9 @@ Assign(Id(x), y) -> (
           );
 ```
 
+```
 _δ(#ASSIGN :: C, T :: W :: V, E, S) = δ(C, V, E, S'), where E[W] = l ∧ S' = S/[l ↦ T]_
+```
 
 ```
 OPASSIGN -> (
@@ -624,7 +674,9 @@ OPASSIGN -> (
             );
 ```
 
+```
 _δ(Loop(X, M) :: C, V, E, S) = δ(X :: #LOOP :: C, Loop(X, M) :: V, E, S)_
+```
 
 ```
 Loop( BExp(x), y) -> (
@@ -639,8 +691,10 @@ Loop( BExp(x), y) -> (
           );
 ```
 
+```
 _δ(#LOOP :: C, Boo(true) :: Loop(X, M) :: V, E, S) = δ(M :: Loop(X, M) :: C, V, E, S)_
 _δ(#LOOP :: C, Boo(false) :: Loop(X, M) :: V, E, S) = δ(C, V, E, S)_
+```
 
 ```
 OPLOOP -> (
@@ -662,7 +716,9 @@ OPLOOP -> (
         );
 ```
 
+```
 _δ(Cond(X, M₁, M₂) :: C, V, E, S) = δ(X :: #COND :: C, Cond(X, M₁, M₂) :: V, E, S)_
+```
 
 ```
 Cond(BExp(x), y, z) -> (
@@ -677,8 +733,10 @@ Cond(BExp(x), y, z) -> (
           );
 ```
 
+```
 _δ(#COND :: C, Boo(true) :: Cond(X, M₁, M₂) :: V, E, S) = δ(M₁ :: C, V, E, S)_
 _δ(#COND :: C, Boo(false) :: Cond(X, M₁, M₂) :: V, E, S) = δ(M₂ :: C, V, E, S)_
+```
 
 ```
 OPCOND -> (
@@ -699,7 +757,9 @@ OPCOND -> (
         );
 ```
 
+```
 _δ(CSeq(M₁, M₂) :: C, V, E, S) = δ(M₁ :: M₂ :: C, V, E, S)_
+```
 
 ```
 CSeq(x, y) -> (
