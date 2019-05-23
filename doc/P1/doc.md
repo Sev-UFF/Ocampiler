@@ -11,7 +11,6 @@ Quando lê-se um NUM(N), simplesmente colocamos o valor N na pilha de valores.
 
 ```
 _δ(Num(N) :: C, V, S) = δ(C, N :: V, S)_  
-
 ```
 
 ```
