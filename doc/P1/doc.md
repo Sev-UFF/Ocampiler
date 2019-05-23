@@ -3,6 +3,11 @@
 
 #Demonstração em código das denotações
 
+No autômato, o nosso código inicia-se com um POP na pilha de controle, e logo em seguida faz-se o seguinte PATTERN MATCH, para tomar a devida decisão de acordo com o elemento que se retirou, podendo ele ser algum tipo indutivo de Pi ou algum OPTCODE.
+
+
+Quando lê-se um NUM(N), simplesmente colocamos o valor N na pilha de valores.
+
 _δ(Num(N) :: C, V, S) = δ(C, N :: V, S)_  
 ```
 Num(x) -> (
