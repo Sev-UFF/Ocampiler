@@ -2,10 +2,125 @@
 
 Em cada tópico a seguir explicaremos como implementamos o funcionamento do π framework em Ocaml.
 
-
 ## Gramática π
 
+Usamos os tipos indutivos de Ocaml para criar uma estrutura de tipos iguais às definidas pelo framework. O tipo _statement_ é o usado para definir o nível máximo no qual o lexer e o parser trabalham. O _statement_ está dentro do tipo _control_ que é onde o autômato trabalha, pois além das denotações ele faz uso dos Opcodes, que por sua vez estão definidos como tipos induzidos pelo tipo _control_. 
 
+A gramática do nível das expressões é definida como 
+
+```
+<Statement> ::= <Exp> 
+
+<Exp>       ::= <ArithExp> | <BoolExp> 
+
+<ArithExp>  ::= Num(<digits>) | Sum(<Exp> , <Exp> ) | Sub(<Exp>, <Exp>) | 
+                Mul(<Exp>, <Exp>) | Div(<Exp>, <Exp>)
+
+<BoolExp>   ::= Boo(<bool>) | Eq(<Exp>, <Exp>) | Lt(<Exp>, <Exp>) | 
+                Le(<Exp>, <Exp>) | Gt(<Exp>, <Exp>) | Ge(<Exp>, <Exp>) | 
+                And(<Exp>, <Exp>) | Or(<Exp>, <Exp>) | Not(<Exp>) 
+
+<bool>      ::= True | False
+```
+
+e foi implementada em Ocaml da seguinte maneira
+
+```
+type statement = 
+   | Exp of expression
+;;
+
+type arithmeticExpression = 
+  | Num of int
+  | Sum of expression * expression
+  | Sub of expression * expression
+  | Mul of expression * expression
+  | Div of expression * expression 
+;;
+
+type booleanExpression =
+  | Boo of bool  
+  | Eq of expression * expression
+  | Lt of expression * expression
+  | Le of expression * expression
+  | Gt of expression * expression
+  | Ge of expression * expression
+  | And of expression * expression
+  | Or of expression * expression
+  | Not of expression
+;;
+
+type expression = 
+  | AExp of arithmeticExpression
+  | BExp of booleanExpression
+  | Id of string
+;;
+```
+
+Já no nível dos comandos temos a seguinte especificação
+
+```
+<Statement> ::= <Cmd> 
+
+<Cmd>       ::= Id(<String>) | Nop | Assign(<Id>, <Exp>) | Loop(<BoolExp>, <Cmd>) | 
+                CSeq(<Cmd>, <Cmd>) | Cond(<BoolExp>, <Cmd>, <Cmd>)
+```
+
+que foi implementada extendendo esses tipos aos tipos previamente definidos
+
+```
+type command = 
+  | Loop of expression * command
+  | CSeq of command * command
+  | Nop
+  | Assign of expression * expression
+  | Cond of expression * command * command
+;;
+
+type statement = 
+  | Cmd of command
+;;
+
+```
+
+Os opcodes definidos pelas expressões e comandos 
+
+```
+<ExpOC>     ::= #SUM | #SUB | #MUL | #DIV |   
+                #EQ | #LT | #LE | #GT | #GE | #AND | #OR | #NOT
+
+<CmdOC>     ::= #ASSIGN | #LOOP | #COND
+```
+Foram implementados no nível de controle, que possui também o tipo _statement_ dentro dele
+
+```
+type expOc =
+  | OPSUM
+  | OPMUL
+  | OPSUB 
+  | OPDIV 
+  | OPEQ 
+  | OPLT 
+  | OPLE 
+  | OPGT 
+  | OPGE 
+  | OPAND 
+  | OPOR 
+  | OPNOT
+;;
+
+type cmdOc =
+  | OPASSIGN 
+  | OPLOOP 
+  | OPCOND
+;;
+
+type control = 
+  | Statement of statement
+  | ExpOc of expOc
+  | CmdOc of cmdOc
+;;
+```
 
 ## Lexer
 
