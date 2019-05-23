@@ -867,16 +867,16 @@ Quando lê-se um Id(W), verificamos primeiro que o valor contido em Id é do tip
 
 ```
 Id(id) -> (
-            let key = Hashtbl.find environment id  in
-              match key with 
-                | Value(x) -> ();
-                | Loc(x) -> (
-                  let value = Hashtbl.find memory x  in
-                    match value with
-                    | Integer(x) ->   (Stack.push (Int(x)) valueStack);
-                    | Boolean(x) ->  (Stack.push (Bool(x)) valueStack);
-                )
-            );
+  let key = Hashtbl.find environment id  in
+    match key with 
+      | Value(x) -> ();
+      | Loc(x) -> (
+        let value = Hashtbl.find memory x  in
+          match value with
+          | Integer(x) ->   (Stack.push (Int(x)) valueStack);
+          | Boolean(x) ->  (Stack.push (Bool(x)) valueStack);
+      );
+);
 ```
 
 Quando lê-se um Assign(W, X), empilhamos o OPTCODE #ASSIGN e a expressão X na pilha de controle e, por fim, empilhamos a String W na pilha de valores.
@@ -888,10 +888,10 @@ Quando lê-se um Assign(W, X), empilhamos o OPTCODE #ASSIGN e a expressão X na 
 
 ```
 Assign(Id(x), y) -> (
-             (Stack.push (CmdOc(OPASSIGN)) controlStack );
-             (Stack.push (Statement(Exp(y))) controlStack );
-             (Stack.push (Str(x)) valueStack);
-          );
+  (Stack.push (CmdOc(OPASSIGN)) controlStack );
+  (Stack.push (Statement(Exp(y))) controlStack );
+  (Stack.push (Str(x)) valueStack);
+);
 ```
 
 Ao ler o #ASSIGN, fazemos um pop na pilha de valores para ler o valor a ser atualizado na memória, podendo ser um Bool ou um Int. Em seguida, fazemos mais um POP onde pegamos a string identificadora. Com a string em mãos, descobrimos a chave que está associada a esse Id no Hashtable de enviroment e, com essa chave, descobrimos no Hashtable da memória o conteúdo associado a ela, atualizando este valor com o valor encontrado no primeiro POP deste caso. Qualquer valor não esperado resultará em uma Exception.
