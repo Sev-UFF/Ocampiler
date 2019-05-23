@@ -1045,6 +1045,8 @@ OPASSIGN ->
 );
 ```
 
+Quando lê-se um Loop(X, M), empilhamos o OPTCODE #LOOP e a expressão X na pilha de controle e, por fim, empilhamos a expressão Loop(X, M) na pilha de valores. X pode ser tanto uma Boolean Expression como um Id carregando um valor booleano em si.
+
 ```
 δ(Loop(X, M) :: C, V, E, S) = δ(X :: #LOOP :: C, Loop(X, M) :: V, E, S)
 ```
@@ -1063,6 +1065,8 @@ Loop( BExp(x), y) ->
   (Stack.push (Control(Statement(Cmd(Loop(Id(x), y))))) valueStack );
 );
 ```
+
+Ao ler o #LOOP, fazemos um pop na pilha de valores para ler o Boolean Expression já avaliado. Em seguida, fazemos mais um POP onde pegamos a expressão inteira Loop(X, M). Caso a Boolean Expression seja True, colocamos a espressão Loop(X, M) na pilha de controle e depois o parâmetro M do Loop(X, M) também na pilha de controle. Caso seja False, não se faz nada, chamando-se recursivamente a função para se fazer o próximo POP na pilha de controle.
 
 ```
 δ(#LOOP :: C, Boo(true) :: Loop(X, M) :: V, E, S) = δ(M :: Loop(X, M) :: C, V, E, S)
