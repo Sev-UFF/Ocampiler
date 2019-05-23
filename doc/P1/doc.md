@@ -105,7 +105,7 @@ Sub(AExp(x), AExp(y)) -> (
               ); 
 ```
 
-Ao ler o #SUB, fazemos um pop na pilha de valores para ler o valor X(N1) e verificamos que é do tipo inteiro. Depois fazemos outro POP para ler o valor Y(N2) e verificamos que este também é do tipo inteiro. Depois subtraimos eles, colocando o resultado na pilha de valores. Caso não sejam, cairíamos em uma Exception.
+Ao ler o #SUB, fazemos um pop na pilha de valores para ler o valor X(N1) e verificamos que é do tipo inteiro. Depois fazemos outro POP para ler o valor Y(N2) e verificamos que este também é do tipo inteiro. Depois subtraímos eles, colocando o resultado na pilha de valores. Caso não sejam, cairíamos em uma Exception.
 
 ```
 δ(#SUB :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ - N₂ :: V, S)
@@ -131,7 +131,7 @@ OPSUB -> (
 
 Quando lê-se um MUL(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou ID(x)) podendo haver a combinação 2 a 2 deles. Por exemplo, podemos fazer os 4 tipos de multiplicação: 5 * 4; 5 * x; x * 5; x * y;
 
-Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #MUL, depois o E2 (Arithmetic Expression Y) e por fim o E1 (Arithmetic Expression X) na pilha de valores.
+Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #MUL, depois o E2 (Arithmetic Expression Y) e por fim o E1 (Arithmetic Expression X) na pilha de controle.
 
 
 ```
