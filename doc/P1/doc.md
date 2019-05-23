@@ -21,7 +21,7 @@ Num(x) -> (
 
 Quando lê-se um SUM(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou ID(x)) podendo haver a combinação 2 a 2 deles. Por exemplo, podemos fazer os 4 tipos de soma: 2 + 2; 2 + x; x + 2; x + y;
 
-Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #SUM, depois o E2 (Arithmetic Expression Y) e por fim o E1 (Arithmetic Expression X) na pilha de valores.
+Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #SUM, depois o E2 e por fim o E1 na pilha de controle.
 
 
 ```
@@ -76,7 +76,7 @@ OPSUM -> (
 
 Quando lê-se um SUB(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou ID(x)) podendo haver a combinação 2 a 2 deles. Por exemplo, podemos fazer os 4 tipos de subtração: 4 - 4; 4 - x; x - 4; x - y;
 
-Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #SUB, depois o E2 (Arithmetic Expression Y) e por fim o E1 (Arithmetic Expression X) na pilha de valores.
+Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #SUB, depois o E2 e por fim o E1 na pilha de controle.
 
 ```
 δ(Sub(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #SUB :: C, V, S)  
@@ -131,7 +131,7 @@ OPSUB -> (
 
 Quando lê-se um MUL(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou ID(x)) podendo haver a combinação 2 a 2 deles. Por exemplo, podemos fazer os 4 tipos de multiplicação: 5 * 4; 5 * x; x * 5; x * y;
 
-Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #MUL, depois o E2 (Arithmetic Expression Y) e por fim o E1 (Arithmetic Expression X) na pilha de controle.
+Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #MUL, depois o E2 e por fim o E1 na pilha de controle.
 
 
 ```
@@ -186,7 +186,7 @@ OPMUL -> (
 
 Quando lê-se um DIV(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou ID(x)) podendo haver a combinação 2 a 2 deles. Por exemplo, podemos fazer os 4 tipos de divisão: 6 / 2; 6 / x; x / 6; x / y;
 
-Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #DIV, depois o E2 (Arithmetic Expression Y) e por fim o E1 (Arithmetic Expression X) na pilha de valores.
+Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #DIV, depois o E2 e por fim o E1 na pilha de controle.
 
 
 ```
@@ -242,6 +242,12 @@ OPDIV -> (
               | _ -> raise (AutomatonException "Error on #DIV");
             );
 ```
+
+
+Quando lê-se um EQ(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression, Boolean Expression ou ID(x)) podendo haver algumas combinações entre eles. Por exemplo, podemos fazer os 7 tipos de igualdade: true == false; true == x; y = false; x == y; 2 == 2; 2 == x; x == 2;
+
+Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #EQ, depois o E2 e por fim o E1 na pilha de controle.
+
 
 ```
 δ(Eq(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #EQ :: C, V, S)
