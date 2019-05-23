@@ -6,7 +6,7 @@
 No autômato, o nosso código inicia-se com um POP na pilha de controle, e logo em seguida faz-se o seguinte PATTERN MATCH, para tomar a devida decisão de acordo com o elemento que se retirou, podendo ele ser algum tipo indutivo de Pi ou algum OPTCODE. Dessa forma, o autômato opera recebendo um estado válido(q) e faz uma transição para o estado (q') através da função de transição δ  - δ(q) -> δ(q') - conforme o exemplo a seguir.
 
 
-Quando lê-se um NUM(N), simplesmente colocamos o valor N na pilha de valores.
+Quando lê-se um Num(N), simplesmente colocamos o valor N na pilha de valores.
 
 
 ```
@@ -19,7 +19,7 @@ Num(x) -> (
                 );
 ```
 
-Quando lê-se um SUM(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou ID(x)) podendo haver a combinação 2 a 2 deles. Por exemplo, podemos fazer os 4 tipos de soma: 2 + 2; 2 + x; x + 2; x + y;
+Quando lê-se um Sum(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou Id(x)) podendo haver a combinação 2 a 2 deles. Por exemplo, podemos fazer os 4 tipos de soma: 2 + 2; 2 + x; x + 2; x + y;
 
 Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #SUM, depois o E2 e por fim o E1 na pilha de controle.
 
@@ -74,7 +74,7 @@ OPSUM -> (
             );
 ```
 
-Quando lê-se um SUB(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou ID(x)) podendo haver a combinação 2 a 2 deles. Por exemplo, podemos fazer os 4 tipos de subtração: 4 - 4; 4 - x; x - 4; x - y;
+Quando lê-se um Sub(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou Id(x)) podendo haver a combinação 2 a 2 deles. Por exemplo, podemos fazer os 4 tipos de subtração: 4 - 4; 4 - x; x - 4; x - y;
 
 Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #SUB, depois o E2 e por fim o E1 na pilha de controle.
 
@@ -129,7 +129,7 @@ OPSUB -> (
 ```            
 
 
-Quando lê-se um MUL(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou ID(x)) podendo haver a combinação 2 a 2 deles. Por exemplo, podemos fazer os 4 tipos de multiplicação: 5 * 4; 5 * x; x * 5; x * y;
+Quando lê-se um Mul(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou Id(x)) podendo haver a combinação 2 a 2 deles. Por exemplo, podemos fazer os 4 tipos de multiplicação: 5 * 4; 5 * x; x * 5; x * y;
 
 Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #MUL, depois o E2 e por fim o E1 na pilha de controle.
 
@@ -184,7 +184,7 @@ OPMUL -> (
             );
 ```
 
-Quando lê-se um DIV(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou ID(x)) podendo haver a combinação 2 a 2 deles. Por exemplo, podemos fazer os 4 tipos de divisão: 6 / 2; 6 / x; x / 6; x / y;
+Quando lê-se um Div(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou Id(x)) podendo haver a combinação 2 a 2 deles. Por exemplo, podemos fazer os 4 tipos de divisão: 6 / 2; 6 / x; x / 6; x / y;
 
 Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #DIV, depois o E2 e por fim o E1 na pilha de controle.
 
@@ -244,7 +244,7 @@ OPDIV -> (
 ```
 
 
-Quando lê-se um EQ(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression, Boolean Expression ou ID(x)) podendo haver algumas combinações entre eles. Por exemplo, podemos fazer os 7 tipos de igualdade: true == false; true == x; y = false; x == y; 2 == 2; 2 == x; x == 2;
+Quando lê-se um Eq(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression, Boolean Expression ou Id(x)) podendo haver algumas combinações entre eles. Por exemplo, podemos fazer os 7 tipos de igualdade: true == false; true == x; y = false; x == y; 2 == 2; 2 == x; x == 2;
 
 Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #EQ, depois o E2 e por fim o E1 na pilha de controle.
 
@@ -324,7 +324,7 @@ OPEQ -> (
             );
 ```
 
-Quando lê-se um LT(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou ID(x)) podendo haver uma combinação 2 a 2 entre eles. Por exemplo, podemos fazer os 4 tipos de desigualdades: 2 < 5; 3 < x; x < 4; x < y; 
+Quando lê-se um Lt(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou Id(x)) podendo haver uma combinação 2 a 2 entre eles. Por exemplo, podemos fazer os 4 tipos de desigualdades: 2 < 5; 3 < x; x < 4; x < y; 
 
 Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #LT, depois o E2 e por fim o E1 na pilha de controle.
 
@@ -383,7 +383,7 @@ OPLT -> (
 ```
 δ(Le(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #LE :: C, V, S)
 ```
-Quando lê-se um LE(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou ID(x)) podendo haver uma combinação 2 a 2 entre eles. Por exemplo, podemos fazer os 4 tipos de desigualdades: 2 <= 5; 3 <= x; x <= 4; x <= y; 
+Quando lê-se um Le(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou Id(x)) podendo haver uma combinação 2 a 2 entre eles. Por exemplo, podemos fazer os 4 tipos de desigualdades: 2 <= 5; 3 <= x; x <= 4; x <= y; 
 
 Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #LE, depois o E2 e por fim o E1 na pilha de controle.
 
@@ -433,7 +433,7 @@ OPLE -> (
             );
 ```
 
-Quando lê-se um GT(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou ID(x)) podendo haver uma combinação 2 a 2 entre eles. Por exemplo, podemos fazer os 4 tipos de desigualdades: 2 > 5; 3 > x; x > 4; x > y; 
+Quando lê-se um Gt(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou Id(x)) podendo haver uma combinação 2 a 2 entre eles. Por exemplo, podemos fazer os 4 tipos de desigualdades: 2 > 5; 3 > x; x > 4; x > y; 
 
 Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #GT, depois o E2 e por fim o E1 na pilha de controle.
 
@@ -488,7 +488,7 @@ OPGT -> (
             );
 ```
 
-Quando lê-se um GE(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou ID(x)) podendo haver uma combinação 2 a 2 entre eles. Por exemplo, podemos fazer os 4 tipos de desigualdades: 6 >= 1; 2 >= x; x >= 7; x >= y; 
+Quando lê-se um Ge(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou Id(x)) podendo haver uma combinação 2 a 2 entre eles. Por exemplo, podemos fazer os 4 tipos de desigualdades: 6 >= 1; 2 >= x; x >= 7; x >= y; 
 
 Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #GE, depois o E2 e por fim o E1 na pilha de controle.
 
@@ -542,6 +542,11 @@ OPGE -> (
             );
 ```
 
+Quando lê-se um And(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Boolean Expression ou ID(x)) podendo haver uma combinação 2 a 2 entre eles. Por exemplo, podemos fazer os 4 tipos de operação lógica: true and false; false and x; y and true; x and y;
+
+Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #AND, depois o E2 e por fim o E1 na pilha de controle.
+
+
 ```
 δ(And(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #AND :: C, V, S)
 ```
@@ -569,6 +574,9 @@ And(BExp(x), BExp(y)) -> (
               );
 ```
 
+Ao ler o #AND, fazemos um pop na pilha de valores para ler o valor Boo(B1) e verificamos se ele é do tipo Boo. Depois fazemos outro POP para ler o valor Boo(B2) e verificamos se este também é do tipo Boo. Caso não sejam, cairemmos em uma Exception. Depois resolvemos a operação lógica (B1 and B2), retornando True ou False. 
+
+
 ```
 δ(#AND :: C, Boo(B₁) :: Boo(B₂) :: V, S) = δ(C, B₁ ∧ B₂ :: V, S)
 ```
@@ -589,6 +597,11 @@ OPAND -> (
               | _ -> raise (AutomatonException "Error on #AND");
             );
 ```
+
+Quando lê-se um Or(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Boolean Expression ou ID(x)) podendo haver uma combinação 2 a 2 entre eles. Por exemplo, podemos fazer os 4 tipos de operação lógica: true or false; false or x; y or true; x or y;
+
+Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #AND, depois o E2 e por fim o E1 na pilha de controle.
+
 
 ```
 δ(Or(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #OR :: C, V, S)
@@ -617,6 +630,8 @@ Or(BExp(x), BExp(y)) -> (
               );
 ```
 
+Ao ler o #OR, fazemos um pop na pilha de valores para ler o valor Boo(B1) e verificamos se ele é do tipo Boo. Depois fazemos outro POP para ler o valor Boo(B2) e verificamos se este também é do tipo Boo. Caso não sejam, cairemmos em uma Exception. Depois resolvemos a opração lógica (B1 or B2), retornando True ou False. 
+
 ```
 δ(#OR :: C, Boo(B₁) :: Boo(B₂) :: V, S) = δ(C, B₁ ∨ B₂ :: V, S)
 ```
@@ -638,6 +653,9 @@ OPOR -> (
             );
 ```
 
+Quando lê-se um Not(E), empilhamos primeiro o OPTCODE #NOT, depois a expressão E pilha de controle.
+
+
 ```
 δ(Not(E) :: C, V, S) = δ(E :: #NOT :: C, V, S)
 ```
@@ -652,6 +670,8 @@ Not(BExp(x)) -> (
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
               );
 ```
+
+Ao ler o #NOT, fazemos um pop na pilha de valores para ler o valor Boo(B). Independente do valor avaliado, sempre o colocaremos na pilha de valores o inverso. Por exemplo, se temos Boo(True), colocaremos na pilha de valores o valor False. E vice-versa.
 
 ```
 δ(#NOT :: C, Boo(True) :: V, S) = δ(C, False :: V, S)
