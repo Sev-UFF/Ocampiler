@@ -51,7 +51,7 @@ Sum(AExp(x), AExp(y)) -> (
               );
 ```
 
-Ao ler o #SUM, fazemos um pop na pilha de valores para ler o valor X(N1) e verificamos que é do tipo inteiro. Depois fazemos outro POP para ler o valor Y(N2) e verificamos que este também é do tipo inteiro. Depois somamos eles, colocando o resultado na pilha de valores. Caso não sejam, cairíamos em uma Exception.
+Ao ler o #SUM, fazemos um pop na pilha de valores para ler o valor Num(N1) e verificamos que é do tipo inteiro. Depois fazemos outro POP para ler o valor Num(N2) e verificamos que este também é do tipo inteiro. Depois somamos eles, colocando o resultado na pilha de valores. Caso não sejam, cairíamos em uma Exception.
 
 ```
 δ(#SUM :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ + N₂ :: V, S)
@@ -105,7 +105,7 @@ Sub(AExp(x), AExp(y)) -> (
               ); 
 ```
 
-Ao ler o #SUB, fazemos um pop na pilha de valores para ler o valor X(N1) e verificamos que é do tipo inteiro. Depois fazemos outro POP para ler o valor Y(N2) e verificamos que este também é do tipo inteiro. Depois subtraímos eles, colocando o resultado na pilha de valores. Caso não sejam, cairíamos em uma Exception.
+Ao ler o #SUB, fazemos um pop na pilha de valores para ler o valor Num(N1) e verificamos que é do tipo inteiro. Depois fazemos outro POP para ler o valor Num(N2) e verificamos que este também é do tipo inteiro. Depois subtraímos eles, colocando o resultado na pilha de valores. Caso não sejam, cairíamos em uma Exception.
 
 ```
 δ(#SUB :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ - N₂ :: V, S)
@@ -161,7 +161,7 @@ Mul(AExp(x), AExp(y)) -> (
               );
 ```
 
-Ao ler o #MUL, fazemos um pop na pilha de valores para ler o valor X(N1) e verificamos que é do tipo inteiro. Depois fazemos outro POP para ler o valor Y(N2) e verificamos que este também é do tipo inteiro. Depois multiplicamos eles, colocando o resultado na pilha de valores. Caso não sejam, cairíamos em uma Exception.
+Ao ler o #MUL, fazemos um pop na pilha de valores para ler o valor Num(N1) e verificamos que é do tipo inteiro. Depois fazemos outro POP para ler o valor Num(N2) e verificamos que este também é do tipo inteiro. Depois multiplicamos eles, colocando o resultado na pilha de valores. Caso não sejam, cairíamos em uma Exception.
 
 ```
 δ(#MUL :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ * N₂ :: V, S)
@@ -216,7 +216,7 @@ Div(AExp(x), AExp(y)) -> (
               ); 
 ```
 
-Ao ler o #DIV, fazemos um pop na pilha de valores para ler o valor X(N1) e verificamos que é do tipo inteiro e diferente de zero, pois não se pode dividir um número por zero. Depois fazemos outro POP para ler o valor Y(N2) e verificamos que este também é do tipo inteiro. Depois dividimos Y por X, colocando o resultado na pilha de valores. Caso não sejam, cairíamos em uma Exception.
+Ao ler o #DIV, fazemos um pop na pilha de valores para ler o valor Num(N1) e verificamos que é do tipo inteiro e diferente de zero, pois não se pode dividir um número por zero. Depois fazemos outro POP para ler o valor Num(N2) e verificamos que este também é do tipo inteiro. Depois dividimos Y por X, colocando o resultado na pilha de valores. Caso não sejam, cairíamos em uma Exception.
 
 
 ```
@@ -291,7 +291,7 @@ Eq(BExp(x), BExp(y)) -> (
               );
 ```
 
-Ao ler o #EQ, fazemos um pop na pilha de valores para ler o valor X(B1) e verificamos se ele é do tipo Bool ou Int. Depois fazemos outro POP para ler o valor Y(B2) e verificamos se este também é do tipo Bool ou Int. Sendo que só se permitem dois POPs consecultivos de valores iguais (dois Bool ou dois Int). Depois verificamos se os valores contidos são iguais, retornando True ou diferentes, retornando False.
+Ao ler o #EQ, fazemos um pop na pilha de valores para ler o valor Boo(B1) e verificamos se ele é do tipo Bool ou Int. Depois fazemos outro POP para ler o valor Boo(B2) e verificamos se este também é do tipo Bool ou Int. Sendo que só se permitem dois POPs consecultivos de valores iguais (dois Bool ou dois Int). Depois verificamos se os valores contidos são iguais, retornando True ou diferentes, retornando False.
 
 
 ```
