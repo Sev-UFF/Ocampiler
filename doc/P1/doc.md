@@ -974,14 +974,14 @@ OPNOT ->
       | _ -> raise (AutomatonException "Error on #NOT");
 );   
 ```
+Quando lê-se um Id(W), verificamos primeiro que o valor contido em Id é do tipo Location. Em seguida, descobrimos a chave que está associada a esse Id no Hashtable de enviroment e, com essa chave, descobrimos no Hashtable da memória o conteúdo associado a ela, colocando este valor na pilha de valores. Na memória se pode armazenar valores do tipo Integer ou Boolean.
 
 ```
 δ(Id(W) :: C, V, E, S) = δ(C, B :: V, E, S), where E[W] = l ∧ S[l] = B
 ```
 
 ```
-Id(id) -> 
-(
+Id(id) -> (
   let key = Hashtbl.find environment id  in
     match key with 
       | Value(x) -> ();
@@ -990,22 +990,27 @@ Id(id) ->
           match value with
           | Integer(x) ->   (Stack.push (Int(x)) valueStack);
           | Boolean(x) ->  (Stack.push (Bool(x)) valueStack);
-      )
+      );
 );
 ```
+
+Quando lê-se um Assign(W, X), empilhamos o OPTCODE #ASSIGN e a expressão X na pilha de controle e, por fim, empilhamos a String W na pilha de valores.
+
 
 ```
 δ(Assign(W, X) :: C, V, E, S) = δ(X :: #ASSIGN :: C, W :: V, E, S')
 ```
 
 ```
-Assign(Id(x), y) -> 
-(
-    (Stack.push (CmdOc(OPASSIGN)) controlStack );
-    (Stack.push (Statement(Exp(y))) controlStack );
-    (Stack.push (Str(x)) valueStack);
+Assign(Id(x), y) -> (
+  (Stack.push (CmdOc(OPASSIGN)) controlStack );
+  (Stack.push (Statement(Exp(y))) controlStack );
+  (Stack.push (Str(x)) valueStack);
 );
 ```
+
+Ao ler o #ASSIGN, fazemos um pop na pilha de valores para ler o valor a ser atualizado na memória, podendo ser um Bool ou um Int. Em seguida, fazemos mais um POP onde pegamos a string identificadora. Com a string em mãos, descobrimos a chave que está associada a esse Id no Hashtable de enviroment e, com essa chave, descobrimos no Hashtable da memória o conteúdo associado a ela, atualizando este valor com o valor encontrado no primeiro POP deste caso. Qualquer valor não esperado resultará em uma Exception.
+
 
 ```
 δ(#ASSIGN :: C, T :: W :: V, E, S) = δ(C, V, E, S'), where E[W] = l ∧ S' = S/[l ↦ T]
