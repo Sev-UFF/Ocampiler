@@ -21,7 +21,7 @@ Num(x) -> (
 
 Quando lê-se um SUM(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou ID(x)) podendo haver a combinação 2 a 2 deles. Por exemplo, podemos fazer os 4 tipos de soma: 2 + 2; 2 + x; x + 2; x + y;
 
-Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #SUM, depois a Expressão Y e por fim a Expressão X na pilha de valores.
+Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #SUM, depois o E2 (Arithmetic Expression Y) e por fim o E1 (Arithmetic Expression X) na pilha de valores.
 
 
 ```
@@ -51,7 +51,7 @@ Sum(AExp(x), AExp(y)) -> (
               );
 ```
 
-Ao ler o #SUM, fazemos um pop para ler o valor X e depois outro para ler o valor Y, logo após verificamos que ambos são do tipo inteiro e somamos eles, colocando o resultado na pilha de valores. Caso não sejam, cairíamos em uma Exception.
+Ao ler o #SUM, fazemos um pop na pilha de valores para ler o valor X(N1) e verificamos que é do tipo inteiro. Depois fazemos outro POP para ler o valor Y(N2) e verificamos que este também é do tipo inteiro. Depois somamos eles, colocando o resultado na pilha de valores. Caso não sejam, cairíamos em uma Exception.
 
 ```
 _δ(#SUM :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ + N₂ :: V, S)_
@@ -73,6 +73,10 @@ OPSUM -> (
               | _ -> raise (AutomatonException "Error on #SUM");
             );
 ```
+
+Quando lê-se um SUB(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou ID(x)) podendo haver a combinação 2 a 2 deles. Por exemplo, podemos fazer os 4 tipos de subtração: 4 - 4; 4 - x; x - 4; x - y;
+
+Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #SUB, depois o E2 (Arithmetic Expression Y) e por fim o E1 (Arithmetic Expression X) na pilha de valores.
 
 ```
 _δ(Sub(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #SUB :: C, V, S)_  
@@ -101,6 +105,8 @@ Sub(AExp(x), AExp(y)) -> (
               ); 
 ```
 
+Ao ler o #SUB, fazemos um pop na pilha de valores para ler o valor X(N1) e verificamos que é do tipo inteiro. Depois fazemos outro POP para ler o valor Y(N2) e verificamos que este também é do tipo inteiro. Depois subtraimos eles, colocando o resultado na pilha de valores. Caso não sejam, cairíamos em uma Exception.
+
 ```
 _δ(#SUB :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ - N₂ :: V, S)_
 ```
@@ -121,6 +127,12 @@ OPSUB -> (
               | _ -> raise (AutomatonException "Error on #SUB");
             );
 ```            
+
+
+Quando lê-se um MUL(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou ID(x)) podendo haver a combinação 2 a 2 deles. Por exemplo, podemos fazer os 4 tipos de multiplicação: 5 * 4; 5 * x; x * 5; x * y;
+
+Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #MUL, depois o E2 (Arithmetic Expression Y) e por fim o E1 (Arithmetic Expression X) na pilha de valores.
+
 
 ```
 _δ(Mul(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #MUL :: C, V, S)_  
@@ -149,6 +161,8 @@ Mul(AExp(x), AExp(y)) -> (
               );
 ```
 
+Ao ler o #MUL, fazemos um pop na pilha de valores para ler o valor X(N1) e verificamos que é do tipo inteiro. Depois fazemos outro POP para ler o valor Y(N2) e verificamos que este também é do tipo inteiro. Depois multiplicamos eles, colocando o resultado na pilha de valores. Caso não sejam, cairíamos em uma Exception.
+
 ```
 _δ(#MUL :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ * N₂ :: V, S)_
 ```
@@ -169,6 +183,11 @@ OPMUL -> (
               | _ -> raise (AutomatonException "Error on #MUL");
             );
 ```
+
+Quando lê-se um DIV(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou ID(x)) podendo haver a combinação 2 a 2 deles. Por exemplo, podemos fazer os 4 tipos de divisão: 6 / 2; 6 / x; x / 6; x / y;
+
+Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #DIV, depois o E2 (Arithmetic Expression Y) e por fim o E1 (Arithmetic Expression X) na pilha de valores.
+
 
 ```
 _δ(Div(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #DIV :: C, V, S)_  
@@ -196,6 +215,9 @@ Div(AExp(x), AExp(y)) -> (
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
               ); 
 ```
+
+Ao ler o #DIV, fazemos um pop na pilha de valores para ler o valor X(N1) e verificamos que é do tipo inteiro e diferente de zero, pois não se pode dividir um número por zero. Depois fazemos outro POP para ler o valor Y(N2) e verificamos que este também é do tipo inteiro. Depois dividimos Y por X, colocando o resultado na pilha de valores. Caso não sejam, cairíamos em uma Exception.
+
 
 ```
 _δ(#DIV :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ / N₂ :: V, S) if N₂ ≠ 0_
