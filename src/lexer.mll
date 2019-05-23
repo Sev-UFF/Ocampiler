@@ -29,6 +29,5 @@
           | "else"                  { ELSE }
           | "end"                   { END }
           | ":="                    { ASSIGN }
-          | "nop"                   { NOP }
           | (['a'-'z' 'A'-'Z' '_'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*) as  lxm      { ID(lxm) }
           | eof                     { EOF }
