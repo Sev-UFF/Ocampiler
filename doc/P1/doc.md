@@ -15,6 +15,11 @@ Num(x) -> (
                 );
 ```
 
+Quando lê-se um SUM(E1, E2), devemos antes verificar a qual tipo pertencem os dois parâmetros de Expression (Arithmetic Expression ou ID(x)) podendo haver a combinação 2 a 2 deles. Por exemplo, podemos fazer os 4 tipos de soma: 2 + 2; 2 + x; x + 2; x + y;
+
+Para cada um desses casos, agimos da mesma forma: colocamos primeiro o OPTCODE #SUM, depois a Expressão Y e por fim a Expressão X na pilha de valores.
+
+
 _δ(Sum(E₁, E₂) :: C, V, S) = δ(E₁ :: E₂ :: #SUM :: C, V, S)_   
 
 
@@ -40,6 +45,8 @@ Sum(AExp(x), AExp(y)) -> (
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
               );
 ```
+
+Ao ler o #SUM, fazemos um pop para ler o valor X e depois outro para ler o valor Y, logo após verificamos que ambos são do tipo inteiro e somamos eles, colocando o resultado na pilha de valores. Caso não sejam, cairíamos em uma Exception.
 
 _δ(#SUM :: C, Num(N₁) :: Num(N₂) :: V, S) = δ(C, N₁ + N₂ :: V, S)_
 
