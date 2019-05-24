@@ -166,7 +166,25 @@ ID(x) ASSIGN ID(x) SUM NUMBER(1)
 
 ## Parser
 
-O parser, Ocamlyacc é a implementação de Ocaml do programa yacc, definido em um arquivo mly. Ele deve analisar a estrutura do programa sendo o nosso analisador semântico. Para implementarmos o π framework, de acordo com a leitura de tokens específicas feita, retornamos a denotação π associada àquela operação. O programa é uma tabela de tokens estruturados similares às expressões regulares definidas no lexer. O parser recebe a lista de tokens associada ao programa de entrada e analisa qual estrutura definida em sua tabela corresponde à primeira correspondência lida nessa lista. 
+O parser, Ocamlyacc é a implementação de Ocaml do programa yacc, definido em um arquivo mly. Ele é um Parser Generator de propósito geral que converte uma descricão de uma gramática para uma LALR(1) (Look Ahead Left to Right) em um programa Ocaml para realizar o parser da gramática.Com isso ele deve analisar a estrutura do programa sendo o nosso analisador semântico. Para implementarmos o π framework, de acordo com a leitura de tokens específicas feita, retornamos a denotação π associada àquela operação. O programa é uma tabela de tokens estruturados similares às expressões regulares definidas no lexer. O parser recebe a lista de tokens associada ao programa de entrada e analisa qual estrutura definida em sua tabela corresponde à primeira correspondência lida nessa lista. 
+
+A forma geral de um arquivo de gramática em Ocamlyacc é a seguinte:
+```
+%{
+Header(Ocaml code)
+%}
+
+Ocamlyacc declarations
+
+%%
+
+Grammar rules
+
+%%
+
+Trailer(Additional Ocaml code)
+```
+O %%,% {e%} são sinais de pontuação que aparecem em todos os arquivos gramaticais do Ocamlyacc para separar as seções.O cabeçalho(Header) pode definir os tipos, variáveis e funções usadas nas ações. As declarações de Ocamlyacc(Ocamlyacc declarations) definem o nome dos símbolos terminais e não-terminais e também podem descrever a precedência e os tipos de dados dos valores semânticos de vários símbolos. As regras ( Grammar rules) definem como construir cada símbolo não terminal a partir de suas partes. O Trailer é opcional e contém qualquer código Ocaml que você deseja usar.
 
 A tabela definida no arquivo do parser tem algumas restrições. Primeiro ela deve retornar um tipo único, no nosso caso a π denotação que englobe todas as outras, _statement_. Definimos todos os tipos definidos da gramática também no parser para a melhor estruturação da leitura dos tokens. 
 
