@@ -27,3 +27,6 @@ ocampiler -f <impfile> [-s | -a | -t | --state n | --stats]
 --state n : Exibe o n-ésimo estado de execução do autômato
 --stats: Exibe o número de passos e o tempo de execução do autômato.
 ```
+# Documentação (P1,P2,P3)
+Encontra-se na pasta doc e pode ser acessada pelo link abaixo.	
+[Documentação](https://github.com/sevontheedge/Ocampiler/blob/master/doc/P1/doc.md)
