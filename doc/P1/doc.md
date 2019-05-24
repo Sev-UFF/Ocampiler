@@ -4,7 +4,7 @@ Em cada tópico a seguir explicaremos como implementamos o funcionamento do π f
 
 ## Gramática π
 
-Usamos os tipos indutivos de Ocaml para criar uma estrutura de tipos iguais às definidas pelo framework. O tipo _statement_ é o usado para definir o nível máximo no qual o lexer e o parser trabalham. O _statement_ está dentro do tipo _control_ que é onde o autômato trabalha, pois além das denotações ele faz uso dos Opcodes, que por sua vez estão definidos como tipos induzidos pelo tipo _control_. 
+Usamos os tipos indutivos de Ocaml para criar uma estrutura de tipos iguais às definidas pelo framework. O tipo _statement_ é o usado para definir o nível máximo no qual o lexer e o parser trabalham. O _statement_ está dentro do tipo _control_ que é onde o autômato trabalha, pois além das denotações ele faz uso dos Opcodes, que por sua vez estão definidos como tipos induzidos pelo tipo _control_ conforme a estrutura simplificada abaixo. 
 <p align="center">
 <img src="./Pi_ml.png">
 </p>
