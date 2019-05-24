@@ -1176,3 +1176,34 @@ CSeq(x, y) ->
   (Stack.push (Statement(Cmd(x))) controlStack );
 );
 ```
+No automato criamos os tipos valueStackOptions , storable e bindable que respectivamente são: os valores que o podem ser inseridos na pilha de controle, storable que está associado a memória e o bindable que está associado ao ambiente. Os tipos storable e bindable são os responsáveis por fazerem o mampeamento dos dados. 
+```
+type valueStackOptions = 
+  | Int of int
+  | Str of string
+  | Bool of bool
+  | Control of control;; (* É necessário passar um comando para a a pilha de valor para os casos do IF e LOOP)
+  
+type storable = 
+  | Integer of int
+  | Boolean of bool;;
+
+type bindable = 
+  | Loc of int
+| Value of int;;
+```
+Nós usamos a estrutura de hashtable(pro enviroment e pra memória) e a estrutura de pilha para a pilha de controle e valor que são inicializadas no arquivo [main.ml] (https://github.com/sevontheedge/Ocampiler/blob/master/src/main.ml).
+```
+  let tree = Statement(Parser.main Lexer.token (Lexing.from_string !fileContents) )
+  and controlStack = (Stack.create()) 
+  and valueStack = (Stack.create()) 
+  and environment = (Hashtbl.create 10)
+and memory = (Hashtbl.create 10) in
+
+```
+
+
+
+
+
+
