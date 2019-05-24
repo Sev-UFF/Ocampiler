@@ -1182,7 +1182,7 @@ type valueStackOptions =
   | Int of int
   | Str of string
   | Bool of bool
-  | Control of control;; (* É necessário passar um comando para a a pilha de valor para os casos do IF e LOOP)
+  | Control of control;; (* É necessário passar um comando nos casos do IF e LOOP)
   
 type storable = 
   | Integer of int
