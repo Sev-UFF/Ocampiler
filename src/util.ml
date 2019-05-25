@@ -1,5 +1,9 @@
 open Pi;;
 
+(* Lists *)
+let printStackTraceItem index item =
+  print_endline ("Estado #" ^ (string_of_int(index)) ^ " do π autômato\n\n" ^ item);;
+
 (* Files *)
 let readInputFile file_name =
   let ch = open_in file_name in
@@ -34,6 +38,9 @@ and string_of_expression expression =
   | AExp(x) -> string_of_arithmetic_expression x
   | BExp(x) -> string_of_boolean_expression x
   | Id(x) -> "ID (" ^ x ^ ")"
+  | Ref(x) -> "REF (" ^ (string_of_expression x) ^ ")"
+  | DeRef(x) -> "DEREF (" ^ (string_of_expression x) ^ ")"
+  | ValRef(x) -> "VALREF (" ^ (string_of_expression x) ^ ")"
 
 and string_of_command command = 
   match command with
@@ -42,12 +49,18 @@ and string_of_command command =
   | Nop -> "NOP"
   | Assign(x, y) -> "ASSIGN (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
   | Cond(x, y, z) -> "COND (" ^ (string_of_expression x) ^ ", " ^ (string_of_command y) ^ ", " ^ (string_of_command z) ^ ")"
+  | Blk(x, y) -> "BLK (" ^ (string_of_declaration x) ^ ", " ^ (string_of_command y) ^ ")"
 
+and string_of_declaration declaration =
+  match declaration with
+  | Bind(x, y) -> "BIND (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
+  | DSeq(x, y) -> "DSEQ (" ^ (string_of_declaration x) ^ ", " ^ (string_of_declaration y) ^ ")"
 
 and string_of_statement statement =
   match statement with
   | Exp (x) -> string_of_expression x
   | Cmd (x) -> string_of_command x
+  | Dec(x) -> string_of_declaration x
   
 and string_of_exp_opcode expOc =
   match expOc with
@@ -70,26 +83,34 @@ and string_of_exp_opcode expOc =
   | OPLOOP  -> "#LOOP"
   | OPCOND -> "#COND"
 
-
+  and string_dec_opcode decOc = 
+  match decOc with
+  | OPREF -> "#REF"
+  | OPCNS -> "#CNS"
+  | OPBLKDEC -> "#BLKDEC"
+  | OPBLKCMD -> "#BLKCMD"
+  | OPBIND -> "#BIND"
+  | OPDSEQ -> "#DSEQ"
 
 and string_of_ctn ctn =
   match ctn with 
   | Statement(x) -> string_of_statement x
   | ExpOc(x) -> string_of_exp_opcode x
   | CmdOc(x) -> string_of_cmd_opcode x 
+  | DecOc(x) -> string_dec_opcode x
+;;
   
 (* Stacks *)
-and string_of_stack stack func = 
+let string_of_stack stack func = 
   "[ " ^ (String.concat ", " (List.map func (List.of_seq (Stack.to_seq stack))) ) ^ " ]"
 ;;
 
-(* 
-(* Dictionaries *)
-module Environment = Map.Make(String);;
-module Memory = Map.Make(struct type t = int let compare = compare end);; *)
 
+(* Dictionaries *)
 let string_of_dictionary dict func =
   "{\n " ^ (String.concat ",\n" (List.map func (List.of_seq (Hashtbl.to_seq dict))) ) ^ "\n }"
+;;
+
   
 
 

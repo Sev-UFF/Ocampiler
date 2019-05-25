@@ -4,9 +4,9 @@
         %token <string> ID
         %token PLUS MINUS TIMES DIV
         %token LESS LESSEQUAL GREATER GREATEREQUAL EQUALS AND OR
-        %token LOOP DO IF THEN ELSE END ASSIGN
+        %token LOOP DO IF THEN ELSE END ASSIGN LET VAR BIND IN COMMA DEREF POINTER
         %token NEGATION NOP
-        %token LPAREN RPAREN
+        %token LPAREN RPAREN 
         %token EOF 
         %left PLUS MINUS        /* lowest precedence */
         %left TIMES DIV         /* medium precedence */
@@ -14,7 +14,7 @@
         %type <Pi.statement> main
         %type <Pi.statement> statement
         %type <Pi.expression> expression
-        /* %type <Pi.declaration> declaration */
+        %type <Pi.declaration> declaration
         %type <Pi.arithmeticExpression> arithmeticExpression
         %type <Pi.booleanExpression> booleanExpression
         %type <Pi.command> command
@@ -25,6 +25,12 @@
         statement:
           expression { Pi.Exp($1)}
           | command      {Pi.Cmd($1)}
+          | declaration {Pi.Dec($1)}
+        ;
+        declaration:
+          | declaration COMMA declaration {Pi.DSeq($1, $3)}
+          | VAR ID BIND expression        {Pi.Bind(Pi.Id($2), Pi.Ref($4)) }
+          | LPAREN declaration RPAREN                     { $2 }
         ;
         command:
           LOOP expression DO command  END            { Pi.Loop(($2), $4)}
@@ -32,6 +38,8 @@
           | IF expression THEN command END           { Pi.Cond(($2), $4, Pi.Nop)}
           | ID ASSIGN expression                        { Pi.Assign(Pi.Id($1), $3) }
           | command  command                                    { Pi.CSeq($1, $2) }
+          | LET declaration IN command                  {Pi.Blk($2, $4)}
+          | LET declaration IN command END              {Pi.Blk($2, $4)}
           | LPAREN command RPAREN                     { $2 }
 
         ;

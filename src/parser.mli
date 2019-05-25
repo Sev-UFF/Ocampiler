@@ -20,6 +20,13 @@ type token =
   | ELSE
   | END
   | ASSIGN
+  | LET
+  | VAR
+  | BIND
+  | IN
+  | COMMA
+  | DEREF
+  | POINTER
   | NEGATION
   | NOP
   | LPAREN

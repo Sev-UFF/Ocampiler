@@ -1,10 +1,7 @@
 open Util;;
 open Pi;;
 
-let willPrintStackTrace = ref false;;
-let steps = ref 0;;
-let willPrintSpecificState = ref false;;
-let displayState = ref (-1);;
+let trace = ref [];
 
 exception AutomatonException of string;;
 
@@ -21,6 +18,7 @@ type storable =
 type bindable = 
   | Loc of int
   | Value of int;;
+
 
 let string_of_value_stack item =
   match item with
@@ -46,30 +44,21 @@ let string_of_bindable_dictionary (key, value) =
    "\t( " ^ key ^ ": " ^ (string_of_bindable value) ^ " )";;
 
 
-let print_stacks controlStack valueStack = 
-  print_endline "Pilha de Controle:";
-  print_endline (string_of_stack controlStack string_of_ctn);
-  print_endline "Pilha de Valor:";
-  print_endline (string_of_stack valueStack string_of_value_stack);;
+let string_of_stacks controlStack valueStack = 
+  "Pilha de Controle:\n" ^  (string_of_stack controlStack string_of_ctn) ^ "\nPilha de Valor:\n" ^ (string_of_stack valueStack string_of_value_stack);;
 
-let print_dictionaries environment memory = 
-  print_endline "Ambiente:";
-  print_endline (string_of_dictionary environment string_of_bindable_dictionary);
-  print_endline "Memória:";
-  print_endline (string_of_dictionary memory string_of_storable_dictionary);;
+let string_of_dictionaries environment memory = 
+  "Ambiente:\n" ^ (string_of_dictionary environment string_of_bindable_dictionary) ^ "\nMemória:\n" ^ (string_of_dictionary memory string_of_storable_dictionary);;
+
+let string_of_iteration controlStack valueStack environment memory =
+  (* "Estado #" ^ (string_of_int(!steps)) ^ " do π autômato\n" ^  *)
+  (string_of_stacks controlStack valueStack) ^ "\n" ^ (string_of_dictionaries environment memory) ^ "\n------------------------------------------------------------------------------------------------------------\n";;
 
 let rec delta controlStack valueStack environment memory = 
 
   if not(Stack.is_empty controlStack) then begin
-    
-    steps := !steps + 1;
 
-    if !willPrintStackTrace || (!willPrintSpecificState && (!displayState = !steps)) then begin
-      print_endline( "Estado #" ^ (string_of_int(!steps)) ^ " do π autômato\n");
-      print_stacks controlStack valueStack;
-      print_dictionaries environment memory;
-      print_endline "------------------------------------------------------------------------------------------------------------";
-    end;
+    trace := (!trace)@[(string_of_iteration controlStack valueStack environment memory)];
     
     let ctrl = (Stack.pop controlStack) in
       (match ctrl with
@@ -693,9 +682,5 @@ let rec delta controlStack valueStack environment memory =
       );
     );
     delta controlStack valueStack environment memory;
-  end else begin
-    print_endline "\nFim da execução do autômato\n";
-    
-    print_dictionaries environment memory;
-    
   end;;
+  

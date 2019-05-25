@@ -36,7 +36,7 @@
 
   and declaration = 
   | Bind of expression * expression
-  (* | DSeq of declaration * declaration *)
+  | DSeq of declaration * declaration
 
   and statement = 
    | Exp of expression
