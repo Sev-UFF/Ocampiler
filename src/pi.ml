@@ -21,6 +21,9 @@
     | AExp of arithmeticExpression
     | BExp of booleanExpression
     | Id of string
+    | Ref of expression
+    | DeRef of expression
+    | ValRef of expression
   
 
   and command = 
@@ -29,11 +32,16 @@
     | Nop
     | Assign of expression * expression
     | Cond of expression * command * command
+    | Blk of declaration * command
 
+  and declaration = 
+  | Bind of expression * expression
+  (* | DSeq of declaration * declaration *)
 
   and statement = 
    | Exp of expression
    | Cmd of command
+   | Dec of declaration
   
   and expOc =
    | OPSUM
@@ -54,9 +62,17 @@
    | OPLOOP 
    | OPCOND
 
+   and decOC =
+   | OPREF
+   | OPCNS
+   | OPBLKDEC
+   | OPBLKCMD
+   | OPBIND
+   | OPDSEQ
 
   and control = 
   | Statement of statement
   | ExpOc of expOc
-  | CmdOc of cmdOc;;
+  | CmdOc of cmdOc
+  | DecOc of decOC;;
 
