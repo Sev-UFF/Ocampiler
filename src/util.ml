@@ -52,7 +52,6 @@ and string_of_command command =
 and string_of_declaration declaration =
   match declaration with
   | Bind(x, y) -> "BIND (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
-  | DSeq(x, y) -> "DSEQ (" ^ (string_of_declaration x) ^ ", " ^ (string_of_declaration y) ^ ")"
 
 and string_of_statement statement =
   match statement with

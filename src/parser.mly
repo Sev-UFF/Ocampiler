@@ -29,7 +29,6 @@
           | declaration {Pi.Dec($1)}
         ;
         declaration:
-          | declaration COMMA declaration {Pi.DSeq($1, $3)}
           | VAR ID BIND expression        {Pi.Bind(Pi.Id($2), Pi.Ref($4)) }
           | CNS ID BIND expression        {Pi.Bind(Pi.Id($2), $4) }
           | LPAREN declaration RPAREN                     { $2 }
