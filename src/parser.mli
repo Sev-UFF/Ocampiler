@@ -4,7 +4,7 @@ type token =
   | ID of (string)
   | PLUS
   | MINUS
-  | TIMES
+  | TIMESORPOINTER
   | DIV
   | LESS
   | LESSEQUAL
@@ -22,10 +22,11 @@ type token =
   | ASSIGN
   | LET
   | VAR
+  | CNS
   | BIND
   | IN
   | COMMA
-  | DEREF
+  | ADDRESS
   | POINTER
   | NEGATION
   | NOP

@@ -1,64 +1,15 @@
 open Util;;
 open Pi;;
+open AutomatonType;;
 
-let trace = ref [];
+let trace = ref [];;
 
-exception AutomatonException of string;;
-
-type valueStackOptions = 
-  | Int of int
-  | Str of string
-  | Bool of bool
-  | Control of control;;
-
-type storable = 
-  | Integer of int
-  | Boolean of bool;;
-
-type bindable = 
-  | Loc of int
-  | Value of int;;
-
-
-let string_of_value_stack item =
-  match item with
-  | Int(x) -> string_of_int x
-  | Str(x) -> x
-  | Bool(x) -> if x then "True" else "False"
-  | Control (x) -> (string_of_ctn x);;
-
-let string_of_bindable bindable =
-  match bindable with
-  | Loc(x) -> "LOC [" ^ (string_of_int x) ^ "]"
-  | Value(x) -> "VALUE (" ^ (string_of_int x) ^ ")";;
-
-let string_of_storable storable =
-  match storable with
-  | Integer(x) ->  (string_of_int x) 
-  | Boolean(x) -> if x then "True" else "False";;
-
-let string_of_storable_dictionary (key, value) =
-  "\t( [" ^ (string_of_int key) ^ "]: " ^ (string_of_storable value) ^ " )";;
-
-let string_of_bindable_dictionary (key, value) =
-   "\t( " ^ key ^ ": " ^ (string_of_bindable value) ^ " )";;
-
-
-let string_of_stacks controlStack valueStack = 
-  "Pilha de Controle:\n" ^  (string_of_stack controlStack string_of_ctn) ^ "\nPilha de Valor:\n" ^ (string_of_stack valueStack string_of_value_stack);;
-
-let string_of_dictionaries environment memory = 
-  "Ambiente:\n" ^ (string_of_dictionary environment string_of_bindable_dictionary) ^ "\nMemória:\n" ^ (string_of_dictionary memory string_of_storable_dictionary);;
-
-let string_of_iteration controlStack valueStack environment memory =
-  (* "Estado #" ^ (string_of_int(!steps)) ^ " do π autômato\n" ^  *)
-  (string_of_stacks controlStack valueStack) ^ "\n" ^ (string_of_dictionaries environment memory) ^ "\n------------------------------------------------------------------------------------------------------------\n";;
 
 let rec delta controlStack valueStack environment memory = 
 
   if not(Stack.is_empty controlStack) then begin
 
-    trace := (!trace)@[(string_of_iteration controlStack valueStack environment memory)];
+    trace := (!trace)@[( (Stack.copy controlStack), (Stack.copy valueStack), (Hashtbl.copy environment), (Hashtbl.copy memory) )];
     
     let ctrl = (Stack.pop controlStack) in
       (match ctrl with
@@ -400,13 +351,13 @@ let rec delta controlStack valueStack environment memory =
           | Loop( BExp(x), y) -> (
             (Stack.push (CmdOc(OPLOOP)) controlStack);
             (Stack.push (Statement(Exp(BExp(x)))) controlStack );
-            (Stack.push (Control(Statement(Cmd(Loop(BExp(x), y))))) valueStack ); 
+            (Stack.push (LoopValue(Loop(BExp(x), y))) valueStack ); 
             
           );
           | Loop(Id(x), y) -> (
             (Stack.push (CmdOc(OPLOOP)) controlStack);
             (Stack.push (Statement(Exp(Id(x)))) controlStack );
-            (Stack.push (Control(Statement(Cmd(Loop(Id(x), y))))) valueStack );
+            (Stack.push (LoopValue(Loop(Id(x), y))) valueStack );
             
           );
           | Loop(_, _) -> raise (AutomatonException "Error on Loop");
@@ -425,13 +376,13 @@ let rec delta controlStack valueStack environment memory =
           | Cond(BExp(x), y, z) -> (
             (Stack.push (CmdOc(OPCOND)) controlStack);
             (Stack.push (Statement(Exp(BExp(x)))) controlStack );
-            (Stack.push (Control(Statement(Cmd(Cond(BExp(x), y, z))))) valueStack );
+            (Stack.push (CondValue(Cond(BExp(x), y, z))) valueStack );
             
           );
           | Cond(Id(x), y, z) -> (
             (Stack.push (CmdOc(OPCOND)) controlStack);
             (Stack.push (Statement(Exp(Id(x)))) controlStack );
-            (Stack.push (Control(Statement(Cmd(Cond(Id(x), y, z))))) valueStack );
+            (Stack.push (CondValue(Cond(Id(x), y, z))) valueStack );
             
           );
           | Cond(_, _, _) -> raise (AutomatonException "Error on Cond");
@@ -652,7 +603,7 @@ let rec delta controlStack valueStack environment memory =
             match condloop with
               | Bool(true) -> (
                 match loopV with
-                  | Control(Statement(Cmd(Loop(x,m)))) -> (
+                  | LoopValue(Loop(x,m)) -> (
 
                     (Stack.push (Statement(Cmd(Loop(x,m)))) controlStack);
                     (Stack.push (Statement(Cmd(m))) controlStack);
@@ -669,7 +620,7 @@ let rec delta controlStack valueStack environment memory =
             match ifcond with
               | Bool(condition) -> (
                 match condV with
-                  | Control(Statement(Cmd(Cond(x,m1,m2)))) ->(
+                  | CondValue(Cond(x,m1,m2)) ->(
                     if condition then
                     (Stack.push (Statement(Cmd(m1))) controlStack)
                     else

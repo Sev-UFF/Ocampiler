@@ -20,11 +20,13 @@ O comando de instalação do opam poderá levar alguns minutos, aprecie seu caf�
 
 # Uso e Opções da Linha de Comando
 ```
-ocampiler -f <impfile> [-s | -a | -t | --state n | --stats]
+ocampiler -f <impfile> [-s | -a | -t | --at | --state n | --last n | --stats]
 -s : Exibe o código fonte.
 -a : Exibe a árvore síntática.
 -t : Exibe o traço completo de execução do autômato.
---state n : Exibe o n-ésimo estado de execução do autômato
+--at : Exibe a árvore síntática e termina a execução.
+--state n : Exibe o n-ésimo estado de execução do autômato.
+--last n : Exibe o (last - n)-ésimo estado de execução do autômato.
 --stats: Exibe o número de passos e o tempo de execução do autômato.
 ```
 # Documentação (P1,P2,P3)

@@ -64,11 +64,9 @@
 
    and decOC =
    | OPREF
-   | OPCNS
    | OPBLKDEC
    | OPBLKCMD
    | OPBIND
-   | OPDSEQ
 
   and control = 
   | Statement of statement

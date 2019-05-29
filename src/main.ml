@@ -1,11 +1,7 @@
-(* open Pi;;
-
-let z = new num 5.0 in
-  print_float z#getValue;; *)
-
 open Util;;
 open Pi;;
 open Printf;;
+open AutomatonType;;
 
 let willReadFile = ref false;;
 let fileContents = ref "";;
@@ -25,6 +21,8 @@ let willPrintStackTrace = ref false;;
 let willReadSpecificLastState = ref false;;
 let willPrintSpecificLastState = ref false;;
 let displayLastState =  ref (-1);;
+
+let willTerminate = ref false;;
   
     
 let () =
@@ -42,6 +40,9 @@ let () =
         willPrintSpecificLastState := true;
       end else if arg = "-a" then begin
         willPrintTree := true;
+      end else if arg = "--at" then begin
+        willPrintTree := true;
+        willTerminate := true;
       end else if arg = "-t" then begin 
         willPrintStackTrace := true;
       end else if arg = "-s" then begin 
@@ -72,17 +73,20 @@ let () =
 
   if !willPrintSourceCode then print_endline ("Código fonte Imπ:\n" ^ !fileContents  ^ "\n");
   
+
   let tree = Statement(Parser.main Lexer.token (Lexing.from_string !fileContents) )
   and controlStack = (Stack.create()) 
   and valueStack = (Stack.create()) 
   and environment = (Hashtbl.create 10)
   and memory = (Hashtbl.create 10)  in
 
-        if !willPrintTree then print_endline ("Árvore Sintática:\n" ^ (string_of_ctn tree) ^ "\n");
+        if !willPrintTree then print_endline ("Árvore Sintática:\n" ^ (string_of_control tree) ^ "\n");
+
+        if !willTerminate then exit (0);
 
         (Stack.push tree controlStack);
         (*inicialização de y*)
-        (Hashtbl.add environment "y" (Automaton.Loc(23)) );
+        (* (Hashtbl.add environment "y" (Automaton.Loc(23)) );
         (Hashtbl.add  memory 23 (Automaton.Integer(19)) );
         (*inicialização de z*)
          (Hashtbl.add environment "z" (Automaton.Loc(1)) );
@@ -92,7 +96,7 @@ let () =
         (Hashtbl.add memory 24 (Automaton.Integer(13)) );
         (*inicialização de i *)
         (Hashtbl.add environment "i" (Automaton.Loc(456))  );
-        (Hashtbl.add memory 456 (Automaton.Integer(0)) );
+        (Hashtbl.add memory 456 (Automaton.Integer(0)) ); *)
 
 
         let t0 = Unix.gettimeofday () in
@@ -115,5 +119,6 @@ let () =
           print_endline("\nStatus do autômato");
           print_endline("Número de passos: " ^ string_of_int(length) );
           print_endline("Tempo de execução (em segundos): " ^ string_of_float(t1 -. t0));
-        end;;
+        end
+;;
 

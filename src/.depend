@@ -1,13 +1,17 @@
-automaton.cmo : util.cmo pi.cmo
-automaton.cmx : util.cmx pi.cmx
+automaton.cmo : util.cmo pi.cmo automatonType.cmo
+automaton.cmx : util.cmx pi.cmx automatonType.cmx
+automatonType.cmo : pi.cmo
+automatonType.cmx : pi.cmx
 lexer.cmo : parser.cmi
 lexer.cmx : parser.cmx
-main.cmo : util.cmo pi.cmo parser.cmi lexer.cmo automaton.cmo
-main.cmx : util.cmx pi.cmx parser.cmx lexer.cmx automaton.cmx
+main.cmo : util.cmo pi.cmo parser.cmi lexer.cmo automatonType.cmo \
+    automaton.cmo
+main.cmx : util.cmx pi.cmx parser.cmx lexer.cmx automatonType.cmx \
+    automaton.cmx
 parser.cmo : pi.cmo parser.cmi
 parser.cmx : pi.cmx parser.cmi
 parser.cmi : pi.cmo
 pi.cmo :
 pi.cmx :
-util.cmo : pi.cmo
-util.cmx : pi.cmx
+util.cmo : pi.cmo automatonType.cmo
+util.cmx : pi.cmx automatonType.cmx

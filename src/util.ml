@@ -1,8 +1,6 @@
 open Pi;;
+open AutomatonType;;
 
-(* Lists *)
-let printStackTraceItem index item =
-  print_endline ("Estado #" ^ (string_of_int(index)) ^ " do π autômato\n\n" ^ item);;
 
 (* Files *)
 let readInputFile file_name =
@@ -86,13 +84,11 @@ and string_of_exp_opcode expOc =
   and string_dec_opcode decOc = 
   match decOc with
   | OPREF -> "#REF"
-  | OPCNS -> "#CNS"
   | OPBLKDEC -> "#BLKDEC"
   | OPBLKCMD -> "#BLKCMD"
   | OPBIND -> "#BIND"
-  | OPDSEQ -> "#DSEQ"
 
-and string_of_ctn ctn =
+and string_of_control ctn =
   match ctn with 
   | Statement(x) -> string_of_statement x
   | ExpOc(x) -> string_of_exp_opcode x
@@ -111,6 +107,44 @@ let string_of_dictionary dict func =
   "{\n " ^ (String.concat ",\n" (List.map func (List.of_seq (Hashtbl.to_seq dict))) ) ^ "\n }"
 ;;
 
-  
+
+(* Automaton *)
+let string_of_value_stack item =
+  match item with
+  | Int(x) -> string_of_int x
+  | Str(x) -> x
+  | Bool(x) -> if x then "True" else "False"
+  | LoopValue (x) -> (string_of_command x)
+  | CondValue (x) -> (string_of_command x);;
+
+let string_of_bindable bindable =
+  match bindable with
+  | Loc(x) -> "LOC [" ^ (string_of_int x) ^ "]"
+  | Value(x) -> "VALUE (" ^ (string_of_int x) ^ ")";;
+
+let string_of_storable storable =
+  match storable with
+  | Integer(x) ->  (string_of_int x) 
+  | Boolean(x) -> if x then "True" else "False";;
+
+let string_of_storable_dictionary (key, value) =
+  "\t( [" ^ (string_of_int key) ^ "]: " ^ (string_of_storable value) ^ " )";;
+
+let string_of_bindable_dictionary (key, value) =
+   "\t( " ^ key ^ ": " ^ (string_of_bindable value) ^ " )";;
 
 
+let string_of_stacks controlStack valueStack = 
+  "Pilha de Controle:\n" ^  (string_of_stack controlStack string_of_control) ^ "\nPilha de Valor:\n" ^ (string_of_stack valueStack string_of_value_stack);;
+
+let string_of_dictionaries environment memory = 
+  "Ambiente:\n" ^ (string_of_dictionary environment string_of_bindable_dictionary) ^ "\nMemória:\n" ^ (string_of_dictionary memory string_of_storable_dictionary);;
+
+let string_of_iteration controlStack valueStack environment memory =
+  (* "Estado #" ^ (string_of_int(!steps)) ^ " do π autômato\n" ^  *)
+  (string_of_stacks controlStack valueStack) ^ "\n" ^ (string_of_dictionaries environment memory) ^ "\n------------------------------------------------------------------------------------------------------------\n";;
+
+
+(* Lists *)
+let printStackTraceItem index (controlStack, valueStack, environment, memory) =
+  print_endline ("Estado #" ^ (string_of_int(index)) ^ " do π autômato\n\n" ^ (string_of_iteration controlStack valueStack environment memory));;

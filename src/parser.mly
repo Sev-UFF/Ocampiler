@@ -2,14 +2,14 @@
         %token <int> NUMBER
         %token <bool> BOOLEAN
         %token <string> ID
-        %token PLUS MINUS TIMES DIV
+        %token PLUS MINUS TIMESORPOINTER DIV
         %token LESS LESSEQUAL GREATER GREATEREQUAL EQUALS AND OR
-        %token LOOP DO IF THEN ELSE END ASSIGN LET VAR BIND IN COMMA DEREF POINTER
+        %token LOOP DO IF THEN ELSE END ASSIGN LET VAR CNS BIND IN COMMA ADDRESS POINTER
         %token NEGATION NOP
         %token LPAREN RPAREN 
         %token EOF 
         %left PLUS MINUS        /* lowest precedence */
-        %left TIMES DIV         /* medium precedence */
+        %left TIMESORPOINTER DIV         /* medium precedence */
         %start main             /* the entry point */
         %type <Pi.statement> main
         %type <Pi.statement> statement
@@ -18,6 +18,7 @@
         %type <Pi.arithmeticExpression> arithmeticExpression
         %type <Pi.booleanExpression> booleanExpression
         %type <Pi.command> command
+        %type <Pi.expression> variable
         %%
         main:
             statement EOF     { $1 }
@@ -30,6 +31,7 @@
         declaration:
           | declaration COMMA declaration {Pi.DSeq($1, $3)}
           | VAR ID BIND expression        {Pi.Bind(Pi.Id($2), Pi.Ref($4)) }
+          | CNS ID BIND expression        {Pi.Bind(Pi.Id($2), $4) }
           | LPAREN declaration RPAREN                     { $2 }
         ;
         command:
@@ -41,71 +43,76 @@
           | LET declaration IN command                  {Pi.Blk($2, $4)}
           | LET declaration IN command END              {Pi.Blk($2, $4)}
           | LPAREN command RPAREN                     { $2 }
-
         ;
         expression: 
             arithmeticExpression                    { Pi.AExp( $1) }
             | booleanExpression                     { Pi.BExp( $1) }
-            | ID                                    { Pi.Id( $1) }
+            | variable                              { $1 }
             | LPAREN expression RPAREN              { $2 }
             
+        ;
+        variable:
+           ID                                     { Pi.Id( $1) }
+          | TIMESORPOINTER ID                            { Pi.ValRef(Pi.Id($2))}
+          | ADDRESS ID                            { Pi.DeRef(Pi.Id($2))}
+          | LPAREN variable RPAREN                { $2 }
         ;
         arithmeticExpression:  
           NUMBER                                              { Pi.Num($1) }
           | arithmeticExpression PLUS arithmeticExpression    { Pi.Sum(Pi.AExp($1), Pi.AExp($3) )  }
-          | arithmeticExpression PLUS ID                      { Pi.Sum(Pi.AExp($1), Pi.Id($3) )  }
-          | ID PLUS arithmeticExpression                      { Pi.Sum(Pi.Id($1), Pi.AExp($3) )  }
-          | ID PLUS ID                                        { Pi.Sum(Pi.Id($1), Pi.Id($3) )  }
+          | arithmeticExpression PLUS variable                      { Pi.Sum(Pi.AExp($1), $3 )  }
+          | variable PLUS arithmeticExpression                      { Pi.Sum($1, Pi.AExp($3) )  }
+          | variable PLUS variable                                        { Pi.Sum($1, $3 )  }
           | arithmeticExpression MINUS arithmeticExpression   { Pi.Sub(Pi.AExp($1), Pi.AExp($3) )  }
-          | arithmeticExpression MINUS ID                     { Pi.Sub(Pi.AExp($1), Pi.Id($3) )  }
-          | ID MINUS arithmeticExpression                     { Pi.Sub(Pi.Id($1), Pi.AExp($3) )  }
-          | ID MINUS ID                                       { Pi.Sub(Pi.Id($1), Pi.Id($3) )  }
-          | arithmeticExpression TIMES arithmeticExpression   { Pi.Mul(Pi.AExp($1), Pi.AExp($3) )  }
-          | arithmeticExpression TIMES ID                     { Pi.Mul(Pi.AExp($1), Pi.Id($3) )  }
-          | ID TIMES arithmeticExpression                     { Pi.Mul(Pi.Id($1), Pi.AExp($3) )  }
-          | ID TIMES ID                                       { Pi.Mul(Pi.Id($1), Pi.Id($3) )  }
+          | arithmeticExpression MINUS variable                     { Pi.Sub(Pi.AExp($1), $3 )  }
+          | variable MINUS arithmeticExpression                     { Pi.Sub($1, Pi.AExp($3) )  }
+          | variable MINUS variable                                       { Pi.Sub($1, $3 )  }
+          | arithmeticExpression TIMESORPOINTER arithmeticExpression   { Pi.Mul(Pi.AExp($1), Pi.AExp($3) )  }
+          | arithmeticExpression TIMESORPOINTER variable                     { Pi.Mul(Pi.AExp($1),$3 )  }
+          | variable TIMESORPOINTER arithmeticExpression                     { Pi.Mul($1, Pi.AExp($3) )  }
+          | variable TIMESORPOINTER variable                                       { Pi.Mul($1, $3 )  }
           | arithmeticExpression DIV arithmeticExpression     { Pi.Div(Pi.AExp($1), Pi.AExp($3) )  }
-          | arithmeticExpression DIV ID                       { Pi.Div(Pi.AExp($1), Pi.Id($3) )  }
-          | ID DIV arithmeticExpression                       { Pi.Div(Pi.Id($1), Pi.AExp($3) )  }
-          | ID DIV ID                                         { Pi.Div(Pi.Id($1), Pi.Id($3) )  }
+          | arithmeticExpression DIV variable                       { Pi.Div(Pi.AExp($1), $3 )  }
+          | variable DIV arithmeticExpression                       { Pi.Div($1, Pi.AExp($3) )  }
+          | variable DIV variable                                         { Pi.Div($1, $3 )  }
           | LPAREN arithmeticExpression RPAREN                { $2 }
          
         ;
         booleanExpression:
           BOOLEAN                                                     { Pi.Boo($1) }
           | booleanExpression EQUALS booleanExpression                { Pi.Eq( Pi.BExp($1), Pi.BExp($3)) }
-          | booleanExpression EQUALS ID                               { Pi.Eq( Pi.BExp($1), Pi.Id($3)) }
-          | ID EQUALS booleanExpression                               { Pi.Eq( Pi.Id($1), Pi.BExp($3)) }
-          | ID EQUALS ID                                              { Pi.Eq( Pi.Id($1), Pi.Id($3)) }
+          | booleanExpression EQUALS variable                               { Pi.Eq( Pi.BExp($1), $3) }
+          | variable EQUALS booleanExpression                               { Pi.Eq( $1, Pi.BExp($3)) }
+          | variable EQUALS variable                                              { Pi.Eq( $1, $3) }
           | arithmeticExpression EQUALS arithmeticExpression          { Pi.Eq( Pi.AExp($1), Pi.AExp($3)) }
-          | arithmeticExpression EQUALS ID                            { Pi.Eq( Pi.AExp($1), Pi.Id($3)) }
-          | ID EQUALS arithmeticExpression                            { Pi.Eq( Pi.Id($1), Pi.AExp($3)) }
+          | arithmeticExpression EQUALS variable                            { Pi.Eq( Pi.AExp($1), $3) }
+          | variable EQUALS arithmeticExpression                            { Pi.Eq( $1, Pi.AExp($3)) }
           | arithmeticExpression LESS arithmeticExpression            { Pi.Lt( (Pi.AExp($1), Pi.AExp($3))) }
-          | arithmeticExpression LESS ID                              { Pi.Lt( (Pi.AExp($1), Pi.Id($3))) }
-          | ID LESS arithmeticExpression                              { Pi.Lt( (Pi.Id($1), Pi.AExp($3))) }
-          | ID LESS ID                                                { Pi.Lt( (Pi.Id($1), Pi.Id($3))) }
+          | arithmeticExpression LESS variable                              { Pi.Lt( (Pi.AExp($1), $3)) }
+          | variable LESS arithmeticExpression                              { Pi.Lt( ($1, Pi.AExp($3))) }
+          | variable LESS variable                                                { Pi.Lt( ($1, $3)) }
           | arithmeticExpression LESSEQUAL arithmeticExpression       { Pi.Le( Pi.AExp($1), Pi.AExp($3)) }
-          | arithmeticExpression LESSEQUAL ID                         { Pi.Le( (Pi.AExp($1), Pi.Id($3))) }
-          | ID LESSEQUAL arithmeticExpression                         { Pi.Le( (Pi.Id($1), Pi.AExp($3))) }
-          | ID LESSEQUAL ID                                           { Pi.Le( (Pi.Id($1), Pi.Id($3))) }
+          | arithmeticExpression LESSEQUAL variable                         { Pi.Le( (Pi.AExp($1), $3)) }
+          | variable LESSEQUAL arithmeticExpression                         { Pi.Le( ($1, Pi.AExp($3))) }
+          | variable LESSEQUAL variable                                           { Pi.Le( ($1, $3)) }
           | arithmeticExpression GREATER arithmeticExpression         { Pi.Gt( Pi.AExp($1), Pi.AExp($3)) }
-          | arithmeticExpression GREATER ID                           { Pi.Gt( (Pi.AExp($1), Pi.Id($3))) }
-          | ID GREATER arithmeticExpression                           { Pi.Gt( (Pi.Id($1), Pi.AExp($3))) }
-          | ID GREATER ID                                             { Pi.Gt( (Pi.Id($1), Pi.Id($3))) }
+          | arithmeticExpression GREATER variable                           { Pi.Gt( (Pi.AExp($1), $3)) }
+          | variable GREATER arithmeticExpression                           { Pi.Gt( ($1, Pi.AExp($3))) }
+          | variable GREATER variable                                             { Pi.Gt( ($1, $3)) }
           | arithmeticExpression GREATEREQUAL arithmeticExpression    { Pi.Ge( (Pi.AExp($1), Pi.AExp($3))) }
-          | arithmeticExpression GREATEREQUAL ID                      { Pi.Ge( (Pi.AExp($1), Pi.Id($3))) }
-          | ID GREATEREQUAL arithmeticExpression                      { Pi.Ge( (Pi.Id($1), Pi.AExp($3))) }
-          | ID GREATEREQUAL ID                                        { Pi.Ge( (Pi.Id($1), Pi.Id($3))) }
+          | arithmeticExpression GREATEREQUAL variable                      { Pi.Ge( (Pi.AExp($1), $3)) }
+          | variable GREATEREQUAL arithmeticExpression                      { Pi.Ge( ($1, Pi.AExp($3))) }
+          | variable GREATEREQUAL variable                                        { Pi.Ge( ($1, $3)) }
           | booleanExpression AND booleanExpression                   { Pi.And( Pi.BExp($1), Pi.BExp($3)) }
-          | booleanExpression AND ID                                  { Pi.And( (Pi.BExp($1), Pi.Id($3))) }
-          | ID AND booleanExpression                                  { Pi.And( (Pi.Id($1), Pi.BExp($3))) }
-          | ID AND ID                                                 { Pi.And( (Pi.Id($1), Pi.Id($3))) }
+          | booleanExpression AND variable                                  { Pi.And( (Pi.BExp($1), $3)) }
+          | variable AND booleanExpression                                  { Pi.And( ($1, Pi.BExp($3))) }
+          | variable AND variable                                                 { Pi.And( ($1, $3)) }
           | booleanExpression OR booleanExpression                    { Pi.Or( Pi.BExp($1), Pi.BExp($3)) }
-          | booleanExpression OR ID                                   { Pi.Or( (Pi.BExp($1), Pi.Id($3))) }
-          | ID OR booleanExpression                                   { Pi.Or( (Pi.Id($1), Pi.BExp($3))) }
-          | ID OR ID                                                  { Pi.Or( (Pi.Id($1), Pi.Id($3))) }
+          | booleanExpression OR variable                                   { Pi.Or( (Pi.BExp($1), $3)) }
+          | variable OR booleanExpression                                   { Pi.Or( ($1, Pi.BExp($3))) }
+          | variable OR variable                                                  { Pi.Or( ($1, $3)) }
           | NEGATION LPAREN booleanExpression RPAREN                  { Pi.Not( Pi.BExp($3) )}
-          | NEGATION LPAREN ID RPAREN                                 { Pi.Not( Pi.Id($3) )}
+          | NEGATION LPAREN variable RPAREN                                 { Pi.Not( $3 )}
           | LPAREN booleanExpression RPAREN                           { $2 }
           
 ;

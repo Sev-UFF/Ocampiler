@@ -5,11 +5,11 @@
         }
         rule token = parse
             [' ' '\t' '\r' '\n' ]   { token lexbuf }     (* skip blanks *)
-          |  "#"([^ '\n' ]+)       { token lexbuf }     (* skip comments *)
+          |  "#"([^ '\n' ]+)       { token lexbuf }     (* skip comment lines *)
           | (['-']? ['0'-'9']+) as  lxm      { NUMBER( int_of_string lxm) }
           | '+'                     { PLUS }
           | '-'                     { MINUS }
-          | '*'                     { TIMES }
+          | '*'                     { TIMESORPOINTER }
           | '/'                     { DIV }
           | '('                     { LPAREN }
           | ')'                     { RPAREN }
@@ -33,9 +33,9 @@
           | "="                    { BIND }
           | "let"                    { LET }
           | "var"                    { VAR }
+          | "cns"                    { CNS }
           | "in"                    { IN }
-          | "!"                    { POINTER }
-          | "*"                    { DEREF }
+          | "&"                    { ADDRESS }
           | ","                    { COMMA }
           | (['a'-'z' 'A'-'Z' '_'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*) as  lxm      { ID(lxm) }
           | eof                     { EOF }

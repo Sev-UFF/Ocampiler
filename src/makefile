@@ -15,9 +15,9 @@ YACCGENERATED = parser.mli parser.ml
 GENERATED = $(LEXGENERATED) $(YACCGENERATED)
 
 # Caml sources
-SOURCES = util.ml pi.ml $(GENERATED) automaton.ml  main.ml 
+SOURCES = util.ml pi.ml $(GENERATED) automatonType.ml automaton.ml   main.ml 
 # Caml object files to link
-OBJS = util.cmo pi.cmo lexer.cmo parser.cmo automaton.cmo  main.cmo
+OBJS = util.cmo pi.cmo lexer.cmo parser.cmo automatonType.cmo automaton.cmo  main.cmo
 # Library files not linked by default
 LINKS = unix.cma
 
