@@ -1,7 +1,4 @@
+y := False
+if (y) then x:=3 end
 y := True
-<<<<<<< HEAD
-if (True) then x:=3 else x:=99 end
-(if(not(True))then(x:=1)else(x:=2)end)
-=======
-if (y) then x:=3 else x:=99 end
->>>>>>> b7934dec09d59cc1b08a0c348015ecbffde1c0e1
+
