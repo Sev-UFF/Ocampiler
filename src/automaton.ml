@@ -344,7 +344,11 @@ let rec delta controlStack valueStack environment memory =
               );
               | Not( _) -> raise (AutomatonException "Error on Not");
               
-            );       
+            );   
+            | Ref(ref)-> (
+              (Stack.push (DecOc(OPREF)) controlStack);
+              (Stack.push (Statement(Exp(ref))) controlStack);
+            );
           );
         | Cmd(cmd) -> (
           match cmd with 
@@ -387,6 +391,15 @@ let rec delta controlStack valueStack environment memory =
           );
           | Cond(_, _, _) -> raise (AutomatonException "Error on Cond");
           | Nop -> ();
+        );
+        | Dec (dec) -> (
+          match dec with 
+          | Bind(Id(x), y) -> (
+            (Stack.push (DecOc(OPBIND)) controlStack );
+            (Stack.push (Statement(Exp(y))) controlStack );
+            (Stack.push (Str(x)) valueStack);
+         );
+          | _ -> ();
         );
       );   
       | ExpOc(expOc) -> (
@@ -631,7 +644,35 @@ let rec delta controlStack valueStack environment memory =
               | _ -> raise (AutomatonException "Error on #COND" );
         );
       );
+      | DecOc(decOc) -> (
+        match decOc with
+        | OPREF -> (
+          let value = (Stack.pop valueStack) in
+          match value with
+          | Int(x) -> (
+            (Hashtbl.add  memory (List.length !trace) (Integer(x)));
+            (Stack.push (Bind(Loc(List.length !trace))) valueStack);
+          );
+          | Bool(x) -> (
+            (Hashtbl.add  memory (List.length !trace) (Boolean(x)));
+            (Stack.push (Bind(Loc(List.length !trace))) valueStack);
+          );
+        );
+        | OPBIND -> (
+          let l = (Stack.pop valueStack) in
+            let id = (Stack.pop valueStack) in
+              match id with
+              | Str(x) ->(
+                match l with
+                  | Bind(Loc(y)) -> (
+                    (Stack.push (Assoc(x,Loc(y))) valueStack);
+                  );
+                  | _ -> raise (AutomatonException "Error on #OPBIND 1" );
+                  
+              );
+              | _ -> raise (AutomatonException "Error on #OPBIND 2" );
+          );
+      );
     );
     delta controlStack valueStack environment memory;
   end;;
-  

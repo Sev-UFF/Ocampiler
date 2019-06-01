@@ -108,18 +108,22 @@ let string_of_dictionary dict func =
 
 
 (* Automaton *)
+
+let string_of_bindable bindable =
+  match bindable with
+  | Loc(x) -> "LOC [" ^ (string_of_int x) ^ "]"
+  | Value(x) -> "VALUE (" ^ (string_of_int x) ^ ")";;
+
+  
 let string_of_value_stack item =
   match item with
   | Int(x) -> string_of_int x
   | Str(x) -> x
   | Bool(x) -> if x then "True" else "False"
   | LoopValue (x) -> (string_of_command x)
-  | CondValue (x) -> (string_of_command x);;
-
-let string_of_bindable bindable =
-  match bindable with
-  | Loc(x) -> "LOC [" ^ (string_of_int x) ^ "]"
-  | Value(x) -> "VALUE (" ^ (string_of_int x) ^ ")";;
+  | CondValue (x) -> (string_of_command x)
+  | Assoc (x, y) -> "[" ^ x ^ " -> " ^ (string_of_bindable y) ^ "]"
+  | Bind (x) -> (string_of_bindable x);;
 
 let string_of_storable storable =
   match storable with
