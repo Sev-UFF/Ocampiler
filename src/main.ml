@@ -78,7 +78,8 @@ let () =
   and controlStack = (Stack.create()) 
   and valueStack = (Stack.create()) 
   and environment = (Hashtbl.create 10)
-  and memory = (Hashtbl.create 10)  in
+  and memory = (Hashtbl.create 10)
+  and locations = ref [] in
 
         if !willPrintTree then print_endline ("Árvore Sintática:\n" ^ (string_of_control tree) ^ "\n");
 
@@ -100,7 +101,7 @@ let () =
 
 
         let t0 = Unix.gettimeofday () in
-        Automaton.delta controlStack valueStack environment memory;
+        Automaton.delta controlStack valueStack environment memory locations;
         let t1 = Unix.gettimeofday () in
 
         let length = List.length !(Automaton.trace) in
