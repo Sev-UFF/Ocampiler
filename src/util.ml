@@ -120,7 +120,7 @@ let string_of_list locations =
 
 let string_of_bindable bindable =
   match bindable with
-  | Loc(x) -> "LOC [" ^ (string_of_int x) ^ "]"
+  | Loc(x) -> "LOC[" ^ (string_of_int x) ^ "]"
   | IntConst(x) -> "IntConst (" ^ (string_of_int x) ^ ")"
   | BoolConst(x) -> "BoolConst (" ^ (string_of_bool x) ^ ")";;
 
@@ -132,7 +132,7 @@ let string_of_value_stack item =
   | Bool(x) -> (string_of_bool x)
   | LoopValue (x) -> (string_of_command x)
   | CondValue (x) -> (string_of_command x)
-  | Assoc (x, y) -> x ^ (string_of_bindable y)
+  | Assoc (x, y) -> "{Id(" ^ x ^") -> " ^ (string_of_bindable y) ^ "}"
   | Bind(x) -> (string_of_bindable x);;
 
 

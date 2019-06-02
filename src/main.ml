@@ -79,26 +79,13 @@ let () =
   and valueStack = (Stack.create()) 
   and environment = (Hashtbl.create 10)
   and memory = (Hashtbl.create 10)
-  and locations = ref [] in
-
+  and locations = ref [] 
+  in
         if !willPrintTree then print_endline ("Árvore Sintática:\n" ^ (string_of_control tree) ^ "\n");
 
         if !willTerminate then exit (0);
 
         (Stack.push tree controlStack);
-        (*inicialização de y*)
-        (* (Hashtbl.add environment "y" (Automaton.Loc(23)) );
-        (Hashtbl.add  memory 23 (Automaton.Integer(19)) );
-        (*inicialização de z*)
-         (Hashtbl.add environment "z" (Automaton.Loc(1)) );
-        (Hashtbl.add memory 1 (Automaton.Integer(77)) );
-        (*inicialização de x *)
-        (Hashtbl.add environment "x" (Automaton.Loc(24))  );
-        (Hashtbl.add memory 24 (Automaton.Integer(13)) );
-        (*inicialização de i *)
-        (Hashtbl.add environment "i" (Automaton.Loc(456))  );
-        (Hashtbl.add memory 456 (Automaton.Integer(0)) ); *)
-
 
         let t0 = Unix.gettimeofday () in
         Automaton.delta controlStack valueStack environment memory locations;

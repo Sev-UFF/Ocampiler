@@ -6,14 +6,12 @@ let trace = ref [];;
 
 
 let rec delta controlStack valueStack environment memory locations = 
-
-
-  if not(Stack.is_empty controlStack) then begin
-    let copia = !locations in
-    trace := (!trace)@[( (Stack.copy controlStack), (Stack.copy valueStack), (Hashtbl.copy environment), (Hashtbl.copy memory), (copia))];
   
-   
-
+  let copia = !locations in
+  trace := (!trace)@[( (Stack.copy controlStack), (Stack.copy valueStack), (Hashtbl.copy environment), (Hashtbl.copy memory), (copia))];
+  
+  if not(Stack.is_empty controlStack) then begin 
+    
     let ctrl = (Stack.pop controlStack) in
       (match ctrl with
       | Statement(sta)-> (
