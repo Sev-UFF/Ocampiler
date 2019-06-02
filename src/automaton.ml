@@ -9,8 +9,8 @@ let rec delta controlStack valueStack environment memory locations =
 
 
   if not(Stack.is_empty controlStack) then begin
-
-    trace := (!trace)@[( (Stack.copy controlStack), (Stack.copy valueStack), (Hashtbl.copy environment), (Hashtbl.copy memory), [1;2;3;4])];
+    let copia = !locations in
+    trace := (!trace)@[( (Stack.copy controlStack), (Stack.copy valueStack), (Hashtbl.copy environment), (Hashtbl.copy memory), (copia))];
   
    
 
@@ -659,17 +659,18 @@ let rec delta controlStack valueStack environment memory locations =
       | DecOc(decOc) -> (
         match decOc with
         | OPREF -> (
+          let loc = (List.length !trace) in
           let value = (Stack.pop valueStack) in
           match value with
           | Int(x) -> (
-            (Hashtbl.add  memory (List.length !trace) (Integer(x)));
-            (Stack.push (Bind(Loc(List.length !trace))) valueStack);
-            locations := (!locations)@[List.length !trace];
+            (Hashtbl.add  memory loc (Integer(x)));
+            (Stack.push (Bind(Loc(loc))) valueStack);
+            locations := (!locations)@[loc];
           );
           | Bool(x) -> (
-            (Hashtbl.add  memory (List.length !trace) (Boolean(x)));
-            (Stack.push (Bind(Loc(List.length !trace))) valueStack);
-            locations := (!locations)@[List.length !trace];
+            (Hashtbl.add  memory (loc) (Boolean(x)));
+            (Stack.push (Bind(Loc(loc))) valueStack);
+            locations := (!locations)@[loc];
           );
           | Str(x) -> ();
           | LoopValue(x) -> ();
@@ -691,6 +692,8 @@ let rec delta controlStack valueStack environment memory locations =
               );
               | _ -> raise (AutomatonException "Error on #OPBIND 2" );
           );
+
+
 
 
           | OPBLKDEC -> (
