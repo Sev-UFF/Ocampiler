@@ -350,8 +350,42 @@ let rec delta controlStack valueStack environment memory locations =
               (Stack.push (DecOc(OPREF)) controlStack);
               (Stack.push (Statement(Exp(ref))) controlStack);
             );
-            | DeRef(ref) -> ();
-            | ValRef(ref) -> ();
+            | DeRef(ref) -> (
+              match ref with
+              | Id(id) -> (
+                let key = Hashtbl.find environment id  in
+                  match key with 
+                  | Loc(x) -> (
+                    (Stack.push (Bind(Loc(x))) valueStack );
+                  )
+                  | _ -> raise (AutomatonException "Error on DeRef 1");
+              );
+              | _ -> raise (AutomatonException "Error on DeRef 2");
+            );
+            | ValRef(ref) -> (
+              match ref with
+              | Id(id) -> (
+                let key = Hashtbl.find environment id  in
+                match key with 
+                  | Loc(x1) -> (
+                    let value1 = Hashtbl.find memory x1  in
+                      match value1 with
+                      | Integer(x2) ->   raise (AutomatonException "Error on ValRef: Integer encontrado!");
+                      | Boolean(x2) ->  raise (AutomatonException "Error on ValRef - Boolean encontrado!");
+                      | Pointer(x2) -> (
+                        match x2 with
+                        | Loc(x3) -> (
+                          let value2 = Hashtbl.find memory x3  in
+                          match value2 with
+                          | Integer(x4) ->   (Stack.push (Int(x4)) valueStack);
+                          | Boolean(x4) ->  (Stack.push (Bool(x4)) valueStack);
+                          | Pointer(x4) -> raise (AutomatonException "Error on ValRef");
+                        );
+                      );
+                  )
+              );
+
+            );
           );
         | Cmd(cmd) -> (
           match cmd with 
@@ -398,9 +432,11 @@ let rec delta controlStack valueStack environment memory locations =
             (Stack.push (Statement(Cmd(y))) controlStack);
             (Stack.push (DecOc(OPBLKDEC)) controlStack);
             (Stack.push (Statement(Dec(x))) controlStack);
+
+            let new_locations = !locations in (Stack.push (List(new_locations)) valueStack);
+            locations := [] ;
           );
           | Nop -> ();
-
         );
         | Dec (dec) -> (
           match dec with 
@@ -686,21 +722,32 @@ let rec delta controlStack valueStack environment memory locations =
                     (Stack.push (Assoc(x,Loc(y))) valueStack);
                   );
                   | _ -> raise (AutomatonException "Error on #OPBIND 1" );
-                  
               );
               | _ -> raise (AutomatonException "Error on #OPBIND 2" );
           );
-
-
-
-
           | OPBLKDEC -> (
-          
+            let ass = (Stack.pop valueStack) in
+              let env = Hashtbl.copy environment in
+                match ass with
+                  | Assoc(x, y) -> (
+                    (Stack.push (Env(env)) valueStack);
+                    (*Precisa aqui fazer a matemática de quem permanece no 
+                    environment e quem sai...*)
+              );
           );
-
-
           | OPBLKCMD -> (
-          
+            let env = (Stack.pop valueStack) in
+              let locs = (Stack.pop valueStack) in
+                match locs with
+                  | List(x) -> (
+                    locations := x;
+                    match env with
+                      | Env(y) -> (
+                        environment := y;
+                      );
+                  );
+                (*Precisa aqui fazer a matemática de quem permanece na 
+                    memória e quem sai...*)
           );
 
       );
