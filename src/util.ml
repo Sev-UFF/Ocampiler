@@ -110,7 +110,20 @@ let string_of_dictionary dict func =
 ;;
 
 
+let string_of_list locations = 
+  "{\n " ^ String.concat ", " (List.map string_of_int locations) ^ "\n }"
+;;
+
+
 (* Automaton *)
+
+let string_of_bindable bindable =
+  match bindable with
+  | Loc(x) -> "LOC [" ^ (string_of_int x) ^ "]"
+  | Value(x) -> "VALUE (" ^ (string_of_int x) ^ ")";;
+  
+
+  
 let string_of_value_stack item =
   match item with
   | Int(x) -> string_of_int x
@@ -144,11 +157,16 @@ let string_of_stacks controlStack valueStack =
 let string_of_dictionaries environment memory = 
   "Ambiente:\n" ^ (string_of_dictionary environment string_of_bindable_dictionary) ^ "\nMemória:\n" ^ (string_of_dictionary memory string_of_storable_dictionary);;
 
-let string_of_iteration controlStack valueStack environment memory =
+
+  let string_of_listas locations = 
+  "Indexes:\n" ^ (string_of_list locations);;
+
+
+let string_of_iteration controlStack valueStack environment memory locations =
   (* "Estado #" ^ (string_of_int(!steps)) ^ " do π autômato\n" ^  *)
-  (string_of_stacks controlStack valueStack) ^ "\n" ^ (string_of_dictionaries environment memory) ^ "\n------------------------------------------------------------------------------------------------------------\n";;
+  (string_of_stacks controlStack valueStack) ^ "\n" ^ (string_of_dictionaries environment memory) ^ "\n" ^ (string_of_listas locations) ^ "\n------------------------------------------------------------------------------------------------------------\n";;
 
 
 (* Lists *)
-let printStackTraceItem index (controlStack, valueStack, environment, memory) =
-  print_endline ("Estado #" ^ (string_of_int(index)) ^ " do π autômato\n\n" ^ (string_of_iteration controlStack valueStack environment memory));;
+let printStackTraceItem index (controlStack, valueStack, environment, memory, locations) =
+  print_endline ("Estado #" ^ (string_of_int(index)) ^ " do π autômato\n\n" ^ (string_of_iteration controlStack valueStack environment memory locations));;

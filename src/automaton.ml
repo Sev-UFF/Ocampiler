@@ -5,12 +5,15 @@ open AutomatonType;;
 let trace = ref [];;
 
 
-let rec delta controlStack valueStack environment memory = 
+let rec delta controlStack valueStack environment memory locations = 
+
 
   if not(Stack.is_empty controlStack) then begin
 
-    trace := (!trace)@[( (Stack.copy controlStack), (Stack.copy valueStack), (Hashtbl.copy environment), (Hashtbl.copy memory) )];
-    
+    trace := (!trace)@[( (Stack.copy controlStack), (Stack.copy valueStack), (Hashtbl.copy environment), (Hashtbl.copy memory), [1;2;3;4])];
+  
+   
+
     let ctrl = (Stack.pop controlStack) in
       (match ctrl with
       | Statement(sta)-> (
@@ -344,7 +347,13 @@ let rec delta controlStack valueStack environment memory =
               );
               | Not( _) -> raise (AutomatonException "Error on Not");
               
-            );       
+            );   
+            | Ref(ref)-> (
+              (Stack.push (DecOc(OPREF)) controlStack);
+              (Stack.push (Statement(Exp(ref))) controlStack);
+            );
+            | DeRef(ref) -> ();
+            | ValRef(ref) -> ();
           );
         | Cmd(cmd) -> (
           match cmd with 
@@ -386,7 +395,23 @@ let rec delta controlStack valueStack environment memory =
             
           );
           | Cond(_, _, _) -> raise (AutomatonException "Error on Cond");
+          | Blk(x, y) -> (
+            (Stack.push (DecOc(OPBLKCMD)) controlStack);
+            (Stack.push (Statement(Cmd(y))) controlStack);
+            (Stack.push (DecOc(OPBLKDEC)) controlStack);
+            (Stack.push (Statement(Dec(x))) controlStack);
+          );
           | Nop -> ();
+
+        );
+        | Dec (dec) -> (
+          match dec with 
+          | Bind(Id(x), y) -> (
+            (Stack.push (DecOc(OPBIND)) controlStack );
+            (Stack.push (Statement(Exp(y))) controlStack );
+            (Stack.push (Str(x)) valueStack);
+         );
+          | _ -> ();
         );
       );   
       | ExpOc(expOc) -> (
@@ -631,7 +656,53 @@ let rec delta controlStack valueStack environment memory =
               | _ -> raise (AutomatonException "Error on #COND" );
         );
       );
+      | DecOc(decOc) -> (
+        match decOc with
+        | OPREF -> (
+          let value = (Stack.pop valueStack) in
+          match value with
+          | Int(x) -> (
+            (Hashtbl.add  memory (List.length !trace) (Integer(x)));
+            (Stack.push (Bind(Loc(List.length !trace))) valueStack);
+            locations := (!locations)@[List.length !trace];
+          );
+          | Bool(x) -> (
+            (Hashtbl.add  memory (List.length !trace) (Boolean(x)));
+            (Stack.push (Bind(Loc(List.length !trace))) valueStack);
+            locations := (!locations)@[List.length !trace];
+          );
+          | Str(x) -> ();
+          | LoopValue(x) -> ();
+          | CondValue(x) -> ();
+          | Assoc(x, y) ->  ();
+          | Bind(x) -> ();
+        );
+        | OPBIND -> (
+          let l = (Stack.pop valueStack) in
+            let id = (Stack.pop valueStack) in
+              match id with
+              | Str(x) ->(
+                match l with
+                  | Bind(Loc(y)) -> (
+                    (Stack.push (Assoc(x,Loc(y))) valueStack);
+                  );
+                  | _ -> raise (AutomatonException "Error on #OPBIND 1" );
+                  
+              );
+              | _ -> raise (AutomatonException "Error on #OPBIND 2" );
+          );
+
+
+          | OPBLKDEC -> (
+          
+          );
+
+
+          | OPBLKCMD -> (
+          
+          );
+
+      );
     );
-    delta controlStack valueStack environment memory;
+    delta controlStack valueStack environment memory locations;
   end;;
-  
