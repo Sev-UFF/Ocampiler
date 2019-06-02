@@ -20,7 +20,7 @@ let rec delta controlStack valueStack environment memory =
           | Id(id) -> (
             let key = Hashtbl.find environment id  in
               match key with 
-                | Value(x) -> ();
+                (* | Value(x) -> (); *)
                 | Loc(x) -> (
                   let value = Hashtbl.find memory x  in
                     match value with
@@ -590,9 +590,9 @@ let rec delta controlStack valueStack environment memory =
                     | _ -> raise (AutomatonException "Error on #ASSIGN")
                     
                   );
-                  | Value(v) -> (
+                  (* | Value(v) -> (
 
-                  );
+                  ); *)
                   
               );
               | _ -> raise (AutomatonException "Error on #ASSIGN")

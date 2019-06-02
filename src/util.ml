@@ -1,6 +1,9 @@
 open Pi;;
 open AutomatonType;;
 
+(* Boolean *)
+let string_of_bool x =
+  if x then "True" else "False";;
 
 (* Files *)
 let readInputFile file_name =
@@ -112,19 +115,21 @@ let string_of_value_stack item =
   match item with
   | Int(x) -> string_of_int x
   | Str(x) -> x
-  | Bool(x) -> if x then "True" else "False"
+  | Bool(x) -> (string_of_bool x)
   | LoopValue (x) -> (string_of_command x)
   | CondValue (x) -> (string_of_command x);;
 
 let string_of_bindable bindable =
   match bindable with
   | Loc(x) -> "LOC [" ^ (string_of_int x) ^ "]"
-  | Value(x) -> "VALUE (" ^ (string_of_int x) ^ ")";;
+  | IntConst(x) -> "IntConst (" ^ (string_of_int x) ^ ")"
+  | BoolConst(x) -> "BoolConst (" ^ (string_of_bool x) ^ ")";;
 
 let string_of_storable storable =
   match storable with
   | Integer(x) ->  (string_of_int x) 
-  | Boolean(x) -> if x then "True" else "False";;
+  | Boolean(x) -> (string_of_bool x)
+  | Pointer(x) -> (string_of_bindable x);;
 
 let string_of_storable_dictionary (key, value) =
   "\t( [" ^ (string_of_int key) ^ "]: " ^ (string_of_storable value) ^ " )";;

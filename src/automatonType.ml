@@ -8,13 +8,15 @@ type valueStackOptions =
   | Str of string
   | Bool of bool
   | LoopValue of command
-  | CondValue of command;;
+  | CondValue of command
 
-type storable = 
+and storable = 
   | Integer of int
-  | Boolean of bool;;
+  | Boolean of bool
+  | Pointer of bindable
 
-type bindable = 
+and bindable = 
   | Loc of int
-  | Value of int;;
+  | IntConst of int
+  | BoolConst of bool;;
 

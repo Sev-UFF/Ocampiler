@@ -1,11 +1,3 @@
 #meu codigo de teste
 
-let var x = 4, var y = 5, let var z = 1 in
-        y := x + z
-
- #let var x = 4 in 
- #let var y = 5 in
- #let var z = 1 in
- #   y := x + z
-
-    # BLK (BIND (ID (x), REF (NUM (4))), BLK (BIND (ID (y), REF (NUM (5))), BLK (BIND (ID (z), REF (NUM (1))), ASSIGN (ID (y), SUM (ID (x), ID (z))))))
+x := True
