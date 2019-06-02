@@ -116,13 +116,6 @@ let string_of_list locations =
 
 
 (* Automaton *)
-
-let string_of_bindable bindable =
-  match bindable with
-  | Loc(x) -> "LOC [" ^ (string_of_int x) ^ "]"
-  | Value(x) -> "VALUE (" ^ (string_of_int x) ^ ")";;
-  
-
   
 let string_of_value_stack item =
   match item with

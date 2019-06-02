@@ -3,11 +3,6 @@ open Pi;;
 
 exception AutomatonException of string;;
 
-
-type bindable = 
-  | Loc of int
-  | Value of int;;
-
   
 type valueStackOptions = 
   | Int of int
@@ -16,7 +11,7 @@ type valueStackOptions =
   | LoopValue of command
   | CondValue of command
   | Assoc of string * bindable
-  | Bind of bindable;;
+  | Bind of bindable
 
 and storable = 
   | Integer of int
