@@ -26,7 +26,6 @@
         statement:
           expression { Pi.Exp($1)}
           | command      {Pi.Cmd($1)}
-          | declaration  {Pi.Dec($1)}
         ;
         declaration:
           | VAR ID BIND expression        {Pi.Bind(Pi.Id($2), Pi.Ref($4)) }

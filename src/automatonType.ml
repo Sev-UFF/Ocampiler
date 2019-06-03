@@ -12,7 +12,7 @@ type valueStackOptions =
   | CondValue of command
   | Assoc of string * bindable
   | Bind of bindable
-  | List of int list
+  | Locations of int list
   | Env of (string, bindable) Hashtbl.t
 
 and storable = 

@@ -111,21 +111,21 @@ let string_of_dictionary dict func =
 
 
 let string_of_list locations = 
-  "{\n " ^ String.concat ", " (List.map string_of_int locations) ^ "\n }"
+  "{\n\t" ^ String.concat ", " (List.map string_of_int locations) ^ "\n}"
 ;;
 
 
 (* Automaton *)
   
 
-let string_of_bindable bindable =
+let rec string_of_bindable bindable =
   match bindable with
   | Loc(x) -> "LOC[" ^ (string_of_int x) ^ "]"
   | IntConst(x) -> "IntConst (" ^ (string_of_int x) ^ ")"
-  | BoolConst(x) -> "BoolConst (" ^ (string_of_bool x) ^ ")";;
+  | BoolConst(x) -> "BoolConst (" ^ (string_of_bool x) ^ ")"
 
 
-let string_of_value_stack item =
+and string_of_value_stack item =
   match item with
   | Int(x) -> string_of_int x
   | Str(x) -> x
@@ -133,34 +133,36 @@ let string_of_value_stack item =
   | LoopValue (x) -> (string_of_command x)
   | CondValue (x) -> (string_of_command x)
   | Assoc (x, y) -> "{Id(" ^ x ^") -> " ^ (string_of_bindable y) ^ "}"
-  | Bind(x) -> (string_of_bindable x);;
+  | Bind(x) -> (string_of_bindable x)
+  | Env(x) -> "Env(" ^  (string_of_dictionary x string_of_bindable_dictionary) ^ ")"
+  | Locations(x) -> "Locations(" ^ (string_of_list x) ^ ")"
 
 
-let string_of_storable storable =
+  and string_of_storable storable =
   match storable with
   | Integer(x) ->  (string_of_int x) 
   | Boolean(x) -> (string_of_bool x)
-  | Pointer(x) -> (string_of_bindable x);;
+  | Pointer(x) -> (string_of_bindable x)
 
-let string_of_storable_dictionary (key, value) =
-  "\t( [" ^ (string_of_int key) ^ "]: " ^ (string_of_storable value) ^ " )";;
+  and string_of_storable_dictionary (key, value) =
+  "\t( LOC[" ^ (string_of_int key) ^ "] -> " ^ (string_of_storable value) ^ " )"
 
-let string_of_bindable_dictionary (key, value) =
-   "\t( " ^ key ^ ": " ^ (string_of_bindable value) ^ " )";;
-
-
-let string_of_stacks controlStack valueStack = 
-  "Pilha de Controle:\n" ^  (string_of_stack controlStack string_of_control) ^ "\nPilha de Valor:\n" ^ (string_of_stack valueStack string_of_value_stack);;
-
-let string_of_dictionaries environment memory = 
-  "Ambiente:\n" ^ (string_of_dictionary environment string_of_bindable_dictionary) ^ "\nMemória:\n" ^ (string_of_dictionary memory string_of_storable_dictionary);;
+  and string_of_bindable_dictionary (key, value) =
+   "\t( " ^ key ^ " -> " ^ (string_of_bindable value) ^ " )"
 
 
-  let string_of_listas locations = 
-  "Indexes:\n" ^ (string_of_list locations);;
+   and string_of_stacks controlStack valueStack = 
+  "Pilha de Controle:\n" ^  (string_of_stack controlStack string_of_control) ^ "\nPilha de Valor:\n" ^ (string_of_stack valueStack string_of_value_stack)
+
+  and string_of_dictionaries environment memory = 
+  "Ambiente:\n" ^ (string_of_dictionary environment string_of_bindable_dictionary) ^ "\nMemória:\n" ^ (string_of_dictionary memory string_of_storable_dictionary)
 
 
-let string_of_iteration controlStack valueStack environment memory locations =
+  and string_of_listas locations = 
+  "Locations:\n" ^ (string_of_list locations)
+
+
+and string_of_iteration controlStack valueStack environment memory locations =
   (* "Estado #" ^ (string_of_int(!steps)) ^ " do π autômato\n" ^  *)
   (string_of_stacks controlStack valueStack) ^ "\n" ^ (string_of_dictionaries environment memory) ^ "\n" ^ (string_of_listas locations) ^ "\n------------------------------------------------------------------------------------------------------------\n";;
 
