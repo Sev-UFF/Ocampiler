@@ -28,8 +28,6 @@ let willTerminate = ref false;;
 let () =
   for i = 1 to Array.length Sys.argv - 1 do 
     let arg = Sys.argv.(i) in 
-      (* printf "[%i] %s\n" i arg; *)
-
       if arg = "-f" then begin
         willReadFile := true;
       end else if arg = "--state" then begin

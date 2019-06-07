@@ -18,6 +18,7 @@
         %type <Pi.arithmeticExpression> arithmeticExpression
         %type <Pi.booleanExpression> booleanExpression
         %type <Pi.command> command
+        %type <Pi.expression> bindableVariable
         %type <Pi.expression> variable
         %%
         main:
@@ -29,7 +30,8 @@
         ;
         declaration:
           | VAR ID BIND expression        {Pi.Bind(Pi.Id($2), Pi.Ref($4)) }
-          | CNS ID BIND expression        {Pi.Bind(Pi.Id($2), $4) }
+          | CNS ID BIND bindableVariable        {Pi.Bind(Pi.Id($2), $4) }
+          | declaration COMMA declaration             { Pi.DSeq($1, $3) }
           | LPAREN declaration RPAREN                     { $2 }
         ;
         command:
@@ -43,16 +45,21 @@
           | LPAREN command RPAREN                     { $2 }
         ;
         expression: 
-            arithmeticExpression                    { Pi.AExp( $1) }
+            ADDRESS ID                            { Pi.DeRef(Pi.Id($2))}
+            | bindableVariable                              { $1 }
+            | LPAREN expression RPAREN              { $2 }
+            
+        ;
+         bindableVariable: 
+             arithmeticExpression                    { Pi.AExp( $1) }
             | booleanExpression                     { Pi.BExp( $1) }
             | variable                              { $1 }
-            | LPAREN expression RPAREN              { $2 }
+            | LPAREN bindableVariable RPAREN              { $2 }
             
         ;
         variable:
            ID                                     { Pi.Id( $1) }
           | TIMESORPOINTER ID                            { Pi.ValRef(Pi.Id($2))}
-          | ADDRESS ID                            { Pi.DeRef(Pi.Id($2))}
           | LPAREN variable RPAREN                { $2 }
         ;
         arithmeticExpression:  

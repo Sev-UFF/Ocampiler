@@ -35,6 +35,7 @@
     | Blk of declaration * command
 
   and declaration = 
+  | DSeq of declaration * declaration
   | Bind of expression * expression
 
   and statement = 

@@ -1,6 +1,6 @@
 #meu codigo de teste
 
-let var x = 0 in
+let var x = 0, var i = 0 in
     let var y = &x in
     x := x + 3
         let var z = 0 in

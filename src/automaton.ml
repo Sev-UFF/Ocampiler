@@ -4,7 +4,6 @@ open AutomatonType;;
 
 let trace = ref [];;
 
-
 let rec delta controlStack valueStack environment memory locations = 
   
   let copia = !locations in
@@ -25,7 +24,7 @@ let rec delta controlStack valueStack environment memory locations =
             let key = Hashtbl.find environment id  in
               match key with 
                 (* | Value(x) -> (); *)
-                | Loc(x) -> (
+                | Loc(Location(x)) -> (
                   let value = Hashtbl.find memory x  in
                     match value with
                     | Integer(x) ->   (Stack.push (Int(x)) valueStack);
@@ -58,7 +57,6 @@ let rec delta controlStack valueStack environment memory locations =
                 (Stack.push (ExpOc(OPSUM)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
               | Sum(_, _) -> raise (AutomatonException "Error on Sum"); 
               | Sub(AExp(x), AExp(y)) -> (
@@ -359,7 +357,7 @@ let rec delta controlStack valueStack environment memory locations =
                 let key = Hashtbl.find environment id  in
                   match key with 
                   | Loc(x) -> (
-                    (Stack.push (Bind(Loc(x))) valueStack );
+                    (Stack.push (Bind(x)) valueStack );
                   )
                   | _ -> raise (AutomatonException "Error on DeRef");
               );
@@ -370,17 +368,17 @@ let rec delta controlStack valueStack environment memory locations =
               | Id(id) -> (
                 let key = Hashtbl.find environment id  in
                 match key with 
-                  | Loc(x1) -> (
+                  | Loc(Location(x1)) -> (
                     let value1 = Hashtbl.find memory x1  in
                       match value1 with
                       | Pointer(x2) -> (
                         match x2 with
-                        | Loc(x3) -> (
+                        | Location(x3) -> (
                           let value2 = Hashtbl.find memory x3  in
                           match value2 with
                           | Integer(x4) ->   (Stack.push (Int(x4)) valueStack);
                           | Boolean(x4) ->  (Stack.push (Bool(x4)) valueStack);
-                          | Pointer(x4) -> raise (AutomatonException "Error on ValRef");
+                          | Pointer(x4) -> (Stack.push (Bind(x4)) valueStack);
                         );
                         | _ ->   raise (AutomatonException "Error on ValRef");
                       );
@@ -643,7 +641,7 @@ let rec delta controlStack valueStack environment memory locations =
               | Str(x) -> (
                 let env = (Hashtbl.find environment x ) in
                   match env with 
-                  | Loc(l) -> (
+                  | Loc(Location(l)) -> (
                     match value with
                     | Int(i) -> (
                       (Hashtbl.replace memory l (Integer(i)));
@@ -696,7 +694,7 @@ let rec delta controlStack valueStack environment memory locations =
         | OPREF -> (
           let loc = (List.length !trace) in
           let value = (Stack.pop valueStack) in
-          (Stack.push (Bind(Loc(loc))) valueStack);
+          (Stack.push (Bind((Location(loc)))) valueStack);
           locations := (!locations)@[loc];
           match value with
           | Int(x) -> (
@@ -705,8 +703,8 @@ let rec delta controlStack valueStack environment memory locations =
           | Bool(x) -> (
             (Hashtbl.add  memory (loc) (Boolean(x)));
           );
-          | Bind(Loc(x)) -> (
-            (Hashtbl.add  memory (loc) (Pointer(Loc(x))));
+          | Bind(x) -> (
+            (Hashtbl.add  memory (loc) (Pointer(x)));
           );
           (* Vou deixar com aviso pra lembrar de fazer esses caras *)
           (* | Str(x) -> ();
@@ -721,9 +719,10 @@ let rec delta controlStack valueStack environment memory locations =
               match id with
               | Str(x) ->(
                 match l with
-                  | Bind(Loc(y)) -> (
+                (* TODO: Refazer o Assoc *)
+                  (* | Bind(Loc(y)) -> (
                     (Stack.push (Assoc(x,Loc(y))) valueStack);
-                  );
+                  ); *)
                   | _ -> raise (AutomatonException "Error on #BIND" );
               );
               | _ -> raise (AutomatonException "Error on #BIND" );

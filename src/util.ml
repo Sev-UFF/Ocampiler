@@ -55,6 +55,7 @@ and string_of_command command =
 and string_of_declaration declaration =
   match declaration with
   | Bind(x, y) -> "BIND (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
+  | DSeq(x, y) ->  "DSEQ (" ^ (string_of_declaration x) ^ ", " ^ (string_of_declaration y) ^ ")"
 
 and string_of_statement statement =
   match statement with
@@ -120,10 +121,13 @@ let string_of_list locations =
 
 let rec string_of_bindable bindable =
   match bindable with
-  | Loc(x) -> "LOC[" ^ (string_of_int x) ^ "]"
+  | Loc(x) ->  (string_of_loc x) 
   | IntConst(x) -> "IntConst (" ^ (string_of_int x) ^ ")"
   | BoolConst(x) -> "BoolConst (" ^ (string_of_bool x) ^ ")"
 
+and string_of_loc loc =
+  match loc with
+  | Location(x) -> "LOC[" ^ (string_of_int x) ^ "]"
 
 and string_of_value_stack item =
   match item with
@@ -133,7 +137,7 @@ and string_of_value_stack item =
   | LoopValue (x) -> (string_of_command x)
   | CondValue (x) -> (string_of_command x)
   | Assoc (x, y) -> "{Id(" ^ x ^") -> " ^ (string_of_bindable y) ^ "}"
-  | Bind(x) -> (string_of_bindable x)
+  | Bind(x) -> (string_of_loc x)
   | Env(x) -> "Env(" ^  (string_of_dictionary x string_of_bindable_dictionary) ^ ")"
   | Locations(x) -> "Locations(" ^ (string_of_list x) ^ ")"
 
@@ -142,7 +146,7 @@ and string_of_value_stack item =
   match storable with
   | Integer(x) ->  (string_of_int x) 
   | Boolean(x) -> (string_of_bool x)
-  | Pointer(x) -> (string_of_bindable x)
+  | Pointer(x) -> (string_of_loc x)
 
   and string_of_storable_dictionary (key, value) =
   "\t( LOC[" ^ (string_of_int key) ^ "] -> " ^ (string_of_storable value) ^ " )"
