@@ -33,7 +33,7 @@
           | "="                    { BIND }
           | "let"                    { LET }
           | "var"                    { VAR }
-          | "cns"                    { CNS }
+          | "cnst"                    { CNS }
           | "in"                    { IN }
           | "&"                    { ADDRESS }
           | ","                    { COMMA }

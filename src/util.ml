@@ -136,7 +136,6 @@ and string_of_value_stack item =
   | Bool(x) -> (string_of_bool x)
   | LoopValue (x) -> (string_of_command x)
   | CondValue (x) -> (string_of_command x)
-  | Assoc (x, y) -> "{Id(" ^ x ^") -> " ^ (string_of_bindable y) ^ "}"
   | Bind(x) -> (string_of_loc x)
   | Env(x) -> "Env(" ^  (string_of_dictionary x string_of_bindable_dictionary) ^ ")"
   | Locations(x) -> "Locations(" ^ (string_of_list x) ^ ")"

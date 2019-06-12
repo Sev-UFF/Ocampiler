@@ -10,7 +10,6 @@ type valueStackOptions =
   | Bool of bool
   | LoopValue of command
   | CondValue of command
-  | Assoc of string * bindable
   | Bind of loc
   | Locations of int list
   | Env of (string, bindable) Hashtbl.t

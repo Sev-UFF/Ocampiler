@@ -1,7 +1,9 @@
 #meu codigo de teste
 
-let var x = 0, var i = 0 in
-    let var y = &x in
-    x := x + 3
-        let var z = 0 in
-            z :=  *y
+let var x = 0, var y = 10 in
+    x := 3
+    let var x = 5 in
+        y := x 
+    end
+    y := x
+end

@@ -389,6 +389,7 @@ let rec delta controlStack valueStack environment memory locations =
               | _ ->   raise (AutomatonException "Error on ValRef");
 
             );
+            | _ ->  raise (AutomatonException "Error on Exp" );
           );
         | Cmd(cmd) -> (
           match cmd with 
@@ -440,6 +441,7 @@ let rec delta controlStack valueStack environment memory locations =
             locations := [] ;
           );
           | Nop -> ();
+          | _ ->  raise (AutomatonException "Error on Cmd" );
         );
         | Dec (dec) -> (
           match dec with 
@@ -448,7 +450,12 @@ let rec delta controlStack valueStack environment memory locations =
             (Stack.push (Statement(Exp(y))) controlStack );
             (Stack.push (Str(x)) valueStack);
          );
-         | _ -> raise (AutomatonException "Error on Bind" );
+         | DSeq(x, y) -> (
+          (Stack.push (Statement(Dec(y))) controlStack);
+          (Stack.push (Statement(Dec(x))) controlStack);
+         );
+
+         | _ -> raise (AutomatonException "Error on Dec" );
         );
       );   
       | ExpOc(expOc) -> (
@@ -630,7 +637,8 @@ let rec delta controlStack valueStack environment memory locations =
               );
               
               | _ -> raise (AutomatonException "Error on #NOT");
-            );                                                                      
+            );    
+            | _ ->  raise (AutomatonException "Error on ExpOC" );                                                                  
       );
       | CmdOc(cmdOc) -> (
         match cmdOc with 
@@ -688,6 +696,7 @@ let rec delta controlStack valueStack environment memory locations =
               );
               | _ -> raise (AutomatonException "Error on #COND" );
         );
+        | _ ->  raise (AutomatonException "Error on CmdOC" );
       );
       | DecOc(decOc) -> (
         match decOc with
@@ -710,19 +719,34 @@ let rec delta controlStack valueStack environment memory locations =
           (* | Str(x) -> ();
           | LoopValue(x) -> ();
           | CondValue(x) -> ();
-          | Assoc(x, y) ->  ();
           | Bind(x) -> (); *)
         );
         | OPBIND -> (
           let l = (Stack.pop valueStack) in
             let id = (Stack.pop valueStack) in
               match id with
-              | Str(x) ->(
+              | Str(st) ->(
                 match l with
-                (* TODO: Refazer o Assoc *)
-                  (* | Bind(Loc(y)) -> (
-                    (Stack.push (Assoc(x,Loc(y))) valueStack);
-                  ); *)
+                  | Bind(y) -> (
+
+                    let possibleEnv = (Stack.top valueStack) in
+                    match possibleEnv with
+                    | Env(x) -> (
+                      let env = (Stack.pop valueStack) in
+                      match env with 
+                      | Env(e) -> (
+                        let newEnv = (Hashtbl.copy e) in
+                        (Hashtbl.add newEnv st (Loc(y)) );
+                        (Stack.push (Env(newEnv)) valueStack );
+                      );
+                      | _  -> raise (AutomatonException "Error on #BIND" );
+                    );
+                    | _ -> (
+                      let newEnv = (Hashtbl.create 3) in
+                        (Hashtbl.add newEnv st (Loc(y)));
+                        (Stack.push (Env(newEnv)) valueStack );
+                    );
+                  );
                   | _ -> raise (AutomatonException "Error on #BIND" );
               );
               | _ -> raise (AutomatonException "Error on #BIND" );
@@ -731,12 +755,19 @@ let rec delta controlStack valueStack environment memory locations =
             let ass = (Stack.pop valueStack) in
               let env = Hashtbl.copy environment in
                 match ass with
-                  | Assoc(x, y) -> (
+                  | Env(e) -> (
                     (Stack.push (Env(env)) valueStack);
-                    (*Como nao existe dseq e a funcao de add da hashtbl faz add ou update podemos fazer:*)
-                    (Hashtbl.add environment x y);
-              );
-              | _ -> raise (AutomatonException "Error on #BLKDEC" );
+                    (Hashtbl.iter 
+                      (  
+                        fun key value -> 
+                          if not(Hashtbl.mem environment key ) 
+                            then (Hashtbl.add environment key value) 
+                          else
+                            (Hashtbl.replace environment key value) 
+                      ) 
+                    e);
+                  );
+                  | _ -> raise (AutomatonException "Error on #BLKDEC" );
           );
           | OPBLKCMD -> (
             let env = (Stack.pop valueStack) in
@@ -755,6 +786,8 @@ let rec delta controlStack valueStack environment memory locations =
                   | _ -> raise (AutomatonException "Error on #BLKCMD" );
                 
           );
+
+          | _ ->  raise (AutomatonException "Error on DecOC" );
 
       );
     );
