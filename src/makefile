@@ -51,6 +51,11 @@ p2:
 	git checkout p2
 	$(MAKE) run
 
+p1:
+	git pull origin p1
+	git checkout p1
+	$(MAKE) run
+
 # Dependencies
 depend: $(SOURCES) $(GENERATED) $(LEXSOURCES) $(YACCSOURCES)
 	$(CAMLDEP) *.mli *.ml > .depend
