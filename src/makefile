@@ -45,6 +45,11 @@ clear:
 	rm -f $(GENERATED)
 	rm -f $(EXEC)
 
+p1:
+	git pull origin p1
+	git checkout p1
+	$(MAKE) run
+
 # Dependencies
 depend: $(SOURCES) $(GENERATED) $(LEXSOURCES) $(YACCSOURCES)
 	$(CAMLDEP) *.mli *.ml > .depend
