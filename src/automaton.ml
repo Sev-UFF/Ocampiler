@@ -10,7 +10,7 @@ let rec delta controlStack valueStack environment memory locations =
   trace := (!trace)@[( (Stack.copy controlStack), (Stack.copy valueStack), (Hashtbl.copy environment), (Hashtbl.copy memory), (copia))];
 
   (* Linha para debugar. apagar depois *)
-  print_endline(string_of_iteration controlStack valueStack environment memory !locations );
+  (* print_endline(string_of_iteration controlStack valueStack environment memory !locations ); *)
   
   if not(Stack.is_empty controlStack) then begin 
     
@@ -23,13 +23,20 @@ let rec delta controlStack valueStack environment memory locations =
           | Id(id) -> (
             let key = Hashtbl.find environment id  in
               match key with 
-                (* | Value(x) -> (); *)
                 | Loc(Location(x)) -> (
                   let value = Hashtbl.find memory x  in
                     match value with
                     | Integer(x) ->   (Stack.push (Int(x)) valueStack);
                     | Boolean(x) ->  (Stack.push (Bool(x)) valueStack);
-                )
+                    (* Conferir se pegar o id de uma variavel que e ponteiro ta certo retornar ela na pilha de valroes *)
+                    | Pointer(p) -> (Stack.push (Bind(p)) valueStack);
+                );
+                | IntConst(i) -> (
+                  (Stack.push (Int(i)) valueStack);
+                );
+                | BoolConst(b) -> (
+                  (Stack.push (Bool(b)) valueStack);
+                );
             );
           | AExp(aExp) -> (
               match aExp with 
@@ -371,17 +378,13 @@ let rec delta controlStack valueStack environment memory locations =
                   | Loc(Location(x1)) -> (
                     let value1 = Hashtbl.find memory x1  in
                       match value1 with
-                      | Pointer(x2) -> (
-                        match x2 with
-                        | Location(x3) -> (
+                      | Pointer(Location(x3)) -> (
                           let value2 = Hashtbl.find memory x3  in
                           match value2 with
                           | Integer(x4) ->   (Stack.push (Int(x4)) valueStack);
                           | Boolean(x4) ->  (Stack.push (Bool(x4)) valueStack);
                           | Pointer(x4) -> (Stack.push (Bind(x4)) valueStack);
                         );
-                        | _ ->   raise (AutomatonException "Error on ValRef");
-                      );
                       | _ ->   raise (AutomatonException "Error on ValRef");
                   );
                   | _ ->   raise (AutomatonException "Error on ValRef");
@@ -389,7 +392,6 @@ let rec delta controlStack valueStack environment memory locations =
               | _ ->   raise (AutomatonException "Error on ValRef");
 
             );
-            | _ ->  raise (AutomatonException "Error on Exp" );
           );
         | Cmd(cmd) -> (
           match cmd with 
@@ -441,7 +443,6 @@ let rec delta controlStack valueStack environment memory locations =
             locations := [] ;
           );
           | Nop -> ();
-          | _ ->  raise (AutomatonException "Error on Cmd" );
         );
         | Dec (dec) -> (
           match dec with 
@@ -450,12 +451,13 @@ let rec delta controlStack valueStack environment memory locations =
             (Stack.push (Statement(Exp(y))) controlStack );
             (Stack.push (Str(x)) valueStack);
          );
+         | Bind(_, _) -> (
+            raise (AutomatonException "Error on Bind" );
+          );
          | DSeq(x, y) -> (
           (Stack.push (Statement(Dec(y))) controlStack);
           (Stack.push (Statement(Dec(x))) controlStack);
          );
-
-         | _ -> raise (AutomatonException "Error on Dec" );
         );
       );   
       | ExpOc(expOc) -> (
@@ -637,8 +639,7 @@ let rec delta controlStack valueStack environment memory locations =
               );
               
               | _ -> raise (AutomatonException "Error on #NOT");
-            );    
-            | _ ->  raise (AutomatonException "Error on ExpOC" );                                                                  
+            );                                                                     
       );
       | CmdOc(cmdOc) -> (
         match cmdOc with 
@@ -657,11 +658,20 @@ let rec delta controlStack valueStack environment memory locations =
                     | Bool(b) -> (
                       (Hashtbl.replace memory l (Boolean(b)));
                     );
-                    (* Conferir o caso do loc por exemplo*)
-                    (* | _ -> raise (AutomatonException "Error on #ASSIGN") *)
+                    (* Conferir esse caso junto com o caso do id para ponteiros para ver se esta tudo certo *)
+                    | Bind(b) -> (
+                      (Hashtbl.replace memory l (Pointer(b)));
+                    );
+                    | _ -> raise (AutomatonException "Error on #ASSIGN")
                   ); 
+                  | IntConst(i) -> (
+                    raise (AutomatonException "Error on #ASSIGN. Cannot change constant value.")
+                  ); 
+                  | BoolConst(b) -> (
+                    raise (AutomatonException "Error on #ASSIGN. Cannot change constant value.")
+                  );
               );
-              | _ -> raise (AutomatonException "Error on #ASSIGN")
+              | _ ->  raise (AutomatonException "Error on #ASSIGN.")
         );
         | OPLOOP -> (
           let condloop = (Stack.pop valueStack) in 
@@ -696,7 +706,6 @@ let rec delta controlStack valueStack environment memory locations =
               );
               | _ -> raise (AutomatonException "Error on #COND" );
         );
-        | _ ->  raise (AutomatonException "Error on CmdOC" );
       );
       | DecOc(decOc) -> (
         match decOc with
@@ -715,11 +724,7 @@ let rec delta controlStack valueStack environment memory locations =
           | Bind(x) -> (
             (Hashtbl.add  memory (loc) (Pointer(x)));
           );
-          (* Vou deixar com aviso pra lembrar de fazer esses caras *)
-          (* | Str(x) -> ();
-          | LoopValue(x) -> ();
-          | CondValue(x) -> ();
-          | Bind(x) -> (); *)
+          | _  -> raise (AutomatonException "Error on #REF" );
         );
         | OPBIND -> (
           let l = (Stack.pop valueStack) in
@@ -786,9 +791,6 @@ let rec delta controlStack valueStack environment memory locations =
                   | _ -> raise (AutomatonException "Error on #BLKCMD" );
                 
           );
-
-          | _ ->  raise (AutomatonException "Error on DecOC" );
-
       );
     );
     delta controlStack valueStack environment memory locations;
