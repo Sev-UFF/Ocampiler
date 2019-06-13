@@ -46,11 +46,6 @@ clear:
 	rm -f $(EXEC)
 
 
-p1:
-	git pull origin p1
-	git checkout p1
-	$(MAKE) run
-
 p2:
 	git pull origin p2
 	git checkout p2
