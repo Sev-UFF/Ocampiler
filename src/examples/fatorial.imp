@@ -1,5 +1,4 @@
-z := 1
-y := 5
+var y = 1
 while (not(y == 0))
 do
     z := z * y

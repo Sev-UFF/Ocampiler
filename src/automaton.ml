@@ -10,7 +10,7 @@ let rec delta controlStack valueStack environment memory locations =
   trace := (!trace)@[( (Stack.copy controlStack), (Stack.copy valueStack), (Hashtbl.copy environment), (Hashtbl.copy memory), (copia))];
 
   (* Linha para debugar. apagar depois *)
-  (* print_endline(string_of_iteration controlStack valueStack environment memory !locations ); *)
+  print_endline(string_of_iteration controlStack valueStack environment memory !locations ); 
   
   if not(Stack.is_empty controlStack) then begin 
     
@@ -65,7 +65,32 @@ let rec delta controlStack valueStack environment memory locations =
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
               );
-              | Sum(_, _) -> raise (AutomatonException "Error on Sum"); 
+              | Sum( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPSUM)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | Sum(ValRef(Id(x)), AExp(y)) ->  (
+                (Stack.push (ExpOc(OPSUM)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | Sum( AExp(x), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPSUM)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+              );
+              | Sum(ValRef(Id(x)), Id(y)) ->  (
+                (Stack.push (ExpOc(OPSUM)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | Sum( Id(x), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPSUM)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              );
+              | Sum(_, _) -> raise (AutomatonException "Error on Sum - |aexp"); 
               | Sub(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPSUB)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
@@ -89,6 +114,31 @@ let rec delta controlStack valueStack environment memory locations =
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
                 
+              );
+              | Sub( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPSUB)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | Sub(ValRef(Id(x)), AExp(y)) ->  (
+                (Stack.push (ExpOc(OPSUB)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | Sub( AExp(x), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPSUB)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+              );
+              | Sub(ValRef(Id(x)), Id(y)) ->  (
+                (Stack.push (ExpOc(OPSUB)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | Sub( Id(x), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPSUB)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
               ); 
               | Sub(_, _) -> raise (AutomatonException "Error on Sub");
               | Mul(AExp(x), AExp(y)) -> (
@@ -114,6 +164,31 @@ let rec delta controlStack valueStack environment memory locations =
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
                 
+              );
+              | Mul( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPMUL)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | Mul(ValRef(Id(x)), AExp(y)) ->  (
+                (Stack.push (ExpOc(OPMUL)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | Mul( AExp(x), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPMUL)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+              );
+              | Mul(ValRef(Id(x)), Id(y)) ->  (
+                (Stack.push (ExpOc(OPMUL)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | Mul( Id(x), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPMUL)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
               ); 
               | Mul(_, _) -> raise (AutomatonException "Error on Mul");
               | Div(AExp(x), AExp(y)) -> (
@@ -139,14 +214,38 @@ let rec delta controlStack valueStack environment memory locations =
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
                 
+              );
+              | Div( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPDIV)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | Div(ValRef(Id(x)), AExp(y)) ->  (
+                (Stack.push (ExpOc(OPDIV)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | Div( AExp(x), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPDIV)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+              );
+              | Div(ValRef(Id(x)), Id(y)) ->  (
+                (Stack.push (ExpOc(OPDIV)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | Div( Id(x), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPDIV)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
               ); 
               | Div(_, _) -> raise (AutomatonException "Error on Div");     
             )
           | BExp(bExp)-> ( 
             match bExp with 
               | Boo(x) -> (
-                (Stack.push (Bool(x)) valueStack);
-                
+                (Stack.push (Bool(x)) valueStack);    
               );
               | Eq(BExp(x), BExp(y)) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
@@ -190,6 +289,48 @@ let rec delta controlStack valueStack environment memory locations =
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
                 
               );
+              | Eq(BExp(x), ValRef(Id(y)) )  -> (
+                (Stack.push (ExpOc(OPEQ)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+                
+              );
+              | Eq( ValRef(Id(x)), BExp(y)) -> (
+                (Stack.push (ExpOc(OPEQ)) controlStack);
+                (Stack.push (Statement(Exp(BExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+                
+              );
+              | Eq(ValRef(Id(x)), ValRef(Id(y))) -> (
+                (Stack.push (ExpOc(OPEQ)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+                
+              );
+              | Eq(AExp(x), ValRef(Id(y))) -> (
+                (Stack.push (ExpOc(OPEQ)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+                
+              );
+              | Eq(ValRef(Id(x)), AExp(y)) -> (
+                (Stack.push (ExpOc(OPEQ)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+                
+              );
+              | Eq(Id(x), ValRef(Id(y))) -> (
+                (Stack.push (ExpOc(OPEQ)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+                
+              );
+              | Eq(ValRef(Id(x)), Id(y)) -> (
+                (Stack.push (ExpOc(OPEQ)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+                
+              );
               | Eq(_, _) -> raise (AutomatonException "Error on Eq"); 
               | Lt(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPLT)) controlStack);
@@ -215,6 +356,31 @@ let rec delta controlStack valueStack environment memory locations =
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
                 
               );
+              | Lt( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPLT)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | Lt(ValRef(Id(x)), AExp(y)) ->  (
+                (Stack.push (ExpOc(OPLT)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | Lt( AExp(x), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPLT)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+              );
+              | Lt(ValRef(Id(x)), Id(y)) ->  (
+                (Stack.push (ExpOc(OPLT)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | Lt( Id(x), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPLT)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              ); 
               | Lt(_, _) -> raise (AutomatonException "Error on Lt"); 
               | Le(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPLE)) controlStack);
@@ -239,6 +405,31 @@ let rec delta controlStack valueStack environment memory locations =
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
                 
+              );
+              | Le( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPLE)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | Le(ValRef(Id(x)), AExp(y)) ->  (
+                (Stack.push (ExpOc(OPLE)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | Le( AExp(x), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPLE)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+              );
+              | Le(ValRef(Id(x)), Id(y)) ->  (
+                (Stack.push (ExpOc(OPLE)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | Le( Id(x), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPLE)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
               );
               | Le(_, _) -> raise (AutomatonException "Error on Le");
               | Gt(AExp(x), AExp(y)) -> (
@@ -265,6 +456,31 @@ let rec delta controlStack valueStack environment memory locations =
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
                 
               );
+              | Gt( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPGT)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | Gt(ValRef(Id(x)), AExp(y)) ->  (
+                (Stack.push (ExpOc(OPGT)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | Gt( AExp(x), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPGT)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+              );
+              | Gt(ValRef(Id(x)), Id(y)) ->  (
+                (Stack.push (ExpOc(OPGT)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | Gt( Id(x), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPGT)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              );
               | Gt(_, _) -> raise (AutomatonException "Error on Gt");
               | Ge(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPGE)) controlStack);
@@ -289,6 +505,31 @@ let rec delta controlStack valueStack environment memory locations =
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
                 
+              );
+              | Ge( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPGE)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | Ge(ValRef(Id(x)), AExp(y)) ->  (
+                (Stack.push (ExpOc(OPGE)) controlStack);
+                (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | Ge( AExp(x), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPGE)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+              );
+              | Ge(ValRef(Id(x)), Id(y)) ->  (
+                (Stack.push (ExpOc(OPGE)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | Ge( Id(x), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPGE)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
               );
               | Ge(_, _) -> raise (AutomatonException "Error on Ge");
               | And(BExp(x), BExp(y)) -> (
@@ -315,6 +556,31 @@ let rec delta controlStack valueStack environment memory locations =
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
                 
               );
+              | And( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPAND)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | And (ValRef(Id(x)), BExp(y)) ->  (
+                (Stack.push (ExpOc(OPAND)) controlStack);
+                (Stack.push (Statement(Exp(BExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | And ( BExp(x), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPAND)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+              );
+              | And (ValRef(Id(x)), Id(y)) ->  (
+                (Stack.push (ExpOc(OPAND)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | And ( Id(x), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPAND)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              );
               | And(_, _) -> raise (AutomatonException "Error on And");
               | Or(BExp(x), BExp(y)) -> (
                 (Stack.push (ExpOc(OPOR)) controlStack);
@@ -340,6 +606,31 @@ let rec delta controlStack valueStack environment memory locations =
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
                 
               );
+              | Or( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPOR)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | Or (ValRef(Id(x)), BExp(y)) ->  (
+                (Stack.push (ExpOc(OPOR)) controlStack);
+                (Stack.push (Statement(Exp(BExp(y)))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | Or ( BExp(x), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPOR)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+              );
+              | Or (ValRef(Id(x)), Id(y)) ->  (
+                (Stack.push (ExpOc(OPOR)) controlStack);
+                (Stack.push (Statement(Exp(Id(y)))) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+              );
+              | Or ( Id(x), ValRef(Id(y)) ) ->  (
+                (Stack.push (ExpOc(OPOR)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);
+              );
               | Or(_, _) -> raise (AutomatonException "Error on Or");
               | Not(BExp(x)) -> (
                 (Stack.push (ExpOc(OPNOT)) controlStack);
@@ -350,6 +641,10 @@ let rec delta controlStack valueStack environment memory locations =
                 (Stack.push (ExpOc(OPNOT)) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
                 
+              );
+              | Not (ValRef(Id(x))) -> (
+                (Stack.push (ExpOc(OPNOT)) controlStack);
+                (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
               );
               | Not( _) -> raise (AutomatonException "Error on Not");
               
@@ -385,11 +680,11 @@ let rec delta controlStack valueStack environment memory locations =
                           | Boolean(x4) ->  (Stack.push (Bool(x4)) valueStack);
                           | Pointer(x4) -> (Stack.push (Bind(x4)) valueStack);
                         );
-                      | _ ->   raise (AutomatonException "Error on ValRef");
+                      | _ ->   raise (AutomatonException "Error on ValRef1");
                   );
-                  | _ ->   raise (AutomatonException "Error on ValRef");
+                  | _ ->   raise (AutomatonException "Error on ValRef2");
               );
-              | _ ->   raise (AutomatonException "Error on ValRef");
+              | _ ->   raise (AutomatonException "Error on ValRef3");
 
             );
           );
@@ -472,9 +767,9 @@ let rec delta controlStack valueStack environment memory locations =
                     (Stack.push (Int(i + j)) valueStack);
                     
                   );
-                  | _ -> raise (AutomatonException "Error on #SUM");
+                  | _ -> raise (AutomatonException "Error on #SUM 485");
               );
-              | _ -> raise (AutomatonException "Error on #SUM");
+              | _ -> raise (AutomatonException "Error on #SUM 487");
             );
           
         | OPMUL -> (
@@ -732,8 +1027,7 @@ let rec delta controlStack valueStack environment memory locations =
               match id with
               | Str(st) ->(
                 match l with
-                  | Bind(y) -> (
-
+                  | Bind(y) -> (             
                     let possibleEnv = (Stack.top valueStack) in
                     match possibleEnv with
                     | Env(x) -> (
@@ -744,7 +1038,7 @@ let rec delta controlStack valueStack environment memory locations =
                         (Hashtbl.add newEnv st (Loc(y)) );
                         (Stack.push (Env(newEnv)) valueStack );
                       );
-                      | _  -> raise (AutomatonException "Error on #BIND" );
+                      | _  -> raise (AutomatonException "Error on #BIND1" );
                     );
                     | _ -> (
                       let newEnv = (Hashtbl.create 3) in
@@ -752,7 +1046,10 @@ let rec delta controlStack valueStack environment memory locations =
                         (Stack.push (Env(newEnv)) valueStack );
                     );
                   );
-                  | _ -> raise (AutomatonException "Error on #BIND" );
+                  (* fazer o caso do boolenao e do int retornado pelas expressoes do bind *)
+                  | Bool(b) -> ();
+                  | Int(i) -> ();
+                  | _ -> raise (AutomatonException "Error on #BIND2" );
               );
               | _ -> raise (AutomatonException "Error on #BIND" );
           );
