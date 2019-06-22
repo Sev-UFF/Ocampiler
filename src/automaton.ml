@@ -1047,8 +1047,12 @@ let rec delta controlStack valueStack environment memory locations =
                     );
                   );
                   (* fazer o caso do boolenao e do int retornado pelas expressoes do bind *)
-                  | Bool(b) -> ();
-                  | Int(i) -> ();
+                  | Bool(b) -> (
+                    ( Hashtbl.add environment st (BoolConst(b)) );
+                  );
+                  | Int(i) -> (
+                    ( Hashtbl.add environment st (IntConst(i)) );
+                  );
                   | _ -> raise (AutomatonException "Error on #BIND2" );
               );
               | _ -> raise (AutomatonException "Error on #BIND" );
