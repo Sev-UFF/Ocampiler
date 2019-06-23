@@ -1048,10 +1048,42 @@ let rec delta controlStack valueStack environment memory locations =
                   );
                   (* fazer o caso do boolenao e do int retornado pelas expressoes do bind *)
                   | Bool(b) -> (
-                    ( Hashtbl.add environment st (BoolConst(b)) );
+                    match (Stack.top valueStack) with
+                    |Env(x) -> (  
+                        if not(Hashtbl.mem x st) then 
+                          let currentEnv = (Stack.pop valueStack) in
+                            match currentEnv with
+                            |Env(cEnv) -> (
+                                (Hashtbl.add cEnv st (BoolConst(b)) );
+                                (Stack.push (Env(cEnv)) valueStack);
+                            );
+                            | _ -> raise (AutomatonException "Error on #BIND Boolconst(b)" );
+                        
+                    );
+                    | _ -> (
+                        let newEnv = (Hashtbl.create 3) in
+                        (Hashtbl.add newEnv st (BoolConst(b)));
+                        (Stack.push (Env(newEnv)) valueStack )
+                    );
                   );
                   | Int(i) -> (
-                    ( Hashtbl.add environment st (IntConst(i)) );
+                    match (Stack.top valueStack) with
+                    |Env(x) -> (
+                          if not(Hashtbl.mem x st) then   
+                            let currentEnv = (Stack.pop valueStack) in
+                              match currentEnv with
+                              |Env(cEnv) -> (
+                                 (Hashtbl.add cEnv st (IntConst(i)) );
+                                  (Stack.push (Env(cEnv)) valueStack);
+                              );
+                              | _ -> raise (AutomatonException "Error on #BIND const(i)" );
+                    );
+                    
+                    | _ -> (
+                        let newEnv = (Hashtbl.create 3) in
+                        (Hashtbl.add newEnv st (IntConst(i)));
+                        (Stack.push (Env(newEnv)) valueStack )
+                    );
                   );
                   | _ -> raise (AutomatonException "Error on #BIND2" );
               );
@@ -1078,9 +1110,11 @@ let rec delta controlStack valueStack environment memory locations =
           | OPBLKCMD -> (
             let env = (Stack.pop valueStack) in
               let locs = (Stack.pop valueStack) in
+              
                 match locs with
                   | Locations(x) -> (
                     locations := x;
+                    
                     match env with
                       | Env(y) -> (
                         (Hashtbl.clear environment);
