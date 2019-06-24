@@ -660,10 +660,16 @@ let rec delta controlStack valueStack environment memory locations =
                   match key with 
                   | Loc(x) -> (
                     (Stack.push (Bind(x)) valueStack );
-                  )
-                  | _ -> raise (AutomatonException "Error on DeRef");
+                  );
+                  |IntConst(x) -> (
+                    (Stack.push (Int(x)) valueStack);
+                  );
+                  |BoolConst(x) -> (
+                    (Stack.push (Bool(x)) valueStack);
+                  );
+                  | _ -> raise (AutomatonException "Error on DeRef 664");
               );
-              | _ -> raise (AutomatonException "Error on DeRef");
+              | _ -> raise (AutomatonException "Error on DeRef 666");
             );
             | ValRef(ref) -> (
               match ref with
@@ -680,6 +686,15 @@ let rec delta controlStack valueStack environment memory locations =
                           | Boolean(x4) ->  (Stack.push (Bool(x4)) valueStack);
                           | Pointer(x4) -> (Stack.push (Bind(x4)) valueStack);
                         );
+                      | Integer(cte) -> (
+                          (Stack.push (Int(cte)) valueStack);
+                      );
+                      | Boolean(cte) -> (
+                        (Stack.push (Bool(cte)) valueStack);
+                      ); 
+                      (*| StrConst(cte) ->(
+
+                      );*)
                       | _ ->   raise (AutomatonException "Error on ValRef1");
                   );
                   | _ ->   raise (AutomatonException "Error on ValRef2");
@@ -767,9 +782,9 @@ let rec delta controlStack valueStack environment memory locations =
                     (Stack.push (Int(i + j)) valueStack);
                     
                   );
-                  | _ -> raise (AutomatonException "Error on #SUM 485");
+                  | _ -> raise (AutomatonException "Error on #SUM 770");
               );
-              | _ -> raise (AutomatonException "Error on #SUM 487");
+              | _ -> raise (AutomatonException "Error on #SUM 772");
             );
           
         | OPMUL -> (
@@ -957,6 +972,11 @@ let rec delta controlStack valueStack environment memory locations =
                     | Bind(b) -> (
                       (Hashtbl.replace memory l (Pointer(b)));
                     );
+
+                    (*| Str(c) -> (
+                      (Hashtbl.remove memory l );
+                      (Hashtbl.add memory l (StrConst(c)) );
+                    );*)
                     | _ -> raise (AutomatonException "Error on #ASSIGN")
                   ); 
                   | IntConst(i) -> (

@@ -146,6 +146,7 @@ and string_of_value_stack item =
   | Integer(x) ->  (string_of_int x) 
   | Boolean(x) -> (string_of_bool x)
   | Pointer(x) -> (string_of_loc x)
+  (*| StrConst(x) -> (x)*)
 
   and string_of_storable_dictionary (key, value) =
   "\t( LOC[" ^ (string_of_int key) ^ "] -> " ^ (string_of_storable value) ^ " )"

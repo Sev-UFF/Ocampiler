@@ -10,15 +10,15 @@
 #end
 
 let const y = True ,var x = 0, var z = 0  in
-   #x := z
+   x := &y
    #y := *x
    #z := *x
    #z := *x + y
    #if (x == 0) then 
-   x := y 
+   z := *x 
    #end
    #let const z = 9 , var y = 17 in
       #z := &x
-    #  y := z
+    #  y := z 
    #end
 end
