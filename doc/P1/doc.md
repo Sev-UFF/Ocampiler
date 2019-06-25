@@ -1370,6 +1370,54 @@ Nós usamos a estrutura de hashtable(pro enviroment e pra memória) e a estrutur
 and memory = (Hashtbl.create 10) in
 
 ```
+
+`𝛅(Ref(X) :: C, V, E, S, L) = 𝛅(X :: #REF :: C, V, E, S, L)`
+```
+
+```
+| Dec (dec) -> (
+  match dec with 
+  | Bind(Id(x), y) -> (
+    (Stack.push (DecOc(OPBIND)) controlStack );
+    (Stack.push (Statement(Exp(y))) controlStack );
+    (Stack.push (Str(x)) valueStack);
+  );
+  | Bind(_, _) -> (
+    raise (AutomatonException "Error on Bind" );
+  );
+  | DSeq(x, y) -> (
+  (Stack.push (Statement(Dec(y))) controlStack);
+  (Stack.push (Statement(Dec(x))) controlStack);
+ );
+);
+```
+```
+𝛅(#REF :: C, T :: V, E, S, L) = 𝛅(C, l :: V, E, S', L'), where S' = S ∪ [l ↦ T], l ∉ S, L' = L ∪ {l}
+```
+
+```
+| DecOc(decOc) -> (
+  match decOc with
+  | OPREF -> (
+    let loc = (List.length !trace) in
+    let value = (Stack.pop valueStack) in
+    (Stack.push (Bind((Location(loc)))) valueStack);
+    locations := (!locations)@[loc];
+    match value with
+    | Int(x) -> (
+      (Hashtbl.add  memory loc (Integer(x)));
+    );
+    | Bool(x) -> (
+      (Hashtbl.add  memory (loc) (Boolean(x)));
+    );
+    | Bind(x) -> (
+      (Hashtbl.add  memory (loc) (Pointer(x)));
+    );
+    | _  -> raise (AutomatonException "Error on #REF" );
+  );
+```
+
+
 ```
 𝛅(#BIND :: C, B :: W :: E' :: V, E, S, L) = 𝛅(C, ({W ↦ B} ∪ E') :: V, E, S, L), where E' ∈ Env,
 𝛅(#BIND :: C, B :: W :: H :: V, E, S, L) = 𝛅(C, {W ↦ B} :: H :: V, E, S, L), where H ∉ Env,
