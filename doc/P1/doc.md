@@ -1373,24 +1373,14 @@ and memory = (Hashtbl.create 10) in
 ```
 𝛅(Ref(X) :: C, V, E, S, L) = 𝛅(X :: #REF :: C, V, E, S, L)`
 ```
-
 ```
-| Dec (dec) -> (
-  match dec with 
-  | Bind(Id(x), y) -> (
-    (Stack.push (DecOc(OPBIND)) controlStack );
-    (Stack.push (Statement(Exp(y))) controlStack );
-    (Stack.push (Str(x)) valueStack);
-  );
-  | Bind(_, _) -> (
-    raise (AutomatonException "Error on Bind" );
-  );
-  | DSeq(x, y) -> (
-  (Stack.push (Statement(Dec(y))) controlStack);
-  (Stack.push (Statement(Dec(x))) controlStack);
- );
+| Ref(ref)-> (
+  (Stack.push (DecOc(OPREF)) controlStack);
+  (Stack.push (Statement(Exp(ref))) controlStack);
 );
 ```
+
+
 ```
 𝛅(#REF :: C, T :: V, E, S, L) = 𝛅(C, l :: V, E, S', L'), where S' = S ∪ [l ↦ T], l ∉ S, L' = L ∪ {l}
 ```
@@ -1417,6 +1407,51 @@ and memory = (Hashtbl.create 10) in
   );
 ```
 
+```
+```
+
+```
+| Dec (dec) -> (
+  match dec with 
+  | Bind(Id(x), y) -> (
+    (Stack.push (DecOc(OPBIND)) controlStack );
+    (Stack.push (Statement(Exp(y))) controlStack );
+    (Stack.push (Str(x)) valueStack);
+  );
+  | Bind(_, _) -> (
+    raise (AutomatonException "Error on Bind" );
+  );
+  | DSeq(x, y) -> (
+  (Stack.push (Statement(Dec(y))) controlStack);
+  (Stack.push (Statement(Dec(x))) controlStack);
+ );
+);
+```
+
+```
+𝛅(DSeq(D₁, D₂), X) :: C, V, E, S, L) = 𝛅(D₁ :: D₂ :: C, V, E, S, L)
+```
+```
+| DSeq(x, y) -> (
+  (Stack.push (Statement(Dec(y))) controlStack);
+  (Stack.push (Statement(Dec(x))) controlStack);
+);
+```
+
+```
+𝛅(Bind(Id(W), X) :: C, V, E, S, L) = 𝛅(X :: #BIND :: C, W :: V, E, S, L)
+```
+
+```
+| Bind(Id(x), y) -> (
+  (Stack.push (DecOc(OPBIND)) controlStack );
+  (Stack.push (Statement(Exp(y))) controlStack );
+  (Stack.push (Str(x)) valueStack);
+);
+| Bind(_, _) -> (
+  raise (AutomatonException "Error on Bind" );
+);
+```
 
 ```
 𝛅(#BIND :: C, B :: W :: E' :: V, E, S, L) = 𝛅(C, ({W ↦ B} ∪ E') :: V, E, S, L), where E' ∈ Env,
@@ -1493,7 +1528,9 @@ and memory = (Hashtbl.create 10) in
 
 
 ```
+𝛅(Blk(D, M) :: C, V, E, S, L) = 𝛅(D :: #BLKDEC :: M :: #BLKCMD :: C, L :: V, E, S, ∅)
 ```
+
 ```
 | Blk(x, y) -> (
   (Stack.push (DecOc(OPBLKCMD)) controlStack);
