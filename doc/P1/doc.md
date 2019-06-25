@@ -1493,6 +1493,19 @@ and memory = (Hashtbl.create 10) in
 
 
 ```
+```
+```
+| Blk(x, y) -> (
+  (Stack.push (DecOc(OPBLKCMD)) controlStack);
+  (Stack.push (Statement(Cmd(y))) controlStack);
+  (Stack.push (DecOc(OPBLKDEC)) controlStack);
+  (Stack.push (Statement(Dec(x))) controlStack);
+  (Stack.push (Locations(!locations)) valueStack);
+  locations := [] ;
+);
+```
+
+```
 𝛅(#BLKDEC :: C, E' :: V, E, S, L) = 𝛅(C, E :: V, E / E', S, L)
 ```
 ```
@@ -1523,7 +1536,8 @@ and memory = (Hashtbl.create 10) in
             | Env(y) -> (
               (Hashtbl.clear environment);
               (Hashtbl.add_seq environment (Hashtbl.to_seq y));
-              (Hashtbl.iter (  fun key value -> if (List.mem key !locations) then (Hashtbl.remove memory key) ) memory );
+              (Hashtbl.iter (  fun key value -> if (List.mem key !locations) then 
+                                              (Hashtbl.remove memory key) ) memory );
               locations := x; 
               );
             | _ -> raise (AutomatonException "Error on #BLKCMD" );
