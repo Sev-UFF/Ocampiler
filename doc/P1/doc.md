@@ -274,30 +274,52 @@ Para cada um desses casos, agimos da mesma forma: colocamos primeiro o opcode #S
 ```
 
 ```
-Sum(AExp(x), AExp(y)) -> 
-(
+| Sum(AExp(x), AExp(y)) -> (
   (Stack.push (ExpOc(OPSUM)) controlStack);
   (Stack.push (Statement(Exp(AExp(y)))) controlStack);
   (Stack.push (Statement(Exp(AExp(x)))) controlStack);
 );
-| Sum(Id(x), AExp(y)) -> 
-(
+| Sum(Id(x), AExp(y)) -> (
   (Stack.push (ExpOc(OPSUM)) controlStack);
   (Stack.push (Statement(Exp(AExp(y)))) controlStack);
   (Stack.push (Statement(Exp(Id(x)))) controlStack);
 ); 
-| Sum(AExp(x), Id(y)) ->  
-(
+| Sum(AExp(x), Id(y)) ->  (
   (Stack.push (ExpOc(OPSUM)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
   (Stack.push (Statement(Exp(AExp(x)))) controlStack);
 ); 
-| Sum(Id(x), Id(y)) ->  
-(
+| Sum(Id(x), Id(y)) ->  (
   (Stack.push (ExpOc(OPSUM)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
   (Stack.push (Statement(Exp(Id(x)))) controlStack);
 );
+| Sum( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPSUM)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Sum(ValRef(Id(x)), AExp(y)) ->  (
+  (Stack.push (ExpOc(OPSUM)) controlStack);
+  (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Sum( AExp(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPSUM)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+);
+| Sum(ValRef(Id(x)), Id(y)) ->  (
+  (Stack.push (ExpOc(OPSUM)) controlStack);
+  (Stack.push (Statement(Exp(Id(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Sum( Id(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPSUM)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(Id(x)))) controlStack);
+);
+| Sum(_, _) -> raise (AutomatonException "Error on Sum - |aexp"); 
 ```
 
 Ao ler o #SUM, fazemos um pop na pilha de valores para ler o valor Num(N1) e verificamos que é do tipo inteiro. Depois fazemos outro POP para ler o valor Num(N2) e verificamos que este também é do tipo inteiro. Depois somamos eles, colocando o resultado na pilha de valores. Caso não sejam, cairíamos em uma Exception.
@@ -333,30 +355,52 @@ Para cada um desses casos, agimos da mesma forma: colocamos primeiro o opcode #S
 ```
 
 ```
-Sub(AExp(x), AExp(y)) -> 
-(
+| Sub(AExp(x), AExp(y)) -> (
   (Stack.push (ExpOc(OPSUB)) controlStack);
   (Stack.push (Statement(Exp(AExp(y)))) controlStack);
   (Stack.push (Statement(Exp(AExp(x)))) controlStack);
 );
-| Sub(Id(x), AExp(y)) -> 
-(
+| Sub(Id(x), AExp(y)) -> (
   (Stack.push (ExpOc(OPSUB)) controlStack);
   (Stack.push (Statement(Exp(AExp(y)))) controlStack);
   (Stack.push (Statement(Exp(Id(x)))) controlStack);
 ); 
-| Sub(AExp(x), Id(y)) ->  
-(
+| Sub(AExp(x), Id(y)) ->  (
   (Stack.push (ExpOc(OPSUB)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
   (Stack.push (Statement(Exp(AExp(x)))) controlStack);
 ); 
-| Sub(Id(x), Id(y)) ->  
-(
+| Sub(Id(x), Id(y)) ->  (
   (Stack.push (ExpOc(OPSUB)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
   (Stack.push (Statement(Exp(Id(x)))) controlStack);
+);
+| Sub( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPSUB)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Sub(ValRef(Id(x)), AExp(y)) ->  (
+  (Stack.push (ExpOc(OPSUB)) controlStack);
+  (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Sub( AExp(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPSUB)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+);
+| Sub(ValRef(Id(x)), Id(y)) ->  (
+  (Stack.push (ExpOc(OPSUB)) controlStack);
+  (Stack.push (Statement(Exp(Id(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Sub( Id(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPSUB)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(Id(x)))) controlStack);
 ); 
+| Sub(_, _) -> raise (AutomatonException "Error on Sub"); 
 ```
 
 Ao ler o #SUB, fazemos um pop na pilha de valores para ler o valor Num(N1) e verificamos que é do tipo inteiro. Depois fazemos outro POP para ler o valor Num(N2) e verificamos que este também é do tipo inteiro. Depois subtraímos eles, colocando o resultado na pilha de valores. Caso não sejam, cairíamos em uma Exception.
@@ -394,30 +438,53 @@ Para cada um desses casos, agimos da mesma forma: colocamos primeiro o opcode #M
 ```
 
 ```            
-Mul(AExp(x), AExp(y)) ->
-(
+| Mul(AExp(x), AExp(y)) -> (
   (Stack.push (ExpOc(OPMUL)) controlStack);
   (Stack.push (Statement(Exp(AExp(y)))) controlStack);
   (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+
 );
-| Mul(Id(x), AExp(y)) -> 
-(
+| Mul(Id(x), AExp(y)) -> (
   (Stack.push (ExpOc(OPMUL)) controlStack);
   (Stack.push (Statement(Exp(AExp(y)))) controlStack);
-  (Stack.push (Statement(Exp(Id(x)))) controlStack);              
+  (Stack.push (Statement(Exp(Id(x)))) controlStack);
 ); 
-| Mul(AExp(x), Id(y)) ->  
-(
+| Mul(AExp(x), Id(y)) ->  (
   (Stack.push (ExpOc(OPMUL)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
   (Stack.push (Statement(Exp(AExp(x)))) controlStack);
 ); 
-| Mul(Id(x), Id(y)) ->  
-(
+| Mul(Id(x), Id(y)) ->  (
   (Stack.push (ExpOc(OPMUL)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
-  (Stack.push (Statement(Exp(Id(x)))) controlStack);                
+  (Stack.push (Statement(Exp(Id(x)))) controlStack);
 );
+| Mul( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPMUL)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Mul(ValRef(Id(x)), AExp(y)) ->  (
+  (Stack.push (ExpOc(OPMUL)) controlStack);
+  (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Mul( AExp(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPMUL)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+);
+| Mul(ValRef(Id(x)), Id(y)) ->  (
+  (Stack.push (ExpOc(OPMUL)) controlStack);
+  (Stack.push (Statement(Exp(Id(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Mul( Id(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPMUL)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(Id(x)))) controlStack);
+); 
+| Mul(_, _) -> raise (AutomatonException "Error on Mul");
 ```
 
 Ao ler o #MUL, fazemos um pop na pilha de valores para ler o valor Num(N1) e verificamos que é do tipo inteiro. Depois fazemos outro POP para ler o valor Num(N2) e verificamos que este também é do tipo inteiro. Depois multiplicamos eles, colocando o resultado na pilha de valores. Caso não sejam, cairíamos em uma Exception.
@@ -454,30 +521,52 @@ Para cada um desses casos, agimos da mesma forma: colocamos primeiro o opcode #D
 ```
 
 ```              
-Div(AExp(x), AExp(y)) -> 
-(
+| Div(AExp(x), AExp(y)) -> (
   (Stack.push (ExpOc(OPDIV)) controlStack);
   (Stack.push (Statement(Exp(AExp(y)))) controlStack);
   (Stack.push (Statement(Exp(AExp(x)))) controlStack);
 );
-| Div(Id(x), AExp(y)) -> 
-(
+| Div(Id(x), AExp(y)) -> (
   (Stack.push (ExpOc(OPDIV)) controlStack);
   (Stack.push (Statement(Exp(AExp(y)))) controlStack);
   (Stack.push (Statement(Exp(Id(x)))) controlStack);
 ); 
-| Div(AExp(x), Id(y)) ->  
-(
+| Div(AExp(x), Id(y)) ->  (
   (Stack.push (ExpOc(OPDIV)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
   (Stack.push (Statement(Exp(AExp(x)))) controlStack);
 ); 
-| Div(Id(x), Id(y)) ->  
-(
+| Div(Id(x), Id(y)) ->  (
   (Stack.push (ExpOc(OPDIV)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
   (Stack.push (Statement(Exp(Id(x)))) controlStack);
+);
+| Div( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPDIV)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Div(ValRef(Id(x)), AExp(y)) ->  (
+  (Stack.push (ExpOc(OPDIV)) controlStack);
+  (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Div( AExp(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPDIV)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+);
+| Div(ValRef(Id(x)), Id(y)) ->  (
+  (Stack.push (ExpOc(OPDIV)) controlStack);
+  (Stack.push (Statement(Exp(Id(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Div( Id(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPDIV)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(Id(x)))) controlStack);
 ); 
+| Div(_, _) -> raise (AutomatonException "Error on Div");
 ```
 
 Ao ler o #DIV, fazemos um pop na pilha de valores para ler o valor Num(N1) e verificamos que é do tipo inteiro e diferente de zero, pois não se pode dividir um número por zero. Depois fazemos outro POP para ler o valor Num(N2) e verificamos que este também é do tipo inteiro. Depois dividimos Y por X, colocando o resultado na pilha de valores. Caso não sejam, cairíamos em uma Exception.
