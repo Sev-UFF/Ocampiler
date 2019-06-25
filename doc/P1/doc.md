@@ -1517,21 +1517,18 @@ and memory = (Hashtbl.create 10) in
 | OPBLKCMD -> (
   let env = (Stack.pop valueStack) in
     let locs = (Stack.pop valueStack) in
-
       match locs with
         | Locations(x) -> (
-
           match env with
             | Env(y) -> (
               (Hashtbl.clear environment);
               (Hashtbl.add_seq environment (Hashtbl.to_seq y));
               (Hashtbl.iter (  fun key value -> if (List.mem key !locations) then (Hashtbl.remove memory key) ) memory );
-              locations := x;
-            );
+              locations := x; 
+              );
             | _ -> raise (AutomatonException "Error on #BLKCMD" );
         );
         | _ -> raise (AutomatonException "Error on #BLKCMD" );
-
 );
  ```
 
