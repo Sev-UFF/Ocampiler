@@ -1,15 +1,16 @@
-x := 0
-y := 0
-z := 10
-i := 1
-
-while (i <= z) do 
-    if (i == 1) then
-        x := 1 
-        y := 0
-    else 
-        x := x + y
-        y := x - y
+#x := 0
+#y := 0
+#z := 10
+#i := 1
+let var x = 0, var an = 0, var n = 4, var i = 1 in
+    while (i <= n) do 
+        if (i == 1) then
+            x := 1 
+            an := 0
+        else 
+            x := x + an
+            an := x - an
+        end
+        i := i + 1
     end
-    i := i + 1
 end

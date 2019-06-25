@@ -1,4 +1,11 @@
-y := False
-if (y) then x:=3 end
-y := True
+let var x = -1 in
+    let var x = 6 in
+        let var x = -3 in
+            let var x = 200 in
+                x := 0
+            end
+        end     
+    end 
+    x := x
+end
 

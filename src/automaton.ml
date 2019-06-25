@@ -38,7 +38,7 @@ let rec delta controlStack valueStack environment memory locations =
                   (Stack.push (Bool(b)) valueStack);
                 );
             );
-          | AExp(aExp) -> (
+            | AExp(aExp) -> (
               match aExp with 
               | Num(x) -> (
                 (Stack.push (Int(x)) valueStack);
@@ -662,12 +662,12 @@ let rec delta controlStack valueStack environment memory locations =
                     (Stack.push (Bind(x)) valueStack );
                   );
                   |IntConst(x) -> (
-                    (Stack.push (Int(x)) valueStack);
+                    raise (AutomatonException "Error on DeRef nao pode acessar endereco de constante - int ");
                   );
                   |BoolConst(x) -> (
-                    (Stack.push (Bool(x)) valueStack);
+                    raise (AutomatonException "Error on DeRef nao pode acessar endereco de constante - bool");
                   );
-                  | _ -> raise (AutomatonException "Error on DeRef 664");
+                  (*| _ -> raise (AutomatonException "Error on DeRef 664");*)
               );
               | _ -> raise (AutomatonException "Error on DeRef 666");
             );
@@ -695,7 +695,7 @@ let rec delta controlStack valueStack environment memory locations =
                       (*| StrConst(cte) ->(
 
                       );*)
-                      | _ ->   raise (AutomatonException "Error on ValRef1");
+                      (*| _ ->   raise (AutomatonException "Error on ValRef1");*)
                   );
                   | _ ->   raise (AutomatonException "Error on ValRef2");
               );
@@ -972,11 +972,6 @@ let rec delta controlStack valueStack environment memory locations =
                     | Bind(b) -> (
                       (Hashtbl.replace memory l (Pointer(b)));
                     );
-
-                    (*| Str(c) -> (
-                      (Hashtbl.remove memory l );
-                      (Hashtbl.add memory l (StrConst(c)) );
-                    );*)
                     | _ -> raise (AutomatonException "Error on #ASSIGN")
                   ); 
                   | IntConst(i) -> (
@@ -1066,7 +1061,6 @@ let rec delta controlStack valueStack environment memory locations =
                         (Stack.push (Env(newEnv)) valueStack );
                     );
                   );
-                  (* fazer o caso do boolenao e do int retornado pelas expressoes do bind *)
                   | Bool(b) -> (
                     match (Stack.top valueStack) with
                     |Env(x) -> (  
@@ -1133,13 +1127,13 @@ let rec delta controlStack valueStack environment memory locations =
               
                 match locs with
                   | Locations(x) -> (
-                    locations := x;
                     
                     match env with
                       | Env(y) -> (
                         (Hashtbl.clear environment);
                         (Hashtbl.add_seq environment (Hashtbl.to_seq y));
-                        (Hashtbl.iter (  fun key value -> if not(List.mem key x) then (Hashtbl.remove memory key) ) memory );
+                        (Hashtbl.iter (  fun key value -> if (List.mem key !locations) then (Hashtbl.remove memory key) ) memory );
+                        locations := x;
                       );
                       | _ -> raise (AutomatonException "Error on #BLKCMD" );
                   );
