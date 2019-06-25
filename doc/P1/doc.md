@@ -1370,8 +1370,8 @@ Nós usamos a estrutura de hashtable(pro enviroment e pra memória) e a estrutur
 and memory = (Hashtbl.create 10) in
 
 ```
-
-`𝛅(Ref(X) :: C, V, E, S, L) = 𝛅(X :: #REF :: C, V, E, S, L)`
+```
+𝛅(Ref(X) :: C, V, E, S, L) = 𝛅(X :: #REF :: C, V, E, S, L)`
 ```
 
 ```
