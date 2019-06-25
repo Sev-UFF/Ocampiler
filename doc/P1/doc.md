@@ -1371,6 +1371,98 @@ and memory = (Hashtbl.create 10) in
 
 ```
 ```
+𝛅(#BIND :: C, B :: W :: E' :: V, E, S, L) = 𝛅(C, ({W ↦ B} ∪ E') :: V, E, S, L), where E' ∈ Env,
+𝛅(#BIND :: C, B :: W :: H :: V, E, S, L) = 𝛅(C, {W ↦ B} :: H :: V, E, S, L), where H ∉ Env,
+```
+
+```
+| OPBIND -> (
+  let l = (Stack.pop valueStack) in
+    let id = (Stack.pop valueStack) in
+      match id with
+      | Str(st) ->(
+        match l with
+          | Bind(y) -> (             
+            let possibleEnv = (Stack.top valueStack) in
+            match possibleEnv with
+            | Env(x) -> (
+              let env = (Stack.pop valueStack) in
+              match env with 
+              | Env(e) -> (
+                let newEnv = (Hashtbl.copy e) in
+                (Hashtbl.add newEnv st (Loc(y)) );
+                (Stack.push (Env(newEnv)) valueStack );
+              );
+              | _  -> raise (AutomatonException "Error on #BIND1" );
+            );
+            | _ -> (
+              let newEnv = (Hashtbl.create 3) in
+                (Hashtbl.add newEnv st (Loc(y)));
+                (Stack.push (Env(newEnv)) valueStack );
+            );
+          );
+          | Bool(b) -> (
+            match (Stack.top valueStack) with
+            |Env(x) -> (  
+                if not(Hashtbl.mem x st) then 
+                  let currentEnv = (Stack.pop valueStack) in
+                    match currentEnv with
+                    |Env(cEnv) -> (
+                        (Hashtbl.add cEnv st (BoolConst(b)) );
+                        (Stack.push (Env(cEnv)) valueStack);
+                    );
+                    | _ -> raise (AutomatonException "Error on #BIND Boolconst(b)" );
+            );
+            | _ -> (
+                let newEnv = (Hashtbl.create 3) in
+                (Hashtbl.add newEnv st (BoolConst(b)));
+                (Stack.push (Env(newEnv)) valueStack )
+            );
+          );
+          | Int(i) -> (
+            match (Stack.top valueStack) with
+            |Env(x) -> (
+                  if not(Hashtbl.mem x st) then   
+                    let currentEnv = (Stack.pop valueStack) in
+                      match currentEnv with
+                      |Env(cEnv) -> (
+                         (Hashtbl.add cEnv st (IntConst(i)) );
+                          (Stack.push (Env(cEnv)) valueStack);
+                      );
+                      | _ -> raise (AutomatonException "Error on #BIND const(i)" );
+            ); 
+            | _ -> (
+                let newEnv = (Hashtbl.create 3) in
+                (Hashtbl.add newEnv st (IntConst(i)));
+                (Stack.push (Env(newEnv)) valueStack )
+            );
+          );
+          | _ -> raise (AutomatonException "Error on #BIND2" );
+      );
+      | _ -> raise (AutomatonException "Error on #BIND" );
+  );
+```
+
+
+```
+𝛅(#BLKDEC :: C, E' :: V, E, S, L) = 𝛅(C, E :: V, E / E', S, L)
+```
+```
+| OPBLKDEC -> (
+  let ass = (Stack.pop valueStack) in
+    let env = Hashtbl.copy environment in
+      match ass with
+        | Env(e) -> (
+          (Stack.push (Env(env)) valueStack);
+          (Hashtbl.iter (  fun key value -> if not(Hashtbl.mem environment key ) then 
+                                                (Hashtbl.add environment key value) 
+                                            else (Hashtbl.replace environment key value) ) e);
+        );
+        | _ -> raise (AutomatonException "Error on #BLKDEC" );
+);
+
+```
+```
 𝛅(#BLKCMD :: C, E :: L :: V, E', S, L') = 𝛅(C, V, E, S', L), where S' = S / L'.
 ```
 ```
