@@ -1524,30 +1524,47 @@ CSeq(x, y) ->
 ```
 No automato criamos os tipos valueStackOptions , storable e bindable que respectivamente são: os valores que o podem ser inseridos na pilha de controle, storable que está associado a memória e o bindable que está associado ao ambiente. Os tipos storable e bindable são os responsáveis por fazerem o mampeamento dos dados. 
 ```
+exception AutomatonException of string;;
+
+  
 type valueStackOptions = 
   | Int of int
   | Str of string
   | Bool of bool
-  | Control of control;; (* É necessário passar um comando nos casos do IF e LOOP)
-  
+  | LoopValue of command
+  | CondValue of command
+  | Bind of loc
+  | Locations of int list
+  | Env of (string, bindable) Hashtbl.t
+;;
+
 type storable = 
   | Integer of int
-  | Boolean of bool;;
+  | Boolean of bool
+  | Pointer of loc
+;;
 
 type bindable = 
-  | Loc of int
-| Value of int;;
+  | Loc of loc
+  | IntConst of int
+  | BoolConst of bool
+;;
+
+type loc =
+  | Location of int
+;;
 ```
-Nós usamos a estrutura de hashtable(pro enviroment e pra memória) e a estrutura de pilha para a pilha de controle e valor que são inicializadas no arquivo [main.ml](https://github.com/sevontheedge/Ocampiler/blob/master/src/main.ml) .
+Nós usamos a estrutura de hashtable(pro enviroment e pra memória), estrutura de lista para guardar as locations e a estrutura de pilha para as stacks de controle e valor que são inicializadas no arquivo [main.ml](https://github.com/sevontheedge/Ocampiler/blob/master/src/main.ml) .
 ```
   let tree = Statement(Parser.main Lexer.token (Lexing.from_string !fileContents) )
   and controlStack = (Stack.create()) 
   and valueStack = (Stack.create()) 
   and environment = (Hashtbl.create 10)
-and memory = (Hashtbl.create 10) in
+  and memory = (Hashtbl.create 10)
+  and locations = ref [] 
 
 ```
-
+Ao dar pattern match com DeRef de um Id W é colocado no topo da pilha de valor a location l correspondente a W. Para isso buscamos no enviroment o bindable correspondente a W e colocamos ele no topo da pilha de valor e caso W seja uma constante não será possível acessar seu endereço.
 ```
 𝛅(DeRef(Id(W)) :: C, V, E, S, L) = 𝛅(C, l :: V, E, S, L), where l = E[W]
 
@@ -1572,6 +1589,7 @@ and memory = (Hashtbl.create 10) in
 );
 ```
 
+Ao dar pattern match com ValRef de um Id W é colocado no topo da pilha de valor T = S[S[E[W]]], ou seja, se x |-> lx ^ lx-> 0 ao fazer um Valref com z := *x ( z -> lz ^ lz -> lx) buscasse no enviroment a location correspondente a x (lz), em seguida buscasse na memória  
 ```
 𝛅(ValRef(Id(W)) :: C, V, E, S, L) = 𝛅(C, T :: V, E, S, L), where T = S[S[E[W]]]
 ```
