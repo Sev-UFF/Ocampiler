@@ -1589,7 +1589,19 @@ Ao dar pattern match com DeRef de um Id W é colocado no topo da pilha de valor 
 );
 ```
 
-Ao dar pattern match com ValRef de um Id W é colocado no topo da pilha de valor T = S[S[E[W]]], ou seja, se x |-> lx ^ lx-> 0 ao fazer um Valref com z := *x ( z -> lz ^ lz -> lx) buscasse no enviroment a location correspondente a x (lz), em seguida buscasse na memória  
+Ao dar pattern match com ValRef de um Id W é colocado no topo da pilha de valor T = S[S[E[W]]], ou seja, se 
+
+```
+...
+z := 7
+x := &z
+y := *x
+x |-> lx ^ lx-> lz, 
+z ->lz ^ lz -> 7 
+```
+ao fazer um Valref com ```y := *x ( y -> ly ^ ly -> 7)``` buscasse no enviroment a location correspondente a x (lx), em seguida buscasse na memória a location que está sendo apontada por lx -> lz ( que  o endereço de z) 
+
+
 ```
 𝛅(ValRef(Id(W)) :: C, V, E, S, L) = 𝛅(C, T :: V, E, S, L), where T = S[S[E[W]]]
 ```
