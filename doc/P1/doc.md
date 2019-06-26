@@ -1658,7 +1658,7 @@ Locations:{ 6 }
 ------------- ---Após OPREF teremos :
 
 Pilha de Controle:[ ...]
-Pilha de Valor:[** LOC[11]**, y, Env({( x -> LOC[6] )}), Locations({}) ]
+Pilha de Valor:[`**` LOC[11]`**`, y, Env({( x -> LOC[6] )}), Locations({}) ]
 Ambiente:{}
 Memória:{( LOC[6] -> -1 ),( **LOC[11] -> 0 **)}
 Locations:{6, 11}
