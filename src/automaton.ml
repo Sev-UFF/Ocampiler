@@ -10,7 +10,7 @@ let rec delta controlStack valueStack environment memory locations =
   trace := (!trace)@[( (Stack.copy controlStack), (Stack.copy valueStack), (Hashtbl.copy environment), (Hashtbl.copy memory), (copia))];
 
   (* Linha para debugar. apagar depois *)
-  print_endline(string_of_iteration controlStack valueStack environment memory !locations ); 
+  (*print_endline(string_of_iteration controlStack valueStack environment memory !locations ); *)
   
   if not(Stack.is_empty controlStack) then begin 
     
@@ -28,7 +28,6 @@ let rec delta controlStack valueStack environment memory locations =
                     match value with
                     | Integer(x) ->   (Stack.push (Int(x)) valueStack);
                     | Boolean(x) ->  (Stack.push (Bool(x)) valueStack);
-                    (* Conferir se pegar o id de uma variavel que e ponteiro ta certo retornar ela na pilha de valroes *)
                     | Pointer(p) -> (Stack.push (Bind(p)) valueStack);
                 );
                 | IntConst(i) -> (
@@ -667,7 +666,7 @@ let rec delta controlStack valueStack environment memory locations =
                   |BoolConst(x) -> (
                     raise (AutomatonException "Error on DeRef nao pode acessar endereco de constante - bool");
                   );
-                  (*| _ -> raise (AutomatonException "Error on DeRef 664");*)
+                  
               );
               | _ -> raise (AutomatonException "Error on DeRef 666");
             );
@@ -692,10 +691,6 @@ let rec delta controlStack valueStack environment memory locations =
                       | Boolean(cte) -> (
                         (Stack.push (Bool(cte)) valueStack);
                       ); 
-                      (*| StrConst(cte) ->(
-
-                      );*)
-                      (*| _ ->   raise (AutomatonException "Error on ValRef1");*)
                   );
                   | _ ->   raise (AutomatonException "Error on ValRef2");
               );
@@ -708,14 +703,17 @@ let rec delta controlStack valueStack environment memory locations =
           | Loop( BExp(x), y) -> (
             (Stack.push (CmdOc(OPLOOP)) controlStack);
             (Stack.push (Statement(Exp(BExp(x)))) controlStack );
-            (Stack.push (LoopValue(Loop(BExp(x), y))) valueStack ); 
-            
+            (Stack.push (LoopValue(Loop(BExp(x), y))) valueStack );   
           );
           | Loop(Id(x), y) -> (
             (Stack.push (CmdOc(OPLOOP)) controlStack);
             (Stack.push (Statement(Exp(Id(x)))) controlStack );
-            (Stack.push (LoopValue(Loop(Id(x), y))) valueStack );
-            
+            (Stack.push (LoopValue(Loop(Id(x), y))) valueStack ); 
+          );
+          | Loop(ValRef(Id(x)), y) -> (
+            (Stack.push (CmdOc(OPLOOP)) controlStack);
+            (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack );
+            (Stack.push (LoopValue(Loop(ValRef(Id(x)), y))) valueStack ); 
           );
           | Loop(_, _) -> raise (AutomatonException "Error on Loop");
           | CSeq(x, y) -> (
@@ -742,13 +740,18 @@ let rec delta controlStack valueStack environment memory locations =
             (Stack.push (CondValue(Cond(Id(x), y, z))) valueStack );
             
           );
+          | Cond(ValRef(Id(x)), y, z) -> (
+            (Stack.push (CmdOc(OPCOND)) controlStack);
+            (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack );
+            (Stack.push (CondValue(Cond(ValRef(Id(x)), y, z))) valueStack );
+            
+          );
           | Cond(_, _, _) -> raise (AutomatonException "Error on Cond");
           | Blk(x, y) -> (
             (Stack.push (DecOc(OPBLKCMD)) controlStack);
             (Stack.push (Statement(Cmd(y))) controlStack);
             (Stack.push (DecOc(OPBLKDEC)) controlStack);
             (Stack.push (Statement(Dec(x))) controlStack);
-
             (Stack.push (Locations(!locations)) valueStack);
             locations := [] ;
           );
@@ -760,11 +763,11 @@ let rec delta controlStack valueStack environment memory locations =
             (Stack.push (DecOc(OPBIND)) controlStack );
             (Stack.push (Statement(Exp(y))) controlStack );
             (Stack.push (Str(x)) valueStack);
-         );
-         | Bind(_, _) -> (
+          );
+          | Bind(_, _) -> (
             raise (AutomatonException "Error on Bind" );
           );
-         | DSeq(x, y) -> (
+          | DSeq(x, y) -> (
           (Stack.push (Statement(Dec(y))) controlStack);
           (Stack.push (Statement(Dec(x))) controlStack);
          );
@@ -968,7 +971,6 @@ let rec delta controlStack valueStack environment memory locations =
                     | Bool(b) -> (
                       (Hashtbl.replace memory l (Boolean(b)));
                     );
-                    (* Conferir esse caso junto com o caso do id para ponteiros para ver se esta tudo certo *)
                     | Bind(b) -> (
                       (Hashtbl.replace memory l (Pointer(b)));
                     );
@@ -1091,8 +1093,7 @@ let rec delta controlStack valueStack environment memory locations =
                                   (Stack.push (Env(cEnv)) valueStack);
                               );
                               | _ -> raise (AutomatonException "Error on #BIND const(i)" );
-                    );
-                    
+                    ); 
                     | _ -> (
                         let newEnv = (Hashtbl.create 3) in
                         (Hashtbl.add newEnv st (IntConst(i)));
@@ -1110,14 +1111,9 @@ let rec delta controlStack valueStack environment memory locations =
                   | Env(e) -> (
                     (Stack.push (Env(env)) valueStack);
                     (Hashtbl.iter 
-                      (  
-                        fun key value -> 
-                          if not(Hashtbl.mem environment key ) 
-                            then (Hashtbl.add environment key value) 
-                          else
-                            (Hashtbl.replace environment key value) 
-                      ) 
-                    e);
+                      (  fun key value -> if not(Hashtbl.mem environment key ) then 
+                                            (Hashtbl.add environment key value) 
+                                          else (Hashtbl.replace environment key value) ) e);
                   );
                   | _ -> raise (AutomatonException "Error on #BLKDEC" );
           );

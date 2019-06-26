@@ -1,2 +1,22 @@
-x := 2 + y
+#teste para os novos casos de arithmetic expressions com valref
+
+let var x = 0 , var y = 5, var z = 0 in
+    x := &y
+    z := *x
+    z := z + *x
+    z := *x + y
+    z := *x + *x
+    z := 1 + *x
+    z := *x + 7
+    z := z - *x
+    z := *x - y
+    z := *x - *x
+    z := 1 - *x
+    z := *x * 7
+    z := z / *x
+    z := *x / y
+    z := *x / *x
+    z := 1 / *x
+    z := *x / 7
+end
 

@@ -19,8 +19,7 @@ and storable =
   | Integer of int
   | Boolean of bool
   | Pointer of loc
-  (*| StrConst of string
-    | IdConst of expression *)
+
 
 and bindable = 
   | Loc of loc
