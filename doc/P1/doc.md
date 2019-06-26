@@ -85,14 +85,57 @@ type statement =
 ;;
 
 ```
+A nível das declarações temos a seguinte especificação
+```
+<Statement> ::= <Dec> 
 
-Os opcodes definidos pelas expressões e comandos 
+<Exp>       ::= Ref(<Exp>)> | DeRef(<Id>) | ValRef(<Id>)
+
+<Dec>       ::= Bind(<Id>, <Exp>) | DSeq(<Dec>, <Dec>)
+
+<Cmd>       ::= Blk(<Dec>, <Cmd>) 
+```
+que foi implementada extendo os tipos definidos para comando
+```
+type expression = 
+  | AExp of arithmeticExpression
+  | BExp of booleanExpression
+  | Id of string
+  | Ref of expression
+  | DeRef of expression
+  | ValRef of expression
+;;
+
+type command = 
+  | Loop of expression * command
+  | CSeq of command * command
+  | Nop
+  | Assign of expression * expression
+  | Cond of expression * command * command
+  | Blk of declaration * command
+;;
+
+type declaration = 
+  | DSeq of declaration * declaration
+  | Bind of expression * expression
+;;
+
+type statement = 
+  | Exp of expression
+  | Cmd of command
+  | Dec of declaration
+;;
+```
+
+Os opcodes definidos pelas expressões, comandos e declaraçes
 
 ```
 <ExpOC>     ::= #SUM | #SUB | #MUL | #DIV |   
                 #EQ | #LT | #LE | #GT | #GE | #AND | #OR | #NOT
 
 <CmdOC>     ::= #ASSIGN | #LOOP | #COND
+
+<DecOC>     ::= #REF | #BLKDEC | #BLKCMD | #BIND 
 ```
 Foram implementados no nível de controle, que possui também o tipo _statement_ dentro dele
 
@@ -112,6 +155,13 @@ type expOc =
   | OPNOT
 ;;
 
+type decOC =
+   | OPREF
+   | OPBLKDEC
+   | OPBLKCMD
+   | OPBIND
+;;
+
 type cmdOc =
   | OPASSIGN 
   | OPLOOP 
@@ -122,7 +172,8 @@ type control =
   | Statement of statement
   | ExpOc of expOc
   | CmdOc of cmdOc
-;;
+  | DecOc of decOC
+ ;;
 ```
 
 ## Lexer
@@ -194,9 +245,12 @@ Temos então a definição dos tipos das π denotações no nível do parser
 %type <Pi.statement> main
 %type <Pi.statement> statement
 %type <Pi.expression> expression
+%type <Pi.declaration> declaration
 %type <Pi.arithmeticExpression> arithmeticExpression
 %type <Pi.booleanExpression> booleanExpression
 %type <Pi.command> command
+%type <Pi.expression> bindableVariable
+%type <Pi.expression> variable
 ```
 
 Onde criamos o tipo main como tipo de retorno da função
@@ -211,28 +265,51 @@ main:
 Para cada tipo definido então definimos a estrutura de tokens associado a ele que está de acordo com as especificações da linguagem. Cada tipo pode retornar outros tipos, ou diretamente uma π denotação, o parser funciona como um todo então através da recursão. Os tipos mantém a mesma hierarquia do π framework e da linguagem.
 
 ```
- statement:
-  expression { Pi.Exp($1)}
-  | command      {Pi.Cmd($1)}
+statement:
+  expression     { Pi.Exp($1)}
+  | command      { Pi.Cmd($1)}
 ;
-
- command:
-  ID ASSIGN expression                        { Pi.Assign(Pi.Id($1), $3) }
+declaration:
+  | VAR ID BIND expression              { Pi.Bind(Pi.Id($2), Pi.Ref($4)) }
+  | CNS ID BIND bindableVariable        { Pi.Bind(Pi.Id($2), $4) }
+  | declaration COMMA declaration       { Pi.DSeq($1, $3) }
+  | LPAREN declaration RPAREN           { $2 }
 ;
-
+command:
+  LOOP expression DO command  END                { Pi.Loop(($2), $4)}
+  | IF expression THEN command ELSE command END  { Pi.Cond(($2), $4, $6)}
+  | IF expression THEN command END               { Pi.Cond(($2), $4, Pi.Nop)}
+  | ID ASSIGN expression                         { Pi.Assign(Pi.Id($1), $3) }
+  | command  command                             { Pi.CSeq($1, $2) }
+  | LET declaration IN command                   { Pi.Blk($2, $4)}
+  | LET declaration IN command END               { Pi.Blk($2, $4)}
+  | LPAREN command RPAREN                        { $2 }
+;
 expression: 
-    arithmeticExpression                    { Pi.AExp( $1) }
-    | booleanExpression                     { Pi.BExp( $1) }
-    | ID                                    { Pi.Id( $1) } 
-;
+    ADDRESS ID                                   { Pi.DeRef(Pi.Id($2))}
+    | bindableVariable                           { $1 }
+    | LPAREN expression RPAREN                   { $2 }
 
-arithmeticExpression:  
-  NUMBER                                              { Pi.Num($1) }
-  | arithmeticExpression PLUS arithmeticExpression    { Pi.Sum(Pi.AExp($1), Pi.AExp($3) )  }
-  | arithmeticExpression PLUS ID                      { Pi.Sum(Pi.AExp($1), Pi.Id($3) )  }
-  | ID PLUS arithmeticExpression                      { Pi.Sum(Pi.Id($1), Pi.AExp($3) )  }
-  | ID PLUS ID                                        { Pi.Sum(Pi.Id($1), Pi.Id($3) )  }
 ;
+ bindableVariable: 
+     arithmeticExpression                        { Pi.AExp( $1) }
+    | booleanExpression                          { Pi.BExp( $1) }
+    | variable                                   { $1 }
+    | LPAREN bindableVariable RPAREN             { $2 }
+
+;
+variable:
+   ID                                            { Pi.Id( $1) }
+  | TIMESORPOINTER ID                            { Pi.ValRef(Pi.Id($2))}
+  | LPAREN variable RPAREN                       { $2 }
+;
+arithmeticExpression:  
+  NUMBER                                                     { Pi.Num($1) }
+  | arithmeticExpression PLUS arithmeticExpression           { Pi.Sum(Pi.AExp($1), Pi.AExp($3) )  }
+  | arithmeticExpression PLUS variable                       { Pi.Sum(Pi.AExp($1), $3 )  }
+  | variable PLUS arithmeticExpression                       { Pi.Sum($1, Pi.AExp($3) )  }
+  | variable PLUS variable                                   { Pi.Sum($1, $3 )  }
+  ...
 ```
 
 De acordo com a estruturação feita, ao lermos o token NUMBER, iremos cair no caso em que retornamos a denotação Num, que por sua vez, graças a recursão de tipos é englobada dentro do tipo arithmeticExpression, que engloba a denotação Num na denotação AExp, até chegarmos no tipo definido pela main. 
@@ -1559,28 +1636,6 @@ and memory = (Hashtbl.create 10) in
   );
   | _  -> raise (AutomatonException "Error on #REF" );
 );
-```
-
-```
-| DecOc(decOc) -> (
-  match decOc with
-  | OPREF -> (
-    let loc = (List.length !trace) in
-    let value = (Stack.pop valueStack) in
-    (Stack.push (Bind((Location(loc)))) valueStack);
-    locations := (!locations)@[loc];
-    match value with
-    | Int(x) -> (
-      (Hashtbl.add  memory loc (Integer(x)));
-    );
-    | Bool(x) -> (
-      (Hashtbl.add  memory (loc) (Boolean(x)));
-    );
-    | Bind(x) -> (
-      (Hashtbl.add  memory (loc) (Pointer(x)));
-    );
-    | _  -> raise (AutomatonException "Error on #REF" );
-  );
 ```
 
 ```
