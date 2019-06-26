@@ -1,5 +1,6 @@
-let var x = -1, var y = 0 in
-   y := &x
-   x := 0
+let  var z = 0, const x = True, const y = -1  in
+   if(x) then
+      z := x
+   end
 end
 

@@ -10,7 +10,7 @@ let rec delta controlStack valueStack environment memory locations =
   trace := (!trace)@[( (Stack.copy controlStack), (Stack.copy valueStack), (Hashtbl.copy environment), (Hashtbl.copy memory), (copia))];
 
   (* Linha para debugar. apagar depois *)
-  (*print_endline(string_of_iteration controlStack valueStack environment memory !locations ); *)
+  print_endline(string_of_iteration controlStack valueStack environment memory !locations ); 
   
   if not(Stack.is_empty controlStack) then begin 
     
@@ -1007,13 +1007,14 @@ let rec delta controlStack valueStack environment memory locations =
                   );
                   | Bool(b) -> (
                     match (Stack.top valueStack) with
-                    |Env(x) -> (  
-                        if not(Hashtbl.mem x st) then 
+                    |Env(z1) -> (  
+                        if not(Hashtbl.mem z1 st) then 
                           let currentEnv = (Stack.pop valueStack) in
                             match currentEnv with
                             |Env(cEnv) -> (
-                                (Hashtbl.add cEnv st (BoolConst(b)) );
-                                (Stack.push (Env(cEnv)) valueStack);
+                                let newEnv = (Hashtbl.copy cEnv) in
+                                (Hashtbl.add newEnv st (BoolConst(b)) );
+                                (Stack.push (Env(newEnv)) valueStack);
                             );
                             | _ -> raise (AutomatonException "Error on #BIND Boolconst(b)" );
                     );
@@ -1025,13 +1026,14 @@ let rec delta controlStack valueStack environment memory locations =
                   );
                   | Int(i) -> (
                     match (Stack.top valueStack) with
-                    |Env(x) -> (
-                          if not(Hashtbl.mem x st) then   
+                    |Env(z2) -> (
+                          if not(Hashtbl.mem z2 st) then   
                             let currentEnv = (Stack.pop valueStack) in
                               match currentEnv with
                               |Env(cEnv) -> (
-                                 (Hashtbl.add cEnv st (IntConst(i)) );
-                                  (Stack.push (Env(cEnv)) valueStack);
+                                let newEnv = (Hashtbl.copy cEnv) in
+                                 (Hashtbl.add newEnv st (IntConst(i)) );
+                                  (Stack.push (Env(newEnv)) valueStack);
                               );
                               | _ -> raise (AutomatonException "Error on #BIND const(i)" );
                     ); 
