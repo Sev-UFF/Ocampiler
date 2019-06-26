@@ -85,14 +85,57 @@ type statement =
 ;;
 
 ```
+A nível das declarações temos a seguinte especificação
+```
+<Statement> ::= <Dec> 
 
-Os opcodes definidos pelas expressões e comandos 
+<Exp>       ::= Ref(<Exp>)> | DeRef(<Id>) | ValRef(<Id>)
+
+<Dec>       ::= Bind(<Id>, <Exp>) | DSeq(<Dec>, <Dec>)
+
+<Cmd>       ::= Blk(<Dec>, <Cmd>) 
+```
+que foi implementada extendo os tipos definidos para comando
+```
+type expression = 
+  | AExp of arithmeticExpression
+  | BExp of booleanExpression
+  | Id of string
+  | Ref of expression
+  | DeRef of expression
+  | ValRef of expression
+;;
+
+type command = 
+  | Loop of expression * command
+  | CSeq of command * command
+  | Nop
+  | Assign of expression * expression
+  | Cond of expression * command * command
+  | Blk of declaration * command
+;;
+
+type declaration = 
+  | DSeq of declaration * declaration
+  | Bind of expression * expression
+;;
+
+type statement = 
+  | Exp of expression
+  | Cmd of command
+  | Dec of declaration
+;;
+```
+
+Os opcodes definidos pelas expressões, comandos e declaraçes
 
 ```
 <ExpOC>     ::= #SUM | #SUB | #MUL | #DIV |   
                 #EQ | #LT | #LE | #GT | #GE | #AND | #OR | #NOT
 
 <CmdOC>     ::= #ASSIGN | #LOOP | #COND
+
+<DecOC>     ::= #REF | #BLKDEC | #BLKCMD | #BIND 
 ```
 Foram implementados no nível de controle, que possui também o tipo _statement_ dentro dele
 
@@ -112,6 +155,13 @@ type expOc =
   | OPNOT
 ;;
 
+type decOC =
+   | OPREF
+   | OPBLKDEC
+   | OPBLKCMD
+   | OPBIND
+;;
+
 type cmdOc =
   | OPASSIGN 
   | OPLOOP 
@@ -122,7 +172,8 @@ type control =
   | Statement of statement
   | ExpOc of expOc
   | CmdOc of cmdOc
-;;
+  | DecOc of decOC
+ ;;
 ```
 
 ## Lexer
@@ -194,9 +245,12 @@ Temos então a definição dos tipos das π denotações no nível do parser
 %type <Pi.statement> main
 %type <Pi.statement> statement
 %type <Pi.expression> expression
+%type <Pi.declaration> declaration
 %type <Pi.arithmeticExpression> arithmeticExpression
 %type <Pi.booleanExpression> booleanExpression
 %type <Pi.command> command
+%type <Pi.expression> bindableVariable
+%type <Pi.expression> variable
 ```
 
 Onde criamos o tipo main como tipo de retorno da função
@@ -211,28 +265,51 @@ main:
 Para cada tipo definido então definimos a estrutura de tokens associado a ele que está de acordo com as especificações da linguagem. Cada tipo pode retornar outros tipos, ou diretamente uma π denotação, o parser funciona como um todo então através da recursão. Os tipos mantém a mesma hierarquia do π framework e da linguagem.
 
 ```
- statement:
-  expression { Pi.Exp($1)}
-  | command      {Pi.Cmd($1)}
+statement:
+  expression     { Pi.Exp($1)}
+  | command      { Pi.Cmd($1)}
 ;
-
- command:
-  ID ASSIGN expression                        { Pi.Assign(Pi.Id($1), $3) }
+declaration:
+  | VAR ID BIND expression              { Pi.Bind(Pi.Id($2), Pi.Ref($4)) }
+  | CNS ID BIND bindableVariable        { Pi.Bind(Pi.Id($2), $4) }
+  | declaration COMMA declaration       { Pi.DSeq($1, $3) }
+  | LPAREN declaration RPAREN           { $2 }
 ;
-
+command:
+  LOOP expression DO command  END                { Pi.Loop(($2), $4)}
+  | IF expression THEN command ELSE command END  { Pi.Cond(($2), $4, $6)}
+  | IF expression THEN command END               { Pi.Cond(($2), $4, Pi.Nop)}
+  | ID ASSIGN expression                         { Pi.Assign(Pi.Id($1), $3) }
+  | command  command                             { Pi.CSeq($1, $2) }
+  | LET declaration IN command                   { Pi.Blk($2, $4)}
+  | LET declaration IN command END               { Pi.Blk($2, $4)}
+  | LPAREN command RPAREN                        { $2 }
+;
 expression: 
-    arithmeticExpression                    { Pi.AExp( $1) }
-    | booleanExpression                     { Pi.BExp( $1) }
-    | ID                                    { Pi.Id( $1) } 
-;
+    ADDRESS ID                                   { Pi.DeRef(Pi.Id($2))}
+    | bindableVariable                           { $1 }
+    | LPAREN expression RPAREN                   { $2 }
 
-arithmeticExpression:  
-  NUMBER                                              { Pi.Num($1) }
-  | arithmeticExpression PLUS arithmeticExpression    { Pi.Sum(Pi.AExp($1), Pi.AExp($3) )  }
-  | arithmeticExpression PLUS ID                      { Pi.Sum(Pi.AExp($1), Pi.Id($3) )  }
-  | ID PLUS arithmeticExpression                      { Pi.Sum(Pi.Id($1), Pi.AExp($3) )  }
-  | ID PLUS ID                                        { Pi.Sum(Pi.Id($1), Pi.Id($3) )  }
 ;
+ bindableVariable: 
+     arithmeticExpression                        { Pi.AExp( $1) }
+    | booleanExpression                          { Pi.BExp( $1) }
+    | variable                                   { $1 }
+    | LPAREN bindableVariable RPAREN             { $2 }
+
+;
+variable:
+   ID                                            { Pi.Id( $1) }
+  | TIMESORPOINTER ID                            { Pi.ValRef(Pi.Id($2))}
+  | LPAREN variable RPAREN                       { $2 }
+;
+arithmeticExpression:  
+  NUMBER                                                     { Pi.Num($1) }
+  | arithmeticExpression PLUS arithmeticExpression           { Pi.Sum(Pi.AExp($1), Pi.AExp($3) )  }
+  | arithmeticExpression PLUS variable                       { Pi.Sum(Pi.AExp($1), $3 )  }
+  | variable PLUS arithmeticExpression                       { Pi.Sum($1, Pi.AExp($3) )  }
+  | variable PLUS variable                                   { Pi.Sum($1, $3 )  }
+  ...
 ```
 
 De acordo com a estruturação feita, ao lermos o token NUMBER, iremos cair no caso em que retornamos a denotação Num, que por sua vez, graças a recursão de tipos é englobada dentro do tipo arithmeticExpression, que engloba a denotação Num na denotação AExp, até chegarmos no tipo definido pela main. 
@@ -274,30 +351,52 @@ Para cada um desses casos, agimos da mesma forma: colocamos primeiro o opcode #S
 ```
 
 ```
-Sum(AExp(x), AExp(y)) -> 
-(
+| Sum(AExp(x), AExp(y)) -> (
   (Stack.push (ExpOc(OPSUM)) controlStack);
   (Stack.push (Statement(Exp(AExp(y)))) controlStack);
   (Stack.push (Statement(Exp(AExp(x)))) controlStack);
 );
-| Sum(Id(x), AExp(y)) -> 
-(
+| Sum(Id(x), AExp(y)) -> (
   (Stack.push (ExpOc(OPSUM)) controlStack);
   (Stack.push (Statement(Exp(AExp(y)))) controlStack);
   (Stack.push (Statement(Exp(Id(x)))) controlStack);
 ); 
-| Sum(AExp(x), Id(y)) ->  
-(
+| Sum(AExp(x), Id(y)) ->  (
   (Stack.push (ExpOc(OPSUM)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
   (Stack.push (Statement(Exp(AExp(x)))) controlStack);
 ); 
-| Sum(Id(x), Id(y)) ->  
-(
+| Sum(Id(x), Id(y)) ->  (
   (Stack.push (ExpOc(OPSUM)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
   (Stack.push (Statement(Exp(Id(x)))) controlStack);
 );
+| Sum( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPSUM)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Sum(ValRef(Id(x)), AExp(y)) ->  (
+  (Stack.push (ExpOc(OPSUM)) controlStack);
+  (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Sum( AExp(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPSUM)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+);
+| Sum(ValRef(Id(x)), Id(y)) ->  (
+  (Stack.push (ExpOc(OPSUM)) controlStack);
+  (Stack.push (Statement(Exp(Id(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Sum( Id(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPSUM)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(Id(x)))) controlStack);
+);
+| Sum(_, _) -> raise (AutomatonException "Error on Sum - |aexp"); 
 ```
 
 Ao ler o #SUM, fazemos um pop na pilha de valores para ler o valor Num(N1) e verificamos que é do tipo inteiro. Depois fazemos outro POP para ler o valor Num(N2) e verificamos que este também é do tipo inteiro. Depois somamos eles, colocando o resultado na pilha de valores. Caso não sejam, cairíamos em uma Exception.
@@ -333,30 +432,52 @@ Para cada um desses casos, agimos da mesma forma: colocamos primeiro o opcode #S
 ```
 
 ```
-Sub(AExp(x), AExp(y)) -> 
-(
+| Sub(AExp(x), AExp(y)) -> (
   (Stack.push (ExpOc(OPSUB)) controlStack);
   (Stack.push (Statement(Exp(AExp(y)))) controlStack);
   (Stack.push (Statement(Exp(AExp(x)))) controlStack);
 );
-| Sub(Id(x), AExp(y)) -> 
-(
+| Sub(Id(x), AExp(y)) -> (
   (Stack.push (ExpOc(OPSUB)) controlStack);
   (Stack.push (Statement(Exp(AExp(y)))) controlStack);
   (Stack.push (Statement(Exp(Id(x)))) controlStack);
 ); 
-| Sub(AExp(x), Id(y)) ->  
-(
+| Sub(AExp(x), Id(y)) ->  (
   (Stack.push (ExpOc(OPSUB)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
   (Stack.push (Statement(Exp(AExp(x)))) controlStack);
 ); 
-| Sub(Id(x), Id(y)) ->  
-(
+| Sub(Id(x), Id(y)) ->  (
   (Stack.push (ExpOc(OPSUB)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
   (Stack.push (Statement(Exp(Id(x)))) controlStack);
+);
+| Sub( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPSUB)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Sub(ValRef(Id(x)), AExp(y)) ->  (
+  (Stack.push (ExpOc(OPSUB)) controlStack);
+  (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Sub( AExp(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPSUB)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+);
+| Sub(ValRef(Id(x)), Id(y)) ->  (
+  (Stack.push (ExpOc(OPSUB)) controlStack);
+  (Stack.push (Statement(Exp(Id(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Sub( Id(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPSUB)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(Id(x)))) controlStack);
 ); 
+| Sub(_, _) -> raise (AutomatonException "Error on Sub");
 ```
 
 Ao ler o #SUB, fazemos um pop na pilha de valores para ler o valor Num(N1) e verificamos que é do tipo inteiro. Depois fazemos outro POP para ler o valor Num(N2) e verificamos que este também é do tipo inteiro. Depois subtraímos eles, colocando o resultado na pilha de valores. Caso não sejam, cairíamos em uma Exception.
@@ -394,30 +515,52 @@ Para cada um desses casos, agimos da mesma forma: colocamos primeiro o opcode #M
 ```
 
 ```            
-Mul(AExp(x), AExp(y)) ->
-(
+| Mul(AExp(x), AExp(y)) -> (
   (Stack.push (ExpOc(OPMUL)) controlStack);
   (Stack.push (Statement(Exp(AExp(y)))) controlStack);
   (Stack.push (Statement(Exp(AExp(x)))) controlStack);
 );
-| Mul(Id(x), AExp(y)) -> 
-(
+| Mul(Id(x), AExp(y)) -> (
   (Stack.push (ExpOc(OPMUL)) controlStack);
   (Stack.push (Statement(Exp(AExp(y)))) controlStack);
-  (Stack.push (Statement(Exp(Id(x)))) controlStack);              
+  (Stack.push (Statement(Exp(Id(x)))) controlStack);
 ); 
-| Mul(AExp(x), Id(y)) ->  
-(
+| Mul(AExp(x), Id(y)) ->  (
   (Stack.push (ExpOc(OPMUL)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
   (Stack.push (Statement(Exp(AExp(x)))) controlStack);
 ); 
-| Mul(Id(x), Id(y)) ->  
-(
+| Mul(Id(x), Id(y)) ->  (
   (Stack.push (ExpOc(OPMUL)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
-  (Stack.push (Statement(Exp(Id(x)))) controlStack);                
+  (Stack.push (Statement(Exp(Id(x)))) controlStack);
 );
+| Mul( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPMUL)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Mul(ValRef(Id(x)), AExp(y)) ->  (
+  (Stack.push (ExpOc(OPMUL)) controlStack);
+  (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Mul( AExp(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPMUL)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+);
+| Mul(ValRef(Id(x)), Id(y)) ->  (
+  (Stack.push (ExpOc(OPMUL)) controlStack);
+  (Stack.push (Statement(Exp(Id(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Mul( Id(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPMUL)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(Id(x)))) controlStack);
+); 
+| Mul(_, _) -> raise (AutomatonException "Error on Mul");
 ```
 
 Ao ler o #MUL, fazemos um pop na pilha de valores para ler o valor Num(N1) e verificamos que é do tipo inteiro. Depois fazemos outro POP para ler o valor Num(N2) e verificamos que este também é do tipo inteiro. Depois multiplicamos eles, colocando o resultado na pilha de valores. Caso não sejam, cairíamos em uma Exception.
@@ -454,30 +597,52 @@ Para cada um desses casos, agimos da mesma forma: colocamos primeiro o opcode #D
 ```
 
 ```              
-Div(AExp(x), AExp(y)) -> 
-(
+| Div(AExp(x), AExp(y)) -> (
   (Stack.push (ExpOc(OPDIV)) controlStack);
   (Stack.push (Statement(Exp(AExp(y)))) controlStack);
   (Stack.push (Statement(Exp(AExp(x)))) controlStack);
 );
-| Div(Id(x), AExp(y)) -> 
-(
+| Div(Id(x), AExp(y)) -> (
   (Stack.push (ExpOc(OPDIV)) controlStack);
   (Stack.push (Statement(Exp(AExp(y)))) controlStack);
   (Stack.push (Statement(Exp(Id(x)))) controlStack);
 ); 
-| Div(AExp(x), Id(y)) ->  
-(
+| Div(AExp(x), Id(y)) ->  (
   (Stack.push (ExpOc(OPDIV)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
   (Stack.push (Statement(Exp(AExp(x)))) controlStack);
 ); 
-| Div(Id(x), Id(y)) ->  
-(
+| Div(Id(x), Id(y)) ->  (
   (Stack.push (ExpOc(OPDIV)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
   (Stack.push (Statement(Exp(Id(x)))) controlStack);
+);
+| Div( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPDIV)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Div(ValRef(Id(x)), AExp(y)) ->  (
+  (Stack.push (ExpOc(OPDIV)) controlStack);
+  (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Div( AExp(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPDIV)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+);
+| Div(ValRef(Id(x)), Id(y)) ->  (
+  (Stack.push (ExpOc(OPDIV)) controlStack);
+  (Stack.push (Statement(Exp(Id(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Div( Id(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPDIV)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(Id(x)))) controlStack);
 ); 
+| Div(_, _) -> raise (AutomatonException "Error on Div"); 
 ```
 
 Ao ler o #DIV, fazemos um pop na pilha de valores para ler o valor Num(N1) e verificamos que é do tipo inteiro e diferente de zero, pois não se pode dividir um número por zero. Depois fazemos outro POP para ler o valor Num(N2) e verificamos que este também é do tipo inteiro. Depois dividimos Y por X, colocando o resultado na pilha de valores. Caso não sejam, cairíamos em uma Exception.
@@ -519,48 +684,77 @@ Para cada um desses casos, agimos da mesma forma: colocamos primeiro o opcode #E
 ```
 
 ```
-Eq(BExp(x), BExp(y)) -> 
-(
+| Eq(BExp(x), BExp(y)) -> (
   (Stack.push (ExpOc(OPEQ)) controlStack);
   (Stack.push (Statement(Exp(BExp(y)))) controlStack);
   (Stack.push (Statement(Exp(BExp(x)))) controlStack);
 );
-| Eq(BExp(x), Id(y)) -> 
-(
+| Eq(BExp(x), Id(y)) -> (
   (Stack.push (ExpOc(OPEQ)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
   (Stack.push (Statement(Exp(BExp(x)))) controlStack);
 );
-| Eq(Id(x), BExp(y)) -> 
-(
+| Eq(Id(x), BExp(y)) -> (
   (Stack.push (ExpOc(OPEQ)) controlStack);
   (Stack.push (Statement(Exp(BExp(y)))) controlStack);
-  (Stack.push (Statement(Exp(Id(x)))) controlStack); 
+  (Stack.push (Statement(Exp(Id(x)))) controlStack);
 );
-| Eq(Id(x), Id(y)) -> 
-(
+| Eq(Id(x), Id(y)) -> (
   (Stack.push (ExpOc(OPEQ)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
   (Stack.push (Statement(Exp(Id(x)))) controlStack);
 );
-| Eq(AExp(x), AExp(y)) -> 
-(
+| Eq(AExp(x), AExp(y)) -> (
   (Stack.push (ExpOc(OPEQ)) controlStack);
   (Stack.push (Statement(Exp(AExp(y)))) controlStack);
   (Stack.push (Statement(Exp(AExp(x)))) controlStack);
 );
-| Eq(AExp(x), Id(y)) -> 
-(
+| Eq(AExp(x), Id(y)) -> (
   (Stack.push (ExpOc(OPEQ)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
   (Stack.push (Statement(Exp(AExp(x)))) controlStack);
 );
-| Eq(Id(x), AExp(y)) -> 
-(
+| Eq(Id(x), AExp(y)) -> (
   (Stack.push (ExpOc(OPEQ)) controlStack);
   (Stack.push (Statement(Exp(AExp(y)))) controlStack);
   (Stack.push (Statement(Exp(Id(x)))) controlStack);
 );
+| Eq(BExp(x), ValRef(Id(y)) )  -> (
+  (Stack.push (ExpOc(OPEQ)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+);
+| Eq( ValRef(Id(x)), BExp(y)) -> (
+  (Stack.push (ExpOc(OPEQ)) controlStack);
+  (Stack.push (Statement(Exp(BExp(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Eq(ValRef(Id(x)), ValRef(Id(y))) -> (
+  (Stack.push (ExpOc(OPEQ)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Eq(AExp(x), ValRef(Id(y))) -> (
+  (Stack.push (ExpOc(OPEQ)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+);
+| Eq(ValRef(Id(x)), AExp(y)) -> (
+  (Stack.push (ExpOc(OPEQ)) controlStack);
+  (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Eq(Id(x), ValRef(Id(y))) -> (
+  (Stack.push (ExpOc(OPEQ)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(Id(x)))) controlStack);
+);
+| Eq(ValRef(Id(x)), Id(y)) -> (
+  (Stack.push (ExpOc(OPEQ)) controlStack);
+  (Stack.push (Statement(Exp(Id(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Eq(_, _) -> raise (AutomatonException "Error on Eq"); 
 ```
 
 Ao ler o #EQ, fazemos um pop na pilha de valores para ler o valor E1 e verificamos se ele é do tipo booleano ou inteiro. Depois fazemos outro POP para ler o valor E2 e verificamos se este também é do tipo booleano ou inteiro. Sendo que só se permitem dois POPs consecutivos de valores iguais (dois Bool ou dois Int). Depois verificamos se os valores contidos são iguais, retornando True ou diferentes, retornando False.
@@ -607,30 +801,53 @@ Para cada um desses casos, agimos da mesma forma: colocamos primeiro o opcode #L
 ```
 
 ```
-Lt(AExp(x), AExp(y)) -> 
-(
+| Lt(AExp(x), AExp(y)) -> (
   (Stack.push (ExpOc(OPLT)) controlStack);
   (Stack.push (Statement(Exp(AExp(y)))) controlStack);
-  (Stack.push (Statement(Exp(AExp(x)))) controlStack); 
+  (Stack.push (Statement(Exp(AExp(x)))) controlStack);
 );
-| Lt(AExp(x), Id(y)) -> 
-(
+| Lt(AExp(x), Id(y)) -> (
   (Stack.push (ExpOc(OPLT)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
   (Stack.push (Statement(Exp(AExp(x)))) controlStack);
 );
-| Lt(Id(x), AExp(y)) -> 
-(
+| Lt(Id(x), AExp(y)) -> (
   (Stack.push (ExpOc(OPLT)) controlStack);
   (Stack.push (Statement(Exp(AExp(y)))) controlStack);
   (Stack.push (Statement(Exp(Id(x)))) controlStack);
 );
-| Lt(Id(x), Id(y)) ->
-(
+| Lt(Id(x), Id(y)) -> (
   (Stack.push (ExpOc(OPLT)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
   (Stack.push (Statement(Exp(Id(x)))) controlStack);
 );
+| Lt( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPLT)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Lt(ValRef(Id(x)), AExp(y)) ->  (
+  (Stack.push (ExpOc(OPLT)) controlStack);
+  (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Lt( AExp(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPLT)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+);
+| Lt(ValRef(Id(x)), Id(y)) ->  (
+  (Stack.push (ExpOc(OPLT)) controlStack);
+  (Stack.push (Statement(Exp(Id(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Lt( Id(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPLT)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(Id(x)))) controlStack);
+); 
+| Lt(_, _) -> raise (AutomatonException "Error on Lt"); 
+
 ```
 
 Ao ler o #LT, fazemos um pop na pilha de valores para ler o valor Num(N1) e verificamos se ele é do tipo inteiro. Depois fazemos outro POP para ler o valor Num(N2) e verificamos se este também é do tipo inteiro. Caso não sejam, cairemmos em uma Exception. Depois verificamos se N2 < N1, retornando True ou False. 
@@ -666,30 +883,52 @@ Quando lê-se o Le(E1, E2), devemos antes verificar a qual tipo pertencem os doi
 Para cada um desses casos, agimos da mesma forma: colocamos primeiro o opcode #LE, depois o E2 e por fim o E1 na pilha de controle.
 
 ```
-Le(AExp(x), AExp(y)) -> 
-(
+| Le(AExp(x), AExp(y)) -> (
   (Stack.push (ExpOc(OPLE)) controlStack);
   (Stack.push (Statement(Exp(AExp(y)))) controlStack);
   (Stack.push (Statement(Exp(AExp(x)))) controlStack);
 );
-| Le(AExp(x), Id(y)) -> 
-(
+| Le(AExp(x), Id(y)) -> (
   (Stack.push (ExpOc(OPLE)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
-  (Stack.push (Statement(Exp(AExp(x)))) controlStack); 
+  (Stack.push (Statement(Exp(AExp(x)))) controlStack);
 );
-| Le(Id(x), AExp(y)) -> 
-(
+| Le(Id(x), AExp(y)) -> (
   (Stack.push (ExpOc(OPLE)) controlStack);
   (Stack.push (Statement(Exp(AExp(y)))) controlStack);
   (Stack.push (Statement(Exp(Id(x)))) controlStack);
 );
-| Le(Id(x), Id(y)) -> 
-(
+| Le(Id(x), Id(y)) -> (
   (Stack.push (ExpOc(OPLE)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
   (Stack.push (Statement(Exp(Id(x)))) controlStack);
 );
+| Le( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPLE)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Le(ValRef(Id(x)), AExp(y)) ->  (
+  (Stack.push (ExpOc(OPLE)) controlStack);
+  (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Le( AExp(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPLE)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+);
+| Le(ValRef(Id(x)), Id(y)) ->  (
+  (Stack.push (ExpOc(OPLE)) controlStack);
+  (Stack.push (Statement(Exp(Id(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Le( Id(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPLE)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(Id(x)))) controlStack);
+);
+| Le(_, _) -> raise (AutomatonException "Error on Le");
 ```
 
 Ao ler o #LE, fazemos um pop na pilha de valores para ler o valor Num(N1) e verificamos se ele é do tipo inteiro. Depois fazemos outro POP para ler o valor Num(N2) e verificamos se este também é do tipo inteiro. Caso não sejam, cairemmos em uma Exception. Depois verificamos se N2 <= N1, retornando True ou False. 
@@ -726,30 +965,52 @@ Para cada um desses casos, agimos da mesma forma: colocamos primeiro o opcode #G
 ```
 
 ```
-Gt(AExp(x), AExp(y)) -> 
-(
+| Gt(AExp(x), AExp(y)) -> (
   (Stack.push (ExpOc(OPGT)) controlStack);
   (Stack.push (Statement(Exp(AExp(y)))) controlStack);
   (Stack.push (Statement(Exp(AExp(x)))) controlStack);
 );
-| Gt(AExp(x), Id(y)) -> 
-(
+| Gt(AExp(x), Id(y)) -> (
   (Stack.push (ExpOc(OPGT)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
-  (Stack.push (Statement(Exp(AExp(x)))) controlStack);                
+  (Stack.push (Statement(Exp(AExp(x)))) controlStack);
 );
-| Gt(Id(x), AExp(y)) -> 
-(
+| Gt(Id(x), AExp(y)) -> (
   (Stack.push (ExpOc(OPGT)) controlStack);
   (Stack.push (Statement(Exp(AExp(y)))) controlStack);
-  (Stack.push (Statement(Exp(Id(x)))) controlStack);                
+  (Stack.push (Statement(Exp(Id(x)))) controlStack);
 );
-| Gt(Id(x), Id(y)) -> 
-(
+| Gt(Id(x), Id(y)) -> (
   (Stack.push (ExpOc(OPGT)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
-  (Stack.push (Statement(Exp(Id(x)))) controlStack);                
+  (Stack.push (Statement(Exp(Id(x)))) controlStack);
 );
+| Gt( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPGT)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Gt(ValRef(Id(x)), AExp(y)) ->  (
+  (Stack.push (ExpOc(OPGT)) controlStack);
+  (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Gt( AExp(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPGT)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+);
+| Gt(ValRef(Id(x)), Id(y)) ->  (
+  (Stack.push (ExpOc(OPGT)) controlStack);
+  (Stack.push (Statement(Exp(Id(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Gt( Id(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPGT)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(Id(x)))) controlStack);
+);
+| Gt(_, _) -> raise (AutomatonException "Error on Gt");
 ```
 
 Ao ler o #GT, fazemos um pop na pilha de valores para ler o valor Num(N1) e verificamos se ele é do tipo inteiro. Depois fazemos outro POP para ler o valor Num(N2) e verificamos se este também é do tipo inteiro. Caso não sejam, cairemmos em uma Exception. Depois verificamos se N2 > N1, retornando True ou False. 
@@ -786,30 +1047,52 @@ Para cada um desses casos, agimos da mesma forma: colocamos primeiro o opcode #G
 ```
 
 ```
-Ge(AExp(x), AExp(y)) -> 
-(
+| Ge(AExp(x), AExp(y)) -> (
   (Stack.push (ExpOc(OPGE)) controlStack);
   (Stack.push (Statement(Exp(AExp(y)))) controlStack);
   (Stack.push (Statement(Exp(AExp(x)))) controlStack);
 );
-| Ge(AExp(x), Id(y)) -> 
-(
+| Ge(AExp(x), Id(y)) -> (
   (Stack.push (ExpOc(OPGE)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
-  (Stack.push (Statement(Exp(AExp(x)))) controlStack);                
+  (Stack.push (Statement(Exp(AExp(x)))) controlStack);
 );
-| Ge(Id(x), AExp(y)) -> 
-(
+| Ge(Id(x), AExp(y)) -> (
   (Stack.push (ExpOc(OPGE)) controlStack);
   (Stack.push (Statement(Exp(AExp(y)))) controlStack);
-  (Stack.push (Statement(Exp(Id(x)))) controlStack);                
+  (Stack.push (Statement(Exp(Id(x)))) controlStack);
 );
-| Ge(Id(x), Id(y)) -> 
-(
+| Ge(Id(x), Id(y)) -> (
   (Stack.push (ExpOc(OPGE)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
-  (Stack.push (Statement(Exp(Id(x)))) controlStack);                
+  (Stack.push (Statement(Exp(Id(x)))) controlStack);
 );
+| Ge( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPGE)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Ge(ValRef(Id(x)), AExp(y)) ->  (
+  (Stack.push (ExpOc(OPGE)) controlStack);
+  (Stack.push (Statement(Exp(AExp(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Ge( AExp(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPGE)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(AExp(x)))) controlStack);
+);
+| Ge(ValRef(Id(x)), Id(y)) ->  (
+  (Stack.push (ExpOc(OPGE)) controlStack);
+  (Stack.push (Statement(Exp(Id(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Ge( Id(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPGE)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(Id(x)))) controlStack);
+);
+| Ge(_, _) -> raise (AutomatonException "Error on Ge");
 ```
 
 Ao ler o #GE, fazemos um pop na pilha de valores para ler o valor Num(N1) e verificamos se ele é do tipo inteiro. Depois fazemos outro POP para ler o valor Num(N2) e verificamos se este também é do tipo inteiro. Caso não sejam, cairemmos em uma Exception. Depois verificamos se N2 >= N1, retornando True ou False. 
@@ -845,30 +1128,56 @@ Para cada um desses casos, agimos da mesma forma: colocamos primeiro o opcode #A
 ```
 
 ```
-And(BExp(x), BExp(y)) -> 
-(
+| And(BExp(x), BExp(y)) -> (
   (Stack.push (ExpOc(OPAND)) controlStack);
   (Stack.push (Statement(Exp(BExp(y)))) controlStack);
   (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+
 );
-| And(BExp(x), Id(y)) -> 
-(
+| And(BExp(x), Id(y)) -> (
   (Stack.push (ExpOc(OPAND)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
   (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+
 );
-| And(Id(x), BExp(y)) -> 
-(
+| And(Id(x), BExp(y)) -> (
   (Stack.push (ExpOc(OPAND)) controlStack);
   (Stack.push (Statement(Exp(BExp(y)))) controlStack);
   (Stack.push (Statement(Exp(Id(x)))) controlStack);
+
 );
-| And(Id(x), Id(y)) -> 
-(
+| And(Id(x), Id(y)) -> (
   (Stack.push (ExpOc(OPAND)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
   (Stack.push (Statement(Exp(Id(x)))) controlStack);
+
 );
+| And( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPAND)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| And (ValRef(Id(x)), BExp(y)) ->  (
+  (Stack.push (ExpOc(OPAND)) controlStack);
+  (Stack.push (Statement(Exp(BExp(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| And ( BExp(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPAND)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+);
+| And (ValRef(Id(x)), Id(y)) ->  (
+  (Stack.push (ExpOc(OPAND)) controlStack);
+  (Stack.push (Statement(Exp(Id(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| And ( Id(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPAND)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(Id(x)))) controlStack);
+);
+| And(_, _) -> raise (AutomatonException "Error on And");
 ```
 
 Ao ler o #AND, fazemos um pop na pilha de valores para ler o valor Boo(B1) e verificamos se ele é do tipo booleano. Depois fazemos outro POP para ler o valor Boo(B2) e verificamos se este também é do tipo booleano. Caso não sejam, cairemmos em uma Exception. Depois resolvemos a operação lógica (B1 and B2), retornando True ou False. 
@@ -906,30 +1215,52 @@ Para cada um desses casos, agimos da mesma forma: colocamos primeiro o opcode #A
 ```
 
 ```
-Or(BExp(x), BExp(y)) -> 
-(
+| Or(BExp(x), BExp(y)) -> (
   (Stack.push (ExpOc(OPOR)) controlStack);
   (Stack.push (Statement(Exp(BExp(y)))) controlStack);
   (Stack.push (Statement(Exp(BExp(x)))) controlStack);
 );
-| Or(BExp(x), Id(y)) -> 
-(
+| Or(BExp(x), Id(y)) -> (
   (Stack.push (ExpOc(OPOR)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
   (Stack.push (Statement(Exp(BExp(x)))) controlStack);
 );
-| Or(Id(x), BExp(y)) -> 
-(
+| Or(Id(x), BExp(y)) -> (
   (Stack.push (ExpOc(OPOR)) controlStack);
   (Stack.push (Statement(Exp(BExp(y)))) controlStack);
   (Stack.push (Statement(Exp(Id(x)))) controlStack);
 );
-| Or(Id(x), Id(y)) -> 
-(
+| Or(Id(x), Id(y)) -> (
   (Stack.push (ExpOc(OPOR)) controlStack);
   (Stack.push (Statement(Exp(Id(y)))) controlStack);
   (Stack.push (Statement(Exp(Id(x)))) controlStack);
 );
+| Or( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPOR)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Or (ValRef(Id(x)), BExp(y)) ->  (
+  (Stack.push (ExpOc(OPOR)) controlStack);
+  (Stack.push (Statement(Exp(BExp(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Or ( BExp(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPOR)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(BExp(x)))) controlStack);
+);
+| Or (ValRef(Id(x)), Id(y)) ->  (
+  (Stack.push (ExpOc(OPOR)) controlStack);
+  (Stack.push (Statement(Exp(Id(y)))) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Or ( Id(x), ValRef(Id(y)) ) ->  (
+  (Stack.push (ExpOc(OPOR)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
+  (Stack.push (Statement(Exp(Id(x)))) controlStack);
+);
+| Or(_, _) -> raise (AutomatonException "Error on Or");
 ```
 
 Ao ler o #OR, fazemos um pop na pilha de valores para ler o valor Boo(B1) e verificamos se ele é do tipo booleano. Depois fazemos outro POP para ler o valor Boo(B2) e verificamos se este também é do tipo booleano. Caso não sejam, cairemmos em uma Exception. Depois resolvemos a opração lógica (B1 or B2), retornando True ou False. 
@@ -964,16 +1295,19 @@ Quando lê-se o Not(E), empilhamos primeiro o opcode #NOT, depois a expressão E
 ```
 
 ```
-Not(BExp(x)) -> 
-(
+| Not(BExp(x)) -> (
   (Stack.push (ExpOc(OPNOT)) controlStack);
-  (Stack.push (Statement(Exp(BExp(x)))) controlStack); 
+  (Stack.push (Statement(Exp(BExp(x)))) controlStack);
 );
-| Not(Id(x)) -> 
-(
+| Not(Id(x)) -> (
   (Stack.push (ExpOc(OPNOT)) controlStack);
   (Stack.push (Statement(Exp(Id(x)))) controlStack);
 );
+| Not (ValRef(Id(x))) -> (
+  (Stack.push (ExpOc(OPNOT)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
+);
+| Not( _) -> raise (AutomatonException "Error on Not");
 ```
 
 Ao ler o #NOT, fazemos um pop na pilha de valores para ler o valor Boo(B). Independente do valor avaliado, sempre o colocaremos na pilha de valores o inverso. Por exemplo, se temos Boo(True), colocaremos na pilha de valores o valor False. E vice-versa.
@@ -1038,15 +1372,14 @@ Ao ler o #ASSIGN, fazemos um pop na pilha de valores para ler o valor a ser atua
 ```
 
 ```
-OPASSIGN -> 
-(
+| OPASSIGN -> (
   let value = (Stack.pop valueStack) in
     let id = (Stack.pop valueStack) in 
       match id with 
       | Str(x) -> (
         let env = (Hashtbl.find environment x ) in
           match env with 
-          | Loc(l) -> (
+          | Loc(Location(l)) -> (
             match value with
             | Int(i) -> (
               (Hashtbl.replace memory l (Integer(i)));
@@ -1054,15 +1387,19 @@ OPASSIGN ->
             | Bool(b) -> (
               (Hashtbl.replace memory l (Boolean(b)));
             );
+            | Bind(b) -> (
+              (Hashtbl.replace memory l (Pointer(b)));
+            );
             | _ -> raise (AutomatonException "Error on #ASSIGN")
-            
+          ); 
+          | IntConst(i) -> (
+            raise (AutomatonException "Error on #ASSIGN. Cannot change constant value.")
+          ); 
+          | BoolConst(b) -> (
+            raise (AutomatonException "Error on #ASSIGN. Cannot change constant value.")
           );
-          | Value(v) -> (
-
-          );
-          
       );
-      | _ -> raise (AutomatonException "Error on #ASSIGN")
+      | _ ->  raise (AutomatonException "Error on #ASSIGN.")
 );
 ```
 
@@ -1084,6 +1421,11 @@ Loop( BExp(x), y) ->
   (Stack.push (CmdOc(OPLOOP)) controlStack);
   (Stack.push (Statement(Exp(Id(x)))) controlStack );
   (Stack.push (Control(Statement(Cmd(Loop(Id(x), y))))) valueStack );
+);
+| Loop(ValRef(Id(x)), y) -> (
+  (Stack.push (CmdOc(OPLOOP)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack );
+  (Stack.push (LoopValue(Loop(ValRef(Id(x)), y))) valueStack ); 
 );
 ```
 
@@ -1123,17 +1465,21 @@ Quando lê-se o Cond(X, M1, M2), empilhamos o opcode #COND e a expressão X na p
 ```
 
 ```
-Cond(BExp(x), y, z) -> 
-(
+Cond(BExp(x), y, z) -> (
   (Stack.push (CmdOc(OPCOND)) controlStack);
   (Stack.push (Statement(Exp(BExp(x)))) controlStack );
   (Stack.push (Control(Statement(Cmd(Cond(BExp(x), y, z))))) valueStack );
 );
-| Cond(Id(x), y, z) -> 
-(
+| Cond(Id(x), y, z) -> (
   (Stack.push (CmdOc(OPCOND)) controlStack);
   (Stack.push (Statement(Exp(Id(x)))) controlStack );
   (Stack.push (Control(Statement(Cmd(Cond(Id(x), y, z))))) valueStack );
+);
+| Cond(ValRef(Id(x)), y, z) -> (
+  (Stack.push (CmdOc(OPCOND)) controlStack);
+  (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack );
+  (Stack.push (CondValue(Cond(ValRef(Id(x)), y, z))) valueStack );
+
 );
 ```
 
@@ -1202,6 +1548,271 @@ and memory = (Hashtbl.create 10) in
 
 ```
 
+```
+𝛅(DeRef(Id(W)) :: C, V, E, S, L) = 𝛅(C, l :: V, E, S, L), where l = E[W]
+
+```
+```
+| DeRef(ref) -> (
+  match ref with
+  | Id(id) -> (
+    let key = Hashtbl.find environment id  in
+      match key with 
+      | Loc(x) -> (
+        (Stack.push (Bind(x)) valueStack );
+      );
+      |IntConst(x) -> (
+        raise (AutomatonException "Error on DeRef nao pode acessar endereco de constante - int ");
+      );
+      |BoolConst(x) -> (
+        raise (AutomatonException "Error on DeRef nao pode acessar endereco de constante - bool");
+      );
+  );
+  | _ -> raise (AutomatonException "Error on DeRef 666");
+);
+```
+
+```
+𝛅(ValRef(Id(W)) :: C, V, E, S, L) = 𝛅(C, T :: V, E, S, L), where T = S[S[E[W]]]
+```
+
+```
+| ValRef(ref) -> (
+  match ref with
+  | Id(id) -> (
+    let key = Hashtbl.find environment id  in
+    match key with 
+      | Loc(Location(x1)) -> (
+        let value1 = Hashtbl.find memory x1  in
+          match value1 with
+          | Pointer(Location(x3)) -> (
+              let value2 = Hashtbl.find memory x3  in
+              match value2 with
+              | Integer(x4) ->   (Stack.push (Int(x4)) valueStack);
+              | Boolean(x4) ->  (Stack.push (Bool(x4)) valueStack);
+              | Pointer(x4) -> (Stack.push (Bind(x4)) valueStack);
+            );
+          | Integer(cte) -> (
+              (Stack.push (Int(cte)) valueStack);
+          );
+          | Boolean(cte) -> (
+            (Stack.push (Bool(cte)) valueStack);
+          ); 
+      );
+      | _ ->   raise (AutomatonException "Error on ValRef2");
+  );
+  | _ ->   raise (AutomatonException "Error on ValRef3");
+);
+```
+
+```
+𝛅(Ref(X) :: C, V, E, S, L) = 𝛅(X :: #REF :: C, V, E, S, L)`
+```
+```
+| Ref(ref)-> (
+  (Stack.push (DecOc(OPREF)) controlStack);
+  (Stack.push (Statement(Exp(ref))) controlStack);
+);
+```
+
+```
+𝛅(#REF :: C, T :: V, E, S, L) = 𝛅(C, l :: V, E, S', L'), where S' = S ∪ [l ↦ T], l ∉ S, L' = L ∪ {l}
+```
+```
+| OPREF -> (
+  let loc = (List.length !trace) in
+  let value = (Stack.pop valueStack) in
+  (Stack.push (Bind((Location(loc)))) valueStack);
+  locations := (!locations)@[loc];
+  match value with
+  | Int(x) -> (
+    (Hashtbl.add  memory loc (Integer(x)));
+  );
+  | Bool(x) -> (
+    (Hashtbl.add  memory (loc) (Boolean(x)));
+  );
+  | Bind(x) -> (
+    (Hashtbl.add  memory (loc) (Pointer(x)));
+  );
+  | _  -> raise (AutomatonException "Error on #REF" );
+);
+```
+
+```
+```
+
+```
+| Dec (dec) -> (
+  match dec with 
+  | Bind(Id(x), y) -> (
+    (Stack.push (DecOc(OPBIND)) controlStack );
+    (Stack.push (Statement(Exp(y))) controlStack );
+    (Stack.push (Str(x)) valueStack);
+  );
+  | Bind(_, _) -> (
+    raise (AutomatonException "Error on Bind" );
+  );
+  | DSeq(x, y) -> (
+  (Stack.push (Statement(Dec(y))) controlStack);
+  (Stack.push (Statement(Dec(x))) controlStack);
+ );
+);
+```
+
+```
+𝛅(DSeq(D₁, D₂), X) :: C, V, E, S, L) = 𝛅(D₁ :: D₂ :: C, V, E, S, L)
+```
+```
+| DSeq(x, y) -> (
+  (Stack.push (Statement(Dec(y))) controlStack);
+  (Stack.push (Statement(Dec(x))) controlStack);
+);
+```
+
+```
+𝛅(Bind(Id(W), X) :: C, V, E, S, L) = 𝛅(X :: #BIND :: C, W :: V, E, S, L)
+```
+
+```
+| Bind(Id(x), y) -> (
+  (Stack.push (DecOc(OPBIND)) controlStack );
+  (Stack.push (Statement(Exp(y))) controlStack );
+  (Stack.push (Str(x)) valueStack);
+);
+| Bind(_, _) -> (
+  raise (AutomatonException "Error on Bind" );
+);
+```
+
+```
+𝛅(#BIND :: C, B :: W :: E' :: V, E, S, L) = 𝛅(C, ({W ↦ B} ∪ E') :: V, E, S, L), where E' ∈ Env,
+𝛅(#BIND :: C, B :: W :: H :: V, E, S, L) = 𝛅(C, {W ↦ B} :: H :: V, E, S, L), where H ∉ Env,
+```
+
+```
+| OPBIND -> (
+  let l = (Stack.pop valueStack) in
+    let id = (Stack.pop valueStack) in
+      match id with
+      | Str(st) ->(
+        match l with
+          | Bind(y) -> (             
+            let possibleEnv = (Stack.top valueStack) in
+            match possibleEnv with
+            | Env(x) -> (
+              let env = (Stack.pop valueStack) in
+              match env with 
+              | Env(e) -> (
+                let newEnv = (Hashtbl.copy e) in
+                (Hashtbl.add newEnv st (Loc(y)) );
+                (Stack.push (Env(newEnv)) valueStack );
+              );
+              | _  -> raise (AutomatonException "Error on #BIND1" );
+            );
+            | _ -> (
+              let newEnv = (Hashtbl.create 3) in
+                (Hashtbl.add newEnv st (Loc(y)));
+                (Stack.push (Env(newEnv)) valueStack );
+            );
+          );
+          | Bool(b) -> (
+            match (Stack.top valueStack) with
+            |Env(x) -> (  
+                if not(Hashtbl.mem x st) then 
+                  let currentEnv = (Stack.pop valueStack) in
+                    match currentEnv with
+                    |Env(cEnv) -> (
+                        (Hashtbl.add cEnv st (BoolConst(b)) );
+                        (Stack.push (Env(cEnv)) valueStack);
+                    );
+                    | _ -> raise (AutomatonException "Error on #BIND Boolconst(b)" );
+            );
+            | _ -> (
+                let newEnv = (Hashtbl.create 3) in
+                (Hashtbl.add newEnv st (BoolConst(b)));
+                (Stack.push (Env(newEnv)) valueStack )
+            );
+          );
+          | Int(i) -> (
+            match (Stack.top valueStack) with
+            |Env(x) -> (
+                  if not(Hashtbl.mem x st) then   
+                    let currentEnv = (Stack.pop valueStack) in
+                      match currentEnv with
+                      |Env(cEnv) -> (
+                         (Hashtbl.add cEnv st (IntConst(i)) );
+                          (Stack.push (Env(cEnv)) valueStack);
+                      );
+                      | _ -> raise (AutomatonException "Error on #BIND const(i)" );
+            ); 
+            | _ -> (
+                let newEnv = (Hashtbl.create 3) in
+                (Hashtbl.add newEnv st (IntConst(i)));
+                (Stack.push (Env(newEnv)) valueStack )
+            );
+          );
+          | _ -> raise (AutomatonException "Error on #BIND2" );
+      );
+      | _ -> raise (AutomatonException "Error on #BIND" );
+  );
+```
+
+
+```
+𝛅(Blk(D, M) :: C, V, E, S, L) = 𝛅(D :: #BLKDEC :: M :: #BLKCMD :: C, L :: V, E, S, ∅)
+```
+
+```
+| Blk(x, y) -> (
+  (Stack.push (DecOc(OPBLKCMD)) controlStack);
+  (Stack.push (Statement(Cmd(y))) controlStack);
+  (Stack.push (DecOc(OPBLKDEC)) controlStack);
+  (Stack.push (Statement(Dec(x))) controlStack);
+  (Stack.push (Locations(!locations)) valueStack);
+  locations := [] ;
+);
+```
+
+```
+𝛅(#BLKDEC :: C, E' :: V, E, S, L) = 𝛅(C, E :: V, E / E', S, L)
+```
+```
+| OPBLKDEC -> (
+  let ass = (Stack.pop valueStack) in
+    let env = Hashtbl.copy environment in
+      match ass with
+        | Env(e) -> (
+          (Stack.push (Env(env)) valueStack);
+          (Hashtbl.iter (  fun key value -> if not(Hashtbl.mem environment key ) then 
+                                                (Hashtbl.add environment key value) 
+                                            else (Hashtbl.replace environment key value) ) e);
+        );
+        | _ -> raise (AutomatonException "Error on #BLKDEC" );
+);
+
+```
+```
+𝛅(#BLKCMD :: C, E :: L :: V, E', S, L') = 𝛅(C, V, E, S', L), where S' = S / L'.
+```
+```
+| OPBLKCMD -> (
+  let env = (Stack.pop valueStack) in
+    let locs = (Stack.pop valueStack) in
+      match locs with
+        | Locations(x) -> (
+          match env with
+            | Env(y) -> (
+              (Hashtbl.clear environment);
+              (Hashtbl.add_seq environment (Hashtbl.to_seq y));
+              (Hashtbl.iter (  fun key value -> if (List.mem key !locations) then 
+                                              (Hashtbl.remove memory key) ) memory );
+              locations := x; 
+              );
+            | _ -> raise (AutomatonException "Error on #BLKCMD" );
+        );
+        | _ -> raise (AutomatonException "Error on #BLKCMD" );
+);
+ ```
 
 
 
