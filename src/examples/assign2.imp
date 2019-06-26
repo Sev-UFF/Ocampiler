@@ -1,3 +1,5 @@
+# Teste de alinhamentos com blocos e verificando blockcmd
+
 let var x = 0, var z = 0 in   # x-> x1 , x1 -> 0 | z -> z1 , z1-> 0
    z := 77                    # z -> z1 , z1 -> 77
    let var x = 11  in         # x -> x2 , x2-> 11

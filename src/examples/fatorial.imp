@@ -1,6 +1,8 @@
-let var z = 1,  var y = 4 in 
-        while not (y == 0) do 
-            z := z * y
-            y := y - 1
+#Calcula fatorial de um número n
+
+let var fat = 1,  var n = 4 in 
+        while not (n == 0) do 
+            fat := fat * n
+            n := n - 1
         end
 end

@@ -89,7 +89,7 @@ let rec delta controlStack valueStack environment memory locations =
                 (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
               );
-              | Sum(_, _) -> raise (AutomatonException "Error on Sum - |aexp"); 
+              | Sum(_, _) -> raise (AutomatonException "Error on Sum AEXP"); 
               | Sub(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPSUB)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
@@ -99,8 +99,7 @@ let rec delta controlStack valueStack environment memory locations =
               | Sub(Id(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPSUB)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
-                (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);    
               ); 
               | Sub(AExp(x), Id(y)) ->  (
                 (Stack.push (ExpOc(OPSUB)) controlStack);
@@ -111,8 +110,7 @@ let rec delta controlStack valueStack environment memory locations =
               | Sub(Id(x), Id(y)) ->  (
                 (Stack.push (ExpOc(OPSUB)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
-                (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);      
               );
               | Sub( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
                 (Stack.push (ExpOc(OPSUB)) controlStack);
@@ -149,14 +147,12 @@ let rec delta controlStack valueStack environment memory locations =
               | Mul(Id(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPMUL)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
-                (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
+                (Stack.push (Statement(Exp(Id(x)))) controlStack);              
               ); 
               | Mul(AExp(x), Id(y)) ->  (
                 (Stack.push (ExpOc(OPMUL)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
               ); 
               | Mul(Id(x), Id(y)) ->  (
                 (Stack.push (ExpOc(OPMUL)) controlStack);
@@ -194,25 +190,21 @@ let rec delta controlStack valueStack environment memory locations =
                 (Stack.push (ExpOc(OPDIV)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
               );
               | Div(Id(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPDIV)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               ); 
               | Div(AExp(x), Id(y)) ->  (
                 (Stack.push (ExpOc(OPDIV)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
               ); 
               | Div(Id(x), Id(y)) ->  (
                 (Stack.push (ExpOc(OPDIV)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
               | Div( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
                 (Stack.push (ExpOc(OPDIV)) controlStack);
@@ -250,110 +242,92 @@ let rec delta controlStack valueStack environment memory locations =
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(BExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(BExp(x)))) controlStack);
-                
               );
               | Eq(BExp(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(BExp(x)))) controlStack);
-                
               );
               | Eq(Id(x), BExp(y)) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(BExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
               | Eq(Id(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
               | Eq(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
               );
               | Eq(AExp(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
               );
               | Eq(Id(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
               | Eq(BExp(x), ValRef(Id(y)) )  -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
                 (Stack.push (Statement(Exp(BExp(x)))) controlStack);
-                
               );
               | Eq( ValRef(Id(x)), BExp(y)) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(BExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
-                
               );
               | Eq(ValRef(Id(x)), ValRef(Id(y))) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
                 (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
-                
               );
               | Eq(AExp(x), ValRef(Id(y))) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
               );
               | Eq(ValRef(Id(x)), AExp(y)) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
-                
               );
               | Eq(Id(x), ValRef(Id(y))) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(ValRef(Id(y))))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
               | Eq(ValRef(Id(x)), Id(y)) -> (
                 (Stack.push (ExpOc(OPEQ)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
-                
               );
               | Eq(_, _) -> raise (AutomatonException "Error on Eq"); 
               | Lt(AExp(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPLT)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
               );
               | Lt(AExp(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPLT)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
               );
               | Lt(Id(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPLT)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
               | Lt(Id(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPLT)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
               | Lt( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
                 (Stack.push (ExpOc(OPLT)) controlStack);
@@ -385,25 +359,21 @@ let rec delta controlStack valueStack environment memory locations =
                 (Stack.push (ExpOc(OPLE)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
               );
               | Le(AExp(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPLE)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
               );
               | Le(Id(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPLE)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
               | Le(Id(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPLE)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
               | Le( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
                 (Stack.push (ExpOc(OPLE)) controlStack);
@@ -435,25 +405,21 @@ let rec delta controlStack valueStack environment memory locations =
                 (Stack.push (ExpOc(OPGT)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
               );
               | Gt(AExp(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPGT)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
               );
               | Gt(Id(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPGT)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
               | Gt(Id(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPGT)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
               | Gt( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
                 (Stack.push (ExpOc(OPGT)) controlStack);
@@ -485,25 +451,21 @@ let rec delta controlStack valueStack environment memory locations =
                 (Stack.push (ExpOc(OPGE)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
               );
               | Ge(AExp(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPGE)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(AExp(x)))) controlStack);
-                
               );
               | Ge(Id(x), AExp(y)) -> (
                 (Stack.push (ExpOc(OPGE)) controlStack);
                 (Stack.push (Statement(Exp(AExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
               | Ge(Id(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPGE)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
               | Ge( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
                 (Stack.push (ExpOc(OPGE)) controlStack);
@@ -535,25 +497,21 @@ let rec delta controlStack valueStack environment memory locations =
                 (Stack.push (ExpOc(OPAND)) controlStack);
                 (Stack.push (Statement(Exp(BExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(BExp(x)))) controlStack);
-                
               );
               | And(BExp(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPAND)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(BExp(x)))) controlStack);
-                
               );
               | And(Id(x), BExp(y)) -> (
                 (Stack.push (ExpOc(OPAND)) controlStack);
                 (Stack.push (Statement(Exp(BExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
               | And(Id(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPAND)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
               | And( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
                 (Stack.push (ExpOc(OPAND)) controlStack);
@@ -585,25 +543,21 @@ let rec delta controlStack valueStack environment memory locations =
                 (Stack.push (ExpOc(OPOR)) controlStack);
                 (Stack.push (Statement(Exp(BExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(BExp(x)))) controlStack);
-                
               );
               | Or(BExp(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPOR)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(BExp(x)))) controlStack);
-                
               );
               | Or(Id(x), BExp(y)) -> (
                 (Stack.push (ExpOc(OPOR)) controlStack);
                 (Stack.push (Statement(Exp(BExp(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
               | Or(Id(x), Id(y)) -> (
                 (Stack.push (ExpOc(OPOR)) controlStack);
                 (Stack.push (Statement(Exp(Id(y)))) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
               | Or( ValRef(Id(x)), ValRef(Id(y)) ) ->  (
                 (Stack.push (ExpOc(OPOR)) controlStack);
@@ -634,19 +588,16 @@ let rec delta controlStack valueStack environment memory locations =
               | Not(BExp(x)) -> (
                 (Stack.push (ExpOc(OPNOT)) controlStack);
                 (Stack.push (Statement(Exp(BExp(x)))) controlStack);
-                
               );
               | Not(Id(x)) -> (
                 (Stack.push (ExpOc(OPNOT)) controlStack);
                 (Stack.push (Statement(Exp(Id(x)))) controlStack);
-                
               );
               | Not (ValRef(Id(x))) -> (
                 (Stack.push (ExpOc(OPNOT)) controlStack);
                 (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack);
               );
-              | Not( _) -> raise (AutomatonException "Error on Not");
-              
+              | Not( _) -> raise (AutomatonException "Error on Not");  
             );   
             | Ref(ref)-> (
               (Stack.push (DecOc(OPREF)) controlStack);
@@ -666,7 +617,6 @@ let rec delta controlStack valueStack environment memory locations =
                   |BoolConst(x) -> (
                     raise (AutomatonException "Error on DeRef nao pode acessar endereco de constante - bool");
                   );
-                  
               );
               | _ -> raise (AutomatonException "Error on DeRef 666");
             );
@@ -695,7 +645,6 @@ let rec delta controlStack valueStack environment memory locations =
                   | _ ->   raise (AutomatonException "Error on ValRef2");
               );
               | _ ->   raise (AutomatonException "Error on ValRef3");
-
             );
           );
         | Cmd(cmd) -> (
@@ -719,32 +668,27 @@ let rec delta controlStack valueStack environment memory locations =
           | CSeq(x, y) -> (
             (Stack.push (Statement(Cmd(y))) controlStack );
             (Stack.push (Statement(Cmd(x))) controlStack );
-            
           );
           | Assign(Id(x), y) -> (
              (Stack.push (CmdOc(OPASSIGN)) controlStack );
              (Stack.push (Statement(Exp(y))) controlStack );
              (Stack.push (Str(x)) valueStack);
-             
           );
           | Assign(_, _) -> raise (AutomatonException "Error on Assign");
           | Cond(BExp(x), y, z) -> (
             (Stack.push (CmdOc(OPCOND)) controlStack);
             (Stack.push (Statement(Exp(BExp(x)))) controlStack );
             (Stack.push (CondValue(Cond(BExp(x), y, z))) valueStack );
-            
           );
           | Cond(Id(x), y, z) -> (
             (Stack.push (CmdOc(OPCOND)) controlStack);
             (Stack.push (Statement(Exp(Id(x)))) controlStack );
             (Stack.push (CondValue(Cond(Id(x), y, z))) valueStack );
-            
           );
           | Cond(ValRef(Id(x)), y, z) -> (
             (Stack.push (CmdOc(OPCOND)) controlStack);
             (Stack.push (Statement(Exp(ValRef(Id(x))))) controlStack );
             (Stack.push (CondValue(Cond(ValRef(Id(x)), y, z))) valueStack );
-            
           );
           | Cond(_, _, _) -> raise (AutomatonException "Error on Cond");
           | Blk(x, y) -> (
@@ -783,13 +727,12 @@ let rec delta controlStack valueStack environment memory locations =
                 match y with
                   | Int(j) -> (
                     (Stack.push (Int(i + j)) valueStack);
-                    
                   );
-                  | _ -> raise (AutomatonException "Error on #SUM 770");
+                  | _ -> raise (AutomatonException "Error on #SUM 731");
               );
-              | _ -> raise (AutomatonException "Error on #SUM 772");
+              | _ -> raise (AutomatonException "Error on #SUM 733");
             );
-          
+
         | OPMUL -> (
           let x = (Stack.pop valueStack) in
             match x with
@@ -797,14 +740,13 @@ let rec delta controlStack valueStack environment memory locations =
                 let y = (Stack.pop valueStack) in
                 match y with
                   | Int(j) -> (
-                    (Stack.push (Int(i * j)) valueStack);
-                    
+                    (Stack.push (Int(i * j)) valueStack);      
                   );
                   | _ -> raise (AutomatonException "Error on #MUL");
               );
               | _ -> raise (AutomatonException "Error on #MUL");
             );
-          
+
         | OPDIV -> (
           let x = (Stack.pop valueStack) in
             match x with
@@ -815,14 +757,13 @@ let rec delta controlStack valueStack environment memory locations =
                   let y = (Stack.pop valueStack) in
                 match y with
                   | Int(j) -> (
-                    (Stack.push (Int(j / i)) valueStack);
-                    
+                    (Stack.push (Int(j / i)) valueStack);      
                   )
                   | _ -> raise (AutomatonException "Error on #DIV");
               );
               | _ -> raise (AutomatonException "Error on #DIV");
             );
-          
+
         | OPSUB -> (
           let x = (Stack.pop valueStack) in
             match x with
@@ -831,12 +772,12 @@ let rec delta controlStack valueStack environment memory locations =
                 match y with
                   | Int(j) -> (
                     (Stack.push (Int(j - i)) valueStack);
-                    
                   );
                   | _ -> raise (AutomatonException "Error on #SUB");
               );
               | _ -> raise (AutomatonException "Error on #SUB");
             );
+
         | OPEQ -> (
           let x = (Stack.pop valueStack) in
             match x with
@@ -845,7 +786,6 @@ let rec delta controlStack valueStack environment memory locations =
                 match y with
                   | Bool(j) -> (
                     (Stack.push (Bool(i == j)) valueStack);
-                    
                   );
                   | _ -> raise (AutomatonException "Error on #EQ");
               );
@@ -854,12 +794,12 @@ let rec delta controlStack valueStack environment memory locations =
                 match y with
                   | Int(j) -> (
                     (Stack.push ( Bool ( i == j)) valueStack);
-                    
                   );
                   | _ -> raise (AutomatonException "Error on #EQ");
               );
               | _ -> raise (AutomatonException "Error on #EQ");
             );
+
         | OPAND -> (
           let x = (Stack.pop valueStack) in
             match x with
@@ -868,12 +808,12 @@ let rec delta controlStack valueStack environment memory locations =
                 match y with
                   | Bool(j) -> (
                     (Stack.push (Bool(i && j)) valueStack);
-                    
                   );
                   | _ -> raise (AutomatonException "Error on #AND");
               );
               | _ -> raise (AutomatonException "Error on #AND");
             );
+
         | OPOR -> (
           let x = (Stack.pop valueStack) in
             match x with
@@ -882,12 +822,12 @@ let rec delta controlStack valueStack environment memory locations =
                 match y with
                   | Bool(j) -> (
                     (Stack.push (Bool(i || j)) valueStack);
-                    
                   );
                   | _ -> raise (AutomatonException "Error on #OR");
               );
               | _ -> raise (AutomatonException "Error on #OR");
             );
+
         | OPLT -> (
           let x = (Stack.pop valueStack) in
             match x with
@@ -896,12 +836,12 @@ let rec delta controlStack valueStack environment memory locations =
                 match y with
                   | Int(j) -> (
                     (Stack.push ( Bool ( j < i)) valueStack);
-                    
                   );
                   | _ -> raise (AutomatonException "Error on #LT");
               );
               | _ -> raise (AutomatonException "Error on #LT");
             );
+
         | OPLE -> (
           let x = (Stack.pop valueStack) in
             match x with
@@ -910,12 +850,12 @@ let rec delta controlStack valueStack environment memory locations =
                 match y with
                   | Int(j) -> (
                     (Stack.push ( Bool ( j <= i)) valueStack);
-                    
                   );
                   | _ -> raise (AutomatonException "Error on #LE");
               );
               | _ -> raise (AutomatonException "Error on #LE");
             );
+
         | OPGT -> (
           let x = (Stack.pop valueStack) in
             match x with
@@ -924,12 +864,12 @@ let rec delta controlStack valueStack environment memory locations =
                 match y with
                   | Int(j) -> (
                     (Stack.push ( Bool ( j > i)) valueStack);
-                    
                   );
                   | _ -> raise (AutomatonException "Error on #GT");
               );
               | _ -> raise (AutomatonException "Error on #GT");
             );
+
         | OPGE -> (
           let x = (Stack.pop valueStack) in
             match x with
@@ -937,23 +877,23 @@ let rec delta controlStack valueStack environment memory locations =
                 let y = (Stack.pop valueStack) in
                 match y with
                   | Int(j) -> (
-                    (Stack.push ( Bool ( j >= i)) valueStack);
-                    
+                    (Stack.push ( Bool ( j >= i)) valueStack);    
                   );
                   | _ -> raise (AutomatonException "Error on #GE");
               );
               | _ -> raise (AutomatonException "Error on #GE");
             );
+
         | OPNOT -> (
           let x = (Stack.pop valueStack) in
             match x with
               | Bool(i) -> (
                 (Stack.push (Bool(not(i))) valueStack);
               );
-              
               | _ -> raise (AutomatonException "Error on #NOT");
             );                                                                     
       );
+
       | CmdOc(cmdOc) -> (
         match cmdOc with 
         | OPASSIGN -> (
@@ -985,6 +925,7 @@ let rec delta controlStack valueStack environment memory locations =
               );
               | _ ->  raise (AutomatonException "Error on #ASSIGN.")
         );
+
         | OPLOOP -> (
           let condloop = (Stack.pop valueStack) in 
             let loopV = (Stack.pop valueStack) in
@@ -992,16 +933,15 @@ let rec delta controlStack valueStack environment memory locations =
               | Bool(true) -> (
                 match loopV with
                   | LoopValue(Loop(x,m)) -> (
-
                     (Stack.push (Statement(Cmd(Loop(x,m)))) controlStack);
                     (Stack.push (Statement(Cmd(m))) controlStack);
-                    
                   )
                   | _ -> raise (AutomatonException "Error on #LOOP");
               );
               | Bool(false) -> ();  (* Não faz nada já que o pop foi feito antes *)
               | _ -> raise (AutomatonException "Error on #LOOP")
         );
+
         | OPCOND -> (
           let ifcond = (Stack.pop valueStack) in
             let condV = (Stack.pop valueStack) in
@@ -1019,6 +959,7 @@ let rec delta controlStack valueStack environment memory locations =
               | _ -> raise (AutomatonException "Error on #COND" );
         );
       );
+
       | DecOc(decOc) -> (
         match decOc with
         | OPREF -> (
@@ -1038,6 +979,7 @@ let rec delta controlStack valueStack environment memory locations =
           );
           | _  -> raise (AutomatonException "Error on #REF" );
         );
+        
         | OPBIND -> (
           let l = (Stack.pop valueStack) in
             let id = (Stack.pop valueStack) in
@@ -1074,7 +1016,6 @@ let rec delta controlStack valueStack environment memory locations =
                                 (Stack.push (Env(cEnv)) valueStack);
                             );
                             | _ -> raise (AutomatonException "Error on #BIND Boolconst(b)" );
-                        
                     );
                     | _ -> (
                         let newEnv = (Hashtbl.create 3) in
@@ -1104,6 +1045,7 @@ let rec delta controlStack valueStack environment memory locations =
               );
               | _ -> raise (AutomatonException "Error on #BIND" );
           );
+
           | OPBLKDEC -> (
             let ass = (Stack.pop valueStack) in
               let env = Hashtbl.copy environment in
@@ -1117,13 +1059,12 @@ let rec delta controlStack valueStack environment memory locations =
                   );
                   | _ -> raise (AutomatonException "Error on #BLKDEC" );
           );
+
           | OPBLKCMD -> (
             let env = (Stack.pop valueStack) in
               let locs = (Stack.pop valueStack) in
-              
                 match locs with
-                  | Locations(x) -> (
-                    
+                  | Locations(x) -> (  
                     match env with
                       | Env(y) -> (
                         (Hashtbl.clear environment);
@@ -1134,7 +1075,6 @@ let rec delta controlStack valueStack environment memory locations =
                       | _ -> raise (AutomatonException "Error on #BLKCMD" );
                   );
                   | _ -> raise (AutomatonException "Error on #BLKCMD" );
-                
           );
       );
     );

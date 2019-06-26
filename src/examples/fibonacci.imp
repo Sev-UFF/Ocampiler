@@ -1,3 +1,5 @@
+#Fibbonacci o resultado fica em an e n é o n-ésimo termo a ser calculado
+
 let var x = 0, var an = 0, var n = 4, var i = 1 in
     while (i <= n) do 
         if (i == 1) then

@@ -56,6 +56,17 @@ p1:
 	git checkout p1
 	$(MAKE) run
 
+test:
+	./ocampiler -f examples/aexp.imp -s -a -t |more
+	./ocampiler -f examples/bexp.imp -s -a -t |more
+	./ocampiler -f examples/fatorial.imp -s -a -t |more
+	./ocampiler -f examples/fibonacci.imp -s -a -t |more
+	./ocampiler -f examples/assign.imp -s -a -t |more
+	./ocampiler -f examples/assign2.imp -s -a -t |more
+	./ocampiler -f examples/deref.imp -s -t 
+	
+	
+
 # Dependencies
 depend: $(SOURCES) $(GENERATED) $(LEXSOURCES) $(YACCSOURCES)
 	$(CAMLDEP) *.mli *.ml > .depend

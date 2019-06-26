@@ -1,0 +1,8 @@
+#Resultado em erro nao e possivel aritmetica com enderecos
+
+let var x = 0, var y = 0 in
+    x := &y
+    y := *x
+    x := x + x
+
+end

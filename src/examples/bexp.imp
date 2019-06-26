@@ -1,3 +1,5 @@
+#Teste nos novos casos de BExp com Valref
+
 let var x = True , var y = False, var z = False, var c = 0 in
     x := &y
     z := *x
@@ -14,7 +16,7 @@ let var x = True , var y = False, var z = False, var c = 0 in
     end
     if(*x) then
         x := x
-    end
+    endg
 end
 
 
