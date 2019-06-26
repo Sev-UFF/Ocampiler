@@ -1207,15 +1207,14 @@ Ao ler o #ASSIGN, fazemos um pop na pilha de valores para ler o valor a ser atua
 ```
 
 ```
-OPASSIGN -> 
-(
+| OPASSIGN -> (
   let value = (Stack.pop valueStack) in
     let id = (Stack.pop valueStack) in 
       match id with 
       | Str(x) -> (
         let env = (Hashtbl.find environment x ) in
           match env with 
-          | Loc(l) -> (
+          | Loc(Location(l)) -> (
             match value with
             | Int(i) -> (
               (Hashtbl.replace memory l (Integer(i)));
@@ -1223,15 +1222,19 @@ OPASSIGN ->
             | Bool(b) -> (
               (Hashtbl.replace memory l (Boolean(b)));
             );
+            | Bind(b) -> (
+              (Hashtbl.replace memory l (Pointer(b)));
+            );
             | _ -> raise (AutomatonException "Error on #ASSIGN")
-            
+          ); 
+          | IntConst(i) -> (
+            raise (AutomatonException "Error on #ASSIGN. Cannot change constant value.")
+          ); 
+          | BoolConst(b) -> (
+            raise (AutomatonException "Error on #ASSIGN. Cannot change constant value.")
           );
-          | Value(v) -> (
-
-          );
-          
       );
-      | _ -> raise (AutomatonException "Error on #ASSIGN")
+      | _ ->  raise (AutomatonException "Error on #ASSIGN.")
 );
 ```
 
@@ -1370,6 +1373,64 @@ Nós usamos a estrutura de hashtable(pro enviroment e pra memória) e a estrutur
 and memory = (Hashtbl.create 10) in
 
 ```
+
+```
+𝛅(DeRef(Id(W)) :: C, V, E, S, L) = 𝛅(C, l :: V, E, S, L), where l = E[W]
+
+```
+```
+| DeRef(ref) -> (
+  match ref with
+  | Id(id) -> (
+    let key = Hashtbl.find environment id  in
+      match key with 
+      | Loc(x) -> (
+        (Stack.push (Bind(x)) valueStack );
+      );
+      |IntConst(x) -> (
+        raise (AutomatonException "Error on DeRef nao pode acessar endereco de constante - int ");
+      );
+      |BoolConst(x) -> (
+        raise (AutomatonException "Error on DeRef nao pode acessar endereco de constante - bool");
+      );
+  );
+  | _ -> raise (AutomatonException "Error on DeRef 666");
+);
+```
+
+```
+𝛅(ValRef(Id(W)) :: C, V, E, S, L) = 𝛅(C, T :: V, E, S, L), where T = S[S[E[W]]]
+```
+
+```
+| ValRef(ref) -> (
+  match ref with
+  | Id(id) -> (
+    let key = Hashtbl.find environment id  in
+    match key with 
+      | Loc(Location(x1)) -> (
+        let value1 = Hashtbl.find memory x1  in
+          match value1 with
+          | Pointer(Location(x3)) -> (
+              let value2 = Hashtbl.find memory x3  in
+              match value2 with
+              | Integer(x4) ->   (Stack.push (Int(x4)) valueStack);
+              | Boolean(x4) ->  (Stack.push (Bool(x4)) valueStack);
+              | Pointer(x4) -> (Stack.push (Bind(x4)) valueStack);
+            );
+          | Integer(cte) -> (
+              (Stack.push (Int(cte)) valueStack);
+          );
+          | Boolean(cte) -> (
+            (Stack.push (Bool(cte)) valueStack);
+          ); 
+      );
+      | _ ->   raise (AutomatonException "Error on ValRef2");
+  );
+  | _ ->   raise (AutomatonException "Error on ValRef3");
+);
+```
+
 ```
 𝛅(Ref(X) :: C, V, E, S, L) = 𝛅(X :: #REF :: C, V, E, S, L)`
 ```
@@ -1380,9 +1441,27 @@ and memory = (Hashtbl.create 10) in
 );
 ```
 
-
 ```
 𝛅(#REF :: C, T :: V, E, S, L) = 𝛅(C, l :: V, E, S', L'), where S' = S ∪ [l ↦ T], l ∉ S, L' = L ∪ {l}
+```
+```
+| OPREF -> (
+  let loc = (List.length !trace) in
+  let value = (Stack.pop valueStack) in
+  (Stack.push (Bind((Location(loc)))) valueStack);
+  locations := (!locations)@[loc];
+  match value with
+  | Int(x) -> (
+    (Hashtbl.add  memory loc (Integer(x)));
+  );
+  | Bool(x) -> (
+    (Hashtbl.add  memory (loc) (Boolean(x)));
+  );
+  | Bind(x) -> (
+    (Hashtbl.add  memory (loc) (Pointer(x)));
+  );
+  | _  -> raise (AutomatonException "Error on #REF" );
+);
 ```
 
 ```
