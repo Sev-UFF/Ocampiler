@@ -1589,17 +1589,17 @@ Ao dar pattern match com DeRef de um Id W é colocado no topo da pilha de valor 
 );
 ```
 
-Ao dar pattern match com ValRef de um Id W é colocado no topo da pilha de valor T = S[S[E[W]]], ou seja, se 
+Ao dar pattern match com ValRef de um Id W é colocado no topo da pilha de valor T = S[S[E[W]]], por exemplo: 
 
 ```
 ...
-z := 7
-x := &z
+z := 7        z |-> lz ^ lz |-> 7 
+x := &z       x |-> lx ^ lx |-> lz
 y := *x
-x |-> lx ^ lx-> lz, 
-z ->lz ^ lz -> 7 
+ 
+
 ```
-ao fazer um Valref com ```y := *x ( y -> ly ^ ly -> 7)``` buscasse no enviroment a location correspondente a x (lx), em seguida buscasse na memória a location que está sendo apontada por lx -> lz ( que  o endereço de z) 
+Ao fazer um Valref com ```y := *x ( y |-> ly ^ ly |-> 7)``` buscasse no enviroment o bindable correspondente a x (lx); em seguida buscasse na memória o storable no qual a location lx está  apontando(lx -> lz que é o endereço de &z); buscasse na memória o storable para o qual lz aponta (lz -> 7) e esse valor é colocado no topo da pilha de valor (7). 
 
 
 ```
@@ -1618,8 +1618,8 @@ ao fazer um Valref com ```y := *x ( y -> ly ^ ly -> 7)``` buscasse no enviroment
           | Pointer(Location(x3)) -> (
               let value2 = Hashtbl.find memory x3  in
               match value2 with
-              | Integer(x4) ->   (Stack.push (Int(x4)) valueStack);
-              | Boolean(x4) ->  (Stack.push (Bool(x4)) valueStack);
+              | Integer(x4) -> (Stack.push (Int(x4)) valueStack);
+              | Boolean(x4) -> (Stack.push (Bool(x4)) valueStack);
               | Pointer(x4) -> (Stack.push (Bind(x4)) valueStack);
             );
           | Integer(cte) -> (
@@ -1635,6 +1635,7 @@ ao fazer um Valref com ```y := *x ( y -> ly ^ ly -> 7)``` buscasse no enviroment
 );
 ```
 
+Ao dar Pattern Match com um ref de x, é colocado #OPREF na pilha de controle e x no topo da pilha.
 ```
 𝛅(Ref(X) :: C, V, E, S, L) = 𝛅(X :: #REF :: C, V, E, S, L)`
 ```
@@ -1643,6 +1644,26 @@ ao fazer um Valref com ```y := *x ( y -> ly ^ ly -> 7)``` buscasse no enviroment
   (Stack.push (DecOc(OPREF)) controlStack);
   (Stack.push (Statement(Exp(ref))) controlStack);
 );
+```
+Ao dar Pattern Match com #OPREF criasse uma nova location e a colocamos na pilha de valor e a memória recebe essa nova location com o valor que lhe foi associado .(lista de locations e memória são atualizadas S->S' e L->L').
+```
+Exemplo : 
+Pilha de Controle:[ #REF, ....]
+Pilha de Valor:
+[ 0, y, Env({( x -> LOC[6] )}), Locations({}) ]
+Ambiente:{}
+Memória:{( LOC[6] -> -1 )}
+Locations:{ 6 }
+
+------------- ---Após OPREF teremos :
+
+Pilha de Controle:[ ...]
+Pilha de Valor:[** LOC[11]**, y, Env({( x -> LOC[6] )}), Locations({}) ]
+Ambiente:{}
+Memória:{( LOC[6] -> -1 ),( **LOC[11] -> 0 **)}
+Locations:{6, 11}
+
+
 ```
 
 ```
@@ -1656,20 +1677,18 @@ ao fazer um Valref com ```y := *x ( y -> ly ^ ly -> 7)``` buscasse no enviroment
   locations := (!locations)@[loc];
   match value with
   | Int(x) -> (
-    (Hashtbl.add  memory loc (Integer(x)));
+    (Hashtbl.add  memory loc (Integer(x)) );
   );
   | Bool(x) -> (
-    (Hashtbl.add  memory (loc) (Boolean(x)));
+    (Hashtbl.add  memory loc (Boolean(x)) );
   );
   | Bind(x) -> (
-    (Hashtbl.add  memory (loc) (Pointer(x)));
+    (Hashtbl.add  memory loc (Pointer(x)) );
   );
   | _  -> raise (AutomatonException "Error on #REF" );
 );
 ```
-
-```
-```
+As declarações podem ser um Bind ou uma sequência de declaraçes.
 
 ```
 | Dec (dec) -> (
@@ -1688,7 +1707,7 @@ ao fazer um Valref com ```y := *x ( y -> ly ^ ly -> 7)``` buscasse no enviroment
  );
 );
 ```
-
+Ao dar pattern Match com Dseq nós colocamos as declarações x e y na pilha de controle.
 ```
 𝛅(DSeq(D₁, D₂), X) :: C, V, E, S, L) = 𝛅(D₁ :: D₂ :: C, V, E, S, L)
 ```
@@ -1699,6 +1718,7 @@ ao fazer um Valref com ```y := *x ( y -> ly ^ ly -> 7)``` buscasse no enviroment
 );
 ```
 
+Ao dar pattern Match com Bind de um Id x e uma expressão y, é colocado OPBIND, seguido da expressão y na pilha de controle e a string identidicadora na pilha de valor.
 ```
 𝛅(Bind(Id(W), X) :: C, V, E, S, L) = 𝛅(X :: #BIND :: C, W :: V, E, S, L)
 ```
@@ -1714,6 +1734,7 @@ ao fazer um Valref com ```y := *x ( y -> ly ^ ly -> 7)``` buscasse no enviroment
 );
 ```
 
+Ao dar pattern match com OPBIND
 ```
 𝛅(#BIND :: C, B :: W :: E' :: V, E, S, L) = 𝛅(C, ({W ↦ B} ∪ E') :: V, E, S, L), where E' ∈ Env,
 𝛅(#BIND :: C, B :: W :: H :: V, E, S, L) = 𝛅(C, {W ↦ B} :: H :: V, E, S, L), where H ∉ Env,
