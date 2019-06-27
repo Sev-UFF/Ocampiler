@@ -1635,7 +1635,7 @@ Ao fazer um Valref com ```y := *x ( y |-> ly ^ ly |-> 7)``` buscasse no envirome
 );
 ```
 
-Ao dar Pattern Match com um ref de x, é colocado #OPREF na pilha de controle e x no topo da pilha. Dessa forma, Ref cria uma location na memoria
+Ao dar Pattern Match com um ref de x, é colocado #OPREF na pilha de controle e x no topo da pilha. Dessa forma, Ref cria uma location na memoria e depois um valor é associado a essa location.
 ```
 𝛅(Ref(X) :: C, V, E, S, L) = 𝛅(X :: #REF :: C, V, E, S, L)`
 ```
@@ -1658,9 +1658,9 @@ Locations:{ 6 }
 ------------- ---Após OPREF teremos :
 
 Pilha de Controle:[ ...]
-Pilha de Valor:[`**` LOC[11]`**`, y, Env({( x -> LOC[6] )}), Locations({}) ]
+Pilha de Valor:[ LOC[11], y, Env({( x -> LOC[6] )}), Locations({}) ]
 Ambiente:{}
-Memória:{( LOC[6] -> -1 ),( **LOC[11] -> 0 **)}
+Memória:{( LOC[6] -> -1 ),```diff -( LOC[11] -> 0 )}
 Locations:{6, 11}
 
 
@@ -1866,6 +1866,7 @@ O OPBLKCMD  é responsável pelo fechamento do bloco. Nele as locatons criadas d
         | _ -> raise (AutomatonException "Error on #BLKCMD" );
 );
  ```
+
 
 
 
