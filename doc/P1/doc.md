@@ -1843,7 +1843,7 @@ OPBLKDEC vai na pilha de valor pegar as associações que foram criadas pelo BIN
 );
 
 ```
-O OPBLKCMD  é responsável pelo fechamento do bloco. Nele as locatons criadas dentro do bloco serão apagadas assim como os respectivos mapeamentos para essas locations e o ambiente anterior será resgatado.
+O OPBLKCMD  é responsável pelo fechamento do bloco. Nele as locatons criadas dentro do bloco serão apagadas assim como os respectivos mapeamentos para essas locations. As locations e o ambiente anterior serão resgatados. Nesse caso o pattern match com OPBLKCMD da dois pops na pilha de valor, limpa o enviroment atual, adiciona os mapeamentos de E e apaga todas as Locations L' e o enviroment atual passa a ser E e as locations são atualizadas com x, onde x = L - L'.
 ```
 𝛅(#BLKCMD :: C, E :: L :: V, E', S, L') = 𝛅(C, V, E, S', L), where S' = S / L'.
 ```
