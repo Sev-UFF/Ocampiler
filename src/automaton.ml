@@ -1071,7 +1071,8 @@ let rec delta controlStack valueStack environment memory locations =
                       | Env(y) -> (
                         (Hashtbl.clear environment);
                         (Hashtbl.add_seq environment (Hashtbl.to_seq y));
-                        (Hashtbl.iter (  fun key value -> if (List.mem key !locations) then (Hashtbl.remove memory key) ) memory );
+                        (Hashtbl.iter (  fun key value -> if (List.mem key !locations) 
+                              then (Hashtbl.remove memory key) ) memory );
                         locations := x;
                       );
                       | _ -> raise (AutomatonException "Error on #BLKCMD" );

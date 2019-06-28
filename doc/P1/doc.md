@@ -1635,7 +1635,7 @@ Ao fazer um Valref com ```y := *x ( y |-> ly ^ ly |-> 7)``` buscasse no envirome
 );
 ```
 
-Ao dar Pattern Match com um ref de x, é colocado #OPREF na pilha de controle e x no topo da pilha.
+Ao dar Pattern Match com um ref de x, é colocado #OPREF na pilha de controle e x no topo da pilha. Dessa forma, Ref cria uma location na memoria e depois um valor é associado a essa location.
 ```
 𝛅(Ref(X) :: C, V, E, S, L) = 𝛅(X :: #REF :: C, V, E, S, L)`
 ```
@@ -1655,12 +1655,12 @@ Ambiente:{}
 Memória:{( LOC[6] -> -1 )}
 Locations:{ 6 }
 
-------------- ---Após OPREF teremos :
+---Após OPREF teremos :
 
 Pilha de Controle:[ ...]
-Pilha de Valor:[** LOC[11]**, y, Env({( x -> LOC[6] )}), Locations({}) ]
+Pilha de Valor:[ LOC[11], y, Env({( x -> LOC[6] )}), Locations({}) ]
 Ambiente:{}
-Memória:{( LOC[6] -> -1 ),( **LOC[11] -> 0 **)}
+Memória:{( LOC[6] -> -1 ),( LOC[11] -> 0 )}
 Locations:{6, 11}
 
 
@@ -1718,7 +1718,7 @@ Ao dar pattern Match com Dseq nós colocamos as declarações x e y na pilha de 
 );
 ```
 
-Ao dar pattern Match com Bind de um Id x e uma expressão y, é colocado OPBIND, seguido da expressão y na pilha de controle e a string identidicadora na pilha de valor.
+Ao dar pattern Match com Bind de um Id x e uma expressão y, é colocado OPBIND, seguido da expressão y na pilha de controle e a string identidicadora na pilha de valor. Dessa forma o Bind faz uma associação entre um ID e um valor(que pode ser uma location no caso de variáveis ou inteiro/booleano no caso de constantes).
 ```
 𝛅(Bind(Id(W), X) :: C, V, E, S, L) = 𝛅(X :: #BIND :: C, W :: V, E, S, L)
 ```
@@ -1734,7 +1734,7 @@ Ao dar pattern Match com Bind de um Id x e uma expressão y, é colocado OPBIND,
 );
 ```
 
-Ao dar pattern match com OPBIND
+Ao dar pattern match com OPBIND pegasse um valor B da pilha de valor e uma string identificadora W e cria-se uma associação W -> B e caso exista um enviroment W->B  adicionado ao enviroment caso contrário é criado um novo enviroment W->B é adicionado a ele e ele é colocado na pilha de valor.
 ```
 𝛅(#BIND :: C, B :: W :: E' :: V, E, S, L) = 𝛅(C, ({W ↦ B} ∪ E') :: V, E, S, L), where E' ∈ Env,
 𝛅(#BIND :: C, B :: W :: H :: V, E, S, L) = 𝛅(C, {W ↦ B} :: H :: V, E, S, L), where H ∉ Env,
@@ -1808,7 +1808,7 @@ Ao dar pattern match com OPBIND
   );
 ```
 
-
+Ao entrarmos em um bloco adicionaremos um ou mais BIND's e vamos construir Ambiente e memória pra um dado escopo. Então o pattern match do Bloco coloca na pilha de controle, OPBLKCMD, Um ou mais comandos y(corpo do bloco), OPBLKDEC, Uma ou mais declaraçes x e na pilha de valor as locations até então criadas. E no último passo a lista de locations é limpa para o bloco criado.
 ```
 𝛅(Blk(D, M) :: C, V, E, S, L) = 𝛅(D :: #BLKDEC :: M :: #BLKCMD :: C, L :: V, E, S, ∅)
 ```
@@ -1824,6 +1824,7 @@ Ao dar pattern match com OPBIND
 );
 ```
 
+OPBLKDEC vai na pilha de valor pegar as associações que foram criadas pelo BIND e vai trazer essas associaçes pro ambiente(E/E'), se E já tiver uma associação E' essa será trocada senão ela será adicionada. Além disso na pilha de valor é colocado o ambiente E.
 ```
 𝛅(#BLKDEC :: C, E' :: V, E, S, L) = 𝛅(C, E :: V, E / E', S, L)
 ```
@@ -1842,6 +1843,7 @@ Ao dar pattern match com OPBIND
 );
 
 ```
+O OPBLKCMD  é responsável pelo fechamento do bloco. Nele as locatons criadas dentro do bloco serão apagadas assim como os respectivos mapeamentos para essas locations. As locations e o ambiente anterior serão resgatados. Nesse caso o pattern match com OPBLKCMD da dois pops na pilha de valor, limpa o enviroment atual, adiciona os mapeamentos de E e apaga todas as Locations L' e o enviroment atual passa a ser E e as locations são atualizadas com x, onde x = L - L'.
 ```
 𝛅(#BLKCMD :: C, E :: L :: V, E', S, L') = 𝛅(C, V, E, S', L), where S' = S / L'.
 ```
@@ -1864,6 +1866,7 @@ Ao dar pattern match com OPBIND
         | _ -> raise (AutomatonException "Error on #BLKCMD" );
 );
  ```
+
 
 
 
