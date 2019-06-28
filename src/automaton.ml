@@ -10,7 +10,7 @@ let rec delta controlStack valueStack environment memory locations =
   trace := (!trace)@[( (Stack.copy controlStack), (Stack.copy valueStack), (Hashtbl.copy environment), (Hashtbl.copy memory), (copia))];
 
   (* Linha para debugar. apagar depois *)
-  (*print_endline(string_of_iteration controlStack valueStack environment memory !locations ); *)
+  print_endline(string_of_iteration controlStack valueStack environment memory !locations ); 
   
   if not(Stack.is_empty controlStack) then begin 
     
@@ -978,71 +978,43 @@ let rec delta controlStack valueStack environment memory locations =
         | OPBIND -> (
           let l = (Stack.pop valueStack) in
             let id = (Stack.pop valueStack) in
-              match id with
-              | Str(st) ->(
-                match l with
-                  | Bind(y) -> (             
-                    let possibleEnv = (Stack.top valueStack) in
-                    match possibleEnv with
-                    | Env(x) -> (
-                      let env = (Stack.pop valueStack) in
-                      match env with 
-                      | Env(e) -> (
-                        let newEnv = (Hashtbl.copy e) in
-                        (Hashtbl.add newEnv st (Loc(y)) );
-                        (Stack.push (Env(newEnv)) valueStack );
-                      );
-                      | _  -> raise (AutomatonException "Error on #BIND1 not a env(e)" );
+            match id with 
+            |Str(w) -> (
+              match (Stack.top valueStack) with
+              |Env(h) -> (
+                match (Stack.pop valueStack) with 
+                | Env (env) -> (                                   (*env exists *)  
+                    let newEnv = (Hashtbl.copy env) in
+                    match l with 
+                    |Bind(y)   -> ( ( Hashtbl.add newEnv w (Loc(y)) );
+                                    ( Stack.push (Env(newEnv)) valueStack ); 
                     );
-                    | _ -> (
-                      let newEnv = (Hashtbl.create 3) in
-                        (Hashtbl.add newEnv st (Loc(y)));
-                        (Stack.push (Env(newEnv)) valueStack );
-                    );
-                  );
-                  | Bool(b) -> (
-                    match (Stack.top valueStack) with
-                    |Env(z1) -> (  
-                        if not(Hashtbl.mem z1 st) then 
-                          let currentEnv = (Stack.pop valueStack) in
-                            match currentEnv with
-                            |Env(cEnv) -> (
-                                let newEnv = (Hashtbl.copy cEnv) in
-                                (Hashtbl.add newEnv st (BoolConst(b)) );
-                                (Stack.push (Env(newEnv)) valueStack);
-                            );
-                            | _ -> raise (AutomatonException "Error on #BIND Boolconst(b)" );
-                    );
-                    | _ -> (
-                        let newEnv = (Hashtbl.create 3) in
-                        (Hashtbl.add newEnv st (BoolConst(b)));
-                        (Stack.push (Env(newEnv)) valueStack )
-                    );
-                  );
-                  | Int(i) -> (
-                    match (Stack.top valueStack) with
-                    |Env(z2) -> (
-                          if not(Hashtbl.mem z2 st) then   
-                            let currentEnv = (Stack.pop valueStack) in
-                              match currentEnv with
-                              |Env(cEnv) -> (
-                                let newEnv = (Hashtbl.copy cEnv) in
-                                 (Hashtbl.add newEnv st (IntConst(i)) );
-                                  (Stack.push (Env(newEnv)) valueStack);
-                              );
-                              | _ -> raise (AutomatonException "Error on #BIND const(i)" );
-                    ); 
-                    | _ -> (
-                        let newEnv = (Hashtbl.create 3) in
-                        (Hashtbl.add newEnv st (IntConst(i)));
-                        (Stack.push (Env(newEnv)) valueStack )
-                    );
-                  );
-                  | _ -> raise (AutomatonException "Error on #BIND2" );
+                    |Int(cte)  -> ( ( Hashtbl.add newEnv w (IntConst(cte)) );
+                                    ( Stack.push (Env(newEnv)) valueStack ); 
+                    );                   
+                    |Bool(cte) -> ( ( Hashtbl.add newEnv w (BoolConst(cte)) );
+                                    ( Stack.push (Env(newEnv)) valueStack ); 
+                    );                    
+                    | _ -> raise (AutomatonException "Error on #BIND valor not binded" );
+                );
+                | _ -> raise (AutomatonException "Error on #BIND env not found" );
               );
-              | _ -> raise (AutomatonException "Error on #BIND" );
+              |_ -> (   let newEnv = (Hashtbl.create 3) in            (*1st dec of block*)
+                        match l with 
+                        |Bind(y)   -> (( Hashtbl.add newEnv w (Loc(y)) );
+                                       ( Stack.push (Env(newEnv)) valueStack );
+                        );
+                        |Int(cte)  -> (( Hashtbl.add newEnv w (IntConst(cte)) );
+                                       ( Stack.push (Env(newEnv)) valueStack );
+                        );
+                        |Bool(cte) -> (( Hashtbl.add newEnv w (BoolConst(cte)) );
+                                       ( Stack.push (Env(newEnv)) valueStack );
+                        );                       
+                        | _ -> raise (AutomatonException "Error on #BIND map not created" );
+              );
+            );
+            | _ -> raise (AutomatonException "Error on #BIND not a valid ID" );
           );
-
           | OPBLKDEC -> (
             let ass = (Stack.pop valueStack) in
               let env = Hashtbl.copy environment in
