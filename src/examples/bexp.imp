@@ -1,6 +1,7 @@
-#Teste nos novos casos de BExp com Valref
+#Teste nos novos casos de BExp com a adição de Valref e deref
 
-let var x = True , var y = False, var z = False, var c = 0 in
+let var x = True , var y = False, var z = False, var c = 0 , var d = 0 in
+    d := &c
     x := &y
     z := *x
     z := z == *x
@@ -8,6 +9,31 @@ let var x = True , var y = False, var z = False, var c = 0 in
     z := *x == *x
     z := *x == True
     z := True == *x
+    z :=  c > *d
+    z := *d > c
+    z := *d > *d
+    z := *d > 0
+    z := 0 > *d
+    z :=  c >= *d
+    z := *d >= c
+    z := *d >= *d
+    z := *d >= 0
+    z := 0 >= *d
+    z :=  c < *d
+    z := *d < c
+    z := *d < *d
+    z := *d < 0
+    z := 0 < *d
+    z :=  c <= *d
+    z := *d <= c
+    z := *d <= *d
+    z := *d <= 0
+    z := 0 <= *d
+    z :=  c == *d
+    z := *d == c
+    z := *d == *d
+    z := *d == 0
+    z := 0 == *d
     z := not(*x)
     while not(*x) do
         z := True
@@ -16,7 +42,7 @@ let var x = True , var y = False, var z = False, var c = 0 in
     end
     if(*x) then
         x := x
-    endg
+    end
 end
 
 

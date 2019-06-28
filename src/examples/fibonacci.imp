@@ -1,13 +1,13 @@
 #Fibbonacci o resultado fica em an e n é o n-ésimo termo a ser calculado
 
-let var x = 0, var an = 0, var n = 4, var i = 1 in
+let var fibN = 0, var an = 0, var n = 6, var i = 1 in
     while (i <= n) do 
         if (i == 1) then
-            x := 1 
+            fibN := 1 
             an := 0
         else 
-            x := x + an
-            an := x - an
+            fibN := fibN + an
+            an := fibN - an
         end
         i := i + 1
     end

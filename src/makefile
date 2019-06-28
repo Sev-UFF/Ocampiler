@@ -63,9 +63,21 @@ test:
 	./ocampiler -f examples/fibonacci.imp -s -a -t |more
 	./ocampiler -f examples/assign.imp -s -a -t |more
 	./ocampiler -f examples/assign2.imp -s -a -t |more
-	./ocampiler -f examples/deref.imp -s -t 
-	
-	
+	./ocampiler -f examples/deref.imp -s -a -t 
+
+quicktest:
+	./ocampiler -f examples/aexp.imp -s -a -t 
+	./ocampiler -f examples/bexp.imp -s -a -t 
+	./ocampiler -f examples/fatorial.imp -s -a -t 
+	./ocampiler -f examples/fibonacci.imp -s -a -t 
+	./ocampiler -f examples/assign.imp -s -a -t 
+	./ocampiler -f examples/assign2.imp -s -a -t --stats
+
+fat:
+	./ocampiler -f examples/fatorial.imp --stats -t
+
+fib:
+	./ocampiler -f examples/fibonacci.imp --stats -t
 
 # Dependencies
 depend: $(SOURCES) $(GENERATED) $(LEXSOURCES) $(YACCSOURCES)

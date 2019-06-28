@@ -635,16 +635,11 @@ let rec delta controlStack valueStack environment memory locations =
                           | Boolean(x4) ->  (Stack.push (Bool(x4)) valueStack);
                           | Pointer(x4) -> (Stack.push (Bind(x4)) valueStack);
                         );
-                      | Integer(cte) -> (
-                          (Stack.push (Int(cte)) valueStack);
-                      );
-                      | Boolean(cte) -> (
-                        (Stack.push (Bool(cte)) valueStack);
-                      ); 
+                      | _ -> raise (AutomatonException "Error on ValRef1 not a pointer");
                   );
-                  | _ ->   raise (AutomatonException "Error on ValRef2");
+                  | _ ->   raise (AutomatonException "Error on ValRef2 not a location");
               );
-              | _ ->   raise (AutomatonException "Error on ValRef3");
+              | _ ->   raise (AutomatonException "Error on ValRef3 not a id");
             );
           );
         | Cmd(cmd) -> (
@@ -728,9 +723,9 @@ let rec delta controlStack valueStack environment memory locations =
                   | Int(j) -> (
                     (Stack.push (Int(i + j)) valueStack);
                   );
-                  | _ -> raise (AutomatonException "Error on #SUM 731");
+                  | _ -> raise (AutomatonException "Error on #SUM not a int j");
               );
-              | _ -> raise (AutomatonException "Error on #SUM 733");
+              | _ -> raise (AutomatonException "Error on #SUM not a int i");
             );
 
         | OPMUL -> (
@@ -742,9 +737,9 @@ let rec delta controlStack valueStack environment memory locations =
                   | Int(j) -> (
                     (Stack.push (Int(i * j)) valueStack);      
                   );
-                  | _ -> raise (AutomatonException "Error on #MUL");
+                  | _ -> raise (AutomatonException "Error on #MUL not a int j");
               );
-              | _ -> raise (AutomatonException "Error on #MUL");
+              | _ -> raise (AutomatonException "Error on #MUL not a int i");
             );
 
         | OPDIV -> (
@@ -759,9 +754,9 @@ let rec delta controlStack valueStack environment memory locations =
                   | Int(j) -> (
                     (Stack.push (Int(j / i)) valueStack);      
                   )
-                  | _ -> raise (AutomatonException "Error on #DIV");
+                  | _ -> raise (AutomatonException "Error on #DIV not a int j");
               );
-              | _ -> raise (AutomatonException "Error on #DIV");
+              | _ -> raise (AutomatonException "Error on #DIV not a int i");
             );
 
         | OPSUB -> (
@@ -773,9 +768,9 @@ let rec delta controlStack valueStack environment memory locations =
                   | Int(j) -> (
                     (Stack.push (Int(j - i)) valueStack);
                   );
-                  | _ -> raise (AutomatonException "Error on #SUB");
+                  | _ -> raise (AutomatonException "Error on #SUB not a int j");
               );
-              | _ -> raise (AutomatonException "Error on #SUB");
+              | _ -> raise (AutomatonException "Error on #SUB not a int i");
             );
 
         | OPEQ -> (
@@ -787,7 +782,7 @@ let rec delta controlStack valueStack environment memory locations =
                   | Bool(j) -> (
                     (Stack.push (Bool(i == j)) valueStack);
                   );
-                  | _ -> raise (AutomatonException "Error on #EQ");
+                  | _ -> raise (AutomatonException "Error on #EQ not a bool j");
               );
               | Int(i) -> (
                 let y = (Stack.pop valueStack) in
@@ -795,9 +790,9 @@ let rec delta controlStack valueStack environment memory locations =
                   | Int(j) -> (
                     (Stack.push ( Bool ( i == j)) valueStack);
                   );
-                  | _ -> raise (AutomatonException "Error on #EQ");
+                  | _ -> raise (AutomatonException "Error on #EQ not a bool j");
               );
-              | _ -> raise (AutomatonException "Error on #EQ");
+              | _ -> raise (AutomatonException "Error on #EQ not a bool i");
             );
 
         | OPAND -> (
@@ -809,9 +804,9 @@ let rec delta controlStack valueStack environment memory locations =
                   | Bool(j) -> (
                     (Stack.push (Bool(i && j)) valueStack);
                   );
-                  | _ -> raise (AutomatonException "Error on #AND");
+                  | _ -> raise (AutomatonException "Error on #AND not a bool j");
               );
-              | _ -> raise (AutomatonException "Error on #AND");
+              | _ -> raise (AutomatonException "Error on #AND not a bool i");
             );
 
         | OPOR -> (
@@ -823,9 +818,9 @@ let rec delta controlStack valueStack environment memory locations =
                   | Bool(j) -> (
                     (Stack.push (Bool(i || j)) valueStack);
                   );
-                  | _ -> raise (AutomatonException "Error on #OR");
+                  | _ -> raise (AutomatonException "Error on #OR not a bool j");
               );
-              | _ -> raise (AutomatonException "Error on #OR");
+              | _ -> raise (AutomatonException "Error on #OR not a bool i");
             );
 
         | OPLT -> (
@@ -837,9 +832,9 @@ let rec delta controlStack valueStack environment memory locations =
                   | Int(j) -> (
                     (Stack.push ( Bool ( j < i)) valueStack);
                   );
-                  | _ -> raise (AutomatonException "Error on #LT");
+                  | _ -> raise (AutomatonException "Error on #LT not a int j");
               );
-              | _ -> raise (AutomatonException "Error on #LT");
+              | _ -> raise (AutomatonException "Error on #LT not a int i");
             );
 
         | OPLE -> (
@@ -851,9 +846,9 @@ let rec delta controlStack valueStack environment memory locations =
                   | Int(j) -> (
                     (Stack.push ( Bool ( j <= i)) valueStack);
                   );
-                  | _ -> raise (AutomatonException "Error on #LE");
+                  | _ -> raise (AutomatonException "Error on #LE not a int j");
               );
-              | _ -> raise (AutomatonException "Error on #LE");
+              | _ -> raise (AutomatonException "Error on #LE not a int i");
             );
 
         | OPGT -> (
@@ -865,9 +860,9 @@ let rec delta controlStack valueStack environment memory locations =
                   | Int(j) -> (
                     (Stack.push ( Bool ( j > i)) valueStack);
                   );
-                  | _ -> raise (AutomatonException "Error on #GT");
+                  | _ -> raise (AutomatonException "Error on #GT not a int j");
               );
-              | _ -> raise (AutomatonException "Error on #GT");
+              | _ -> raise (AutomatonException "Error on #GT not a int i");
             );
 
         | OPGE -> (
@@ -879,9 +874,9 @@ let rec delta controlStack valueStack environment memory locations =
                   | Int(j) -> (
                     (Stack.push ( Bool ( j >= i)) valueStack);    
                   );
-                  | _ -> raise (AutomatonException "Error on #GE");
+                  | _ -> raise (AutomatonException "Error on #GE not a int j");
               );
-              | _ -> raise (AutomatonException "Error on #GE");
+              | _ -> raise (AutomatonException "Error on #GE not a int i");
             );
 
         | OPNOT -> (
@@ -890,7 +885,7 @@ let rec delta controlStack valueStack environment memory locations =
               | Bool(i) -> (
                 (Stack.push (Bool(not(i))) valueStack);
               );
-              | _ -> raise (AutomatonException "Error on #NOT");
+              | _ -> raise (AutomatonException "Error on #NOT not a bool i");
             );                                                                     
       );
 
@@ -923,7 +918,7 @@ let rec delta controlStack valueStack environment memory locations =
                     raise (AutomatonException "Error on #ASSIGN. Cannot change constant value.")
                   );
               );
-              | _ ->  raise (AutomatonException "Error on #ASSIGN.")
+              | _ ->  raise (AutomatonException "Error on #ASSIGN not a str(x)")
         );
 
         | OPLOOP -> (
@@ -936,10 +931,10 @@ let rec delta controlStack valueStack environment memory locations =
                     (Stack.push (Statement(Cmd(Loop(x,m)))) controlStack);
                     (Stack.push (Statement(Cmd(m))) controlStack);
                   )
-                  | _ -> raise (AutomatonException "Error on #LOOP");
+                  | _ -> raise (AutomatonException "Error on #LOOP invalid loop sintaxe loop(x,m)");
               );
               | Bool(false) -> ();  (* Não faz nada já que o pop foi feito antes *)
-              | _ -> raise (AutomatonException "Error on #LOOP")
+              | _ -> raise (AutomatonException "Error on #LOOP sintaxe error")
         );
 
         | OPCOND -> (
@@ -997,7 +992,7 @@ let rec delta controlStack valueStack environment memory locations =
                         (Hashtbl.add newEnv st (Loc(y)) );
                         (Stack.push (Env(newEnv)) valueStack );
                       );
-                      | _  -> raise (AutomatonException "Error on #BIND1" );
+                      | _  -> raise (AutomatonException "Error on #BIND1 not a env(e)" );
                     );
                     | _ -> (
                       let newEnv = (Hashtbl.create 3) in
