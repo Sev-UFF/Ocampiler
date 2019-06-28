@@ -2,5 +2,8 @@ let  var z = 0, const x = True, const y = -1  in
    if(x) then
       z := x
    end
+   let var u = 1 in
+      u := z
+   end
 end
 
