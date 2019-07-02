@@ -79,6 +79,20 @@ fat:
 fib:
 	./ocampiler -f examples/fibonacci.imp --stats -t
 
+help:         
+	##               Options of make command
+    ## 
+	## 
+	##   test      : execute /examples programs for imp language with pause (|more)
+	##   quicktest : execute /examples programs for imp language without pause
+	##   fat       : execute a fatorial program for imp
+	##   fib       : execute a fibonnacci program for imp
+	##   p1        : switch to branch p1
+	##   p2        : switch to branch p2
+	##   clear     : clear the actual build
+	##   install   : install ocaml and all of its dependences
+	##   run       : build the project 
+
 # Dependencies
 depend: $(SOURCES) $(GENERATED) $(LEXSOURCES) $(YACCSOURCES)
 	$(CAMLDEP) *.mli *.ml > .depend
