@@ -24,7 +24,8 @@
     | Ref of expression
     | DeRef of expression
     | ValRef of expression
-  
+    | Formal of expression
+    | Actual of expression
 
   and command = 
     | Loop of expression * command
@@ -33,15 +34,21 @@
     | Assign of expression * expression
     | Cond of expression * command * command
     | Blk of declaration * command
+    | Call of expression * expression
 
+  (*and abstraction = 
+    | Abs of expression * command
+*)
   and declaration = 
-  | DSeq of declaration * declaration
-  | Bind of expression * expression
-
+    | DSeq of declaration * declaration
+    | Bind of expression * expression 
+    | BindAbs of expression * statement
+ 
   and statement = 
    | Exp of expression
    | Cmd of command
    | Dec of declaration
+   | Abs of expression * command
   
   and expOc =
    | OPSUM

@@ -1,9 +1,10 @@
-let  var z = 0, const x = True, const y = -1  in
-   if(x) then
-      z := x
-   end
-   let var u = 1 in
-      u := z
-   end
-end
-
+let var z = 1
+in 
+    let fn f(x) =    
+        let var y = x
+        in      
+            #while not (y == 0)
+            #do 
+              #z := z * y
+              y := y - 1
+    in f(10)

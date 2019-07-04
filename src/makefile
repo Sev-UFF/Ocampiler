@@ -39,6 +39,11 @@ install:
 # Building the world
 run:  depend $(EXEC)
 
+printparser: # Debugging parser
+	$(MAKE) printparser &&
+	export OCAMLRUNPARAM='p'
+	
+
 # Clean up
 clear:
 	rm -f *.cm[io] *.cmx *~ .*~ #*#

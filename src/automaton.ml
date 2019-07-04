@@ -703,6 +703,11 @@ let rec delta controlStack valueStack environment memory locations =
             (Stack.push (Statement(Exp(y))) controlStack );
             (Stack.push (Str(x)) valueStack);
           );
+          | BindAbs(Id(x),y) -> (
+            (Stack.push (DecOc(OPBIND)) controlStack );
+            (Stack.push (Statement(y)) controlStack );
+            (Stack.push (Str(x)) valueStack);
+          ) ;
           | Bind(_, _) -> (
             raise (AutomatonException "Error on Bind" );
           );
@@ -711,6 +716,12 @@ let rec delta controlStack valueStack environment memory locations =
           (Stack.push (Statement(Dec(x))) controlStack);
          );
         );
+        | Abs (x,y) -> (
+          let env = (Hashtbl.copy environment) in(
+            (Stack.push (Closure(x , y , env))  valueStack);
+          );
+        );
+
       );   
       | ExpOc(expOc) -> (
         match expOc with
@@ -1009,7 +1020,10 @@ let rec delta controlStack valueStack environment memory locations =
                         );
                         |Bool(cte) -> (( Hashtbl.add newEnv w (BoolConst(cte)) );
                                        ( Stack.push (Env(newEnv)) valueStack );
-                        );                       
+                        ); 
+                        |Closure(x,y,z) -> ( ( Hashtbl.add newEnv w (Close(l)) );
+                                             ( Stack.push (Env(newEnv)) valueStack );
+                        );                      
                         | _ -> raise (AutomatonException "Error on #BIND map not created" );
               );
             );
