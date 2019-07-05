@@ -1849,7 +1849,7 @@ type loc =
 ```
 
 
-Nós usamos a estrutura de [Hashtbl](https://caml.inria.fr/pub/docs/manual-ocaml/libref/Hashtbl.html) para os dicionários de ambiente e memória, [List](https://caml.inria.fr/pub/docs/manual-ocaml/libref/List.html) para a lista de locations e a [Stack](https://caml.inria.fr/pub/docs/manual-ocaml/libref/Stack.html) para as pilhas de controle e valor, todos inicializadas no arquivo [main.ml](https://github.com/sevontheedge/Ocampiler/src/main.ml).
+Nós usamos a estrutura de [Hashtbl](https://caml.inria.fr/pub/docs/manual-ocaml/libref/Hashtbl.html) para os dicionários de ambiente e memória, [List](https://caml.inria.fr/pub/docs/manual-ocaml/libref/List.html) para a lista de locations e a [Stack](https://caml.inria.fr/pub/docs/manual-ocaml/libref/Stack.html) para as pilhas de controle e valor, todos inicializadas no arquivo [main.ml](https://github.com/sevontheedge/Ocampiler/blob/master/src/main.ml).
 
 ```
   let tree = Statement(Parser.main Lexer.token (Lexing.from_string !fileContents) )
