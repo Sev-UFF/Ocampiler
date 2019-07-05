@@ -40,7 +40,6 @@ install:
 run:  depend $(EXEC)
 
 printparser: # Debugging parser
-	$(MAKE) printparser &&
 	export OCAMLRUNPARAM='p'
 	
 
