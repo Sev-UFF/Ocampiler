@@ -1531,12 +1531,12 @@ CSeq(x, y) ->
 );
 ```
 
-```
+
 Ao ler um DeRef colocamos a location l correspondente ao Id W lido. Para isso buscamos no enviroment o bindable correspondente a W e colocamos ele no topo da pilha de valor e caso W seja uma constante não será possível acessar seu endereço.
 ```
 𝛅(DeRef(Id(W)) :: C, V, E, S, L) = 𝛅(C, l :: V, E, S, L), where l = E[W]
-
 ```
+
 ```
 | DeRef(ref) -> (
   match ref with
@@ -1570,9 +1570,9 @@ x |-> lx
 Memória:
 lz |-> 7 
 lx |-> lz
- 
-
 ```
+
+
 Ao fazer um Valref com ```y := *x ``` buscasse no enviroment o bindable correspondente a x (lx); em seguida buscasse na memória o storable no qual a location lx está  apontando(lx -> lz que é o endereço da variável de id z); buscasse então na memória o storable para o qual lz aponta (lz -> 7) e esse valor é colocado no topo da pilha de valor (7). Caso esse caminho seja interrompido é leventado uma exceção. 
 
 
@@ -1610,9 +1610,11 @@ Ao fazer um Valref com ```y := *x ``` buscasse no enviroment o bindable correspo
 ```
 
 Ao ler o Ref de x, é colocado #REF na pilha de controle e x no topo da pilha. Dessa forma, Ref cria uma location na memoria e depois um valor é associado a essa location.
+
 ```
 𝛅(Ref(X) :: C, V, E, S, L) = 𝛅(X :: #REF :: C, V, E, S, L)`
 ```
+
 ```
 | Ref(ref)-> (
   (Stack.push (DecOc(OPREF)) controlStack);
@@ -1621,8 +1623,10 @@ Ao ler o Ref de x, é colocado #REF na pilha de controle e x no topo da pilha. D
 ```
 
 Ao lermos um #REF criasse uma nova location e a colocamos na pilha de valor e a memória recebe essa nova location com o valor que lhe foi associado. A lista de locations e memória são atualizadas S->S' e L->L'.
+
 ```
 Exemplo: 
+
 Pilha de Controle:[ #REF, ....]
 Pilha de Valor:
 [ 0, y, ... ]
@@ -1638,9 +1642,11 @@ Ambiente:{}
 Memória:{( LOC[6] -> -1 ),( LOC[11] -> 0 )}
 Locations:{6, 11}
 ```
+
 ```
 𝛅(#REF :: C, T :: V, E, S, L) = 𝛅(C, l :: V, E, S', L'), where S' = S ∪ [l ↦ T], l ∉ S, L' = L ∪ {l}
 ```
+
 ```
 | OPREF -> (
   let loc = (List.length !trace) in
@@ -1663,9 +1669,11 @@ Locations:{6, 11}
 
 
 Ao lermos um Dseq nós colocamos as declarações x e y na pilha de controle.
+
 ```
 𝛅(DSeq(D₁, D₂), X) :: C, V, E, S, L) = 𝛅(D₁ :: D₂ :: C, V, E, S, L)
 ```
+
 ```
 | DSeq(x, y) -> (
   (Stack.push (Statement(Dec(y))) controlStack);
@@ -1673,8 +1681,8 @@ Ao lermos um Dseq nós colocamos as declarações x e y na pilha de controle.
 );
 ```
 
-
 Ao lermos um Bind de um Id x e uma expressão y é colocado OPBIND, seguido da expressão y na pilha de controle e a string identificadora na pilha de valor. Dessa forma o Bind faz uma associação entre um ID e um valor(que pode ser uma location no caso de variáveis ou inteiro/booleano no caso de constantes).
+
 ```
 𝛅(Bind(Id(W), X) :: C, V, E, S, L) = 𝛅(X :: #BIND :: C, W :: V, E, S, L)
 ```
@@ -1692,6 +1700,7 @@ Ao lermos um Bind de um Id x e uma expressão y é colocado OPBIND, seguido da e
 
 
 Ao lermos um #BIND pegamos um valor B da pilha de valor e uma string identificadora W e cria-se uma associação W -> B. Caso exista um ambiente no topo da pilha de valores W->B é adicionado a este ambiente, caso contrário é criado um novo ambiente e W->B é adicionado a ele, o ambiente então volta à pilha de valor.
+
 ```
 𝛅(#BIND :: C, B :: W :: E' :: V, E, S, L) = 𝛅(C, ({W ↦ B} ∪ E') :: V, E, S, L), where E' ∈ Env,
 𝛅(#BIND :: C, B :: W :: H :: V, E, S, L) = 𝛅(C, {W ↦ B} :: H :: V, E, S, L), where H ∉ Env,
@@ -1741,8 +1750,8 @@ OPBIND -> (
 ```
 
 
-
 Ao ler Blk entramos em um bloco, adicionando um ou mais BIND's para construir o ambiente e memória do escopo atual. Então coloca-se na pilha de controle, OPBLKCMD, Um ou mais comandos y (corpo do bloco), OPBLKDEC, uma ou mais declaraçes x e na pilha de valor as locations até então criadas. E no último passo a lista de locations é limpa para o bloco recém-criado.
+
 ```
 𝛅(Blk(D, M) :: C, V, E, S, L) = 𝛅(D :: #BLKDEC :: M :: #BLKCMD :: C, L :: V, E, S, ∅)
 ```
@@ -1758,11 +1767,12 @@ Ao ler Blk entramos em um bloco, adicionando um ou mais BIND's para construir o 
 );
 ```
 
-
 Ao ler #BLKDEC olhamos a pilha de valor para pegar as associações que foram criadas pelo BIND e trazer essas associaçes para o novo ambiente necessário pelo novo escopo aberto por um bloco. O novo ambiente(E/E') é montado da seguinte forma se em E já tiver uma associação de mesmo id existente em E' essa será trocada para o valor definido por E` senão uma nova será criada. Além disso na pilha de valor é colocado o ambiente E para guardar o estado atual antes do novo escopo.
+
 ```
 𝛅(#BLKDEC :: C, E' :: V, E, S, L) = 𝛅(C, E :: V, E / E', S, L)
 ```
+
 ```
 | OPBLKDEC -> (
   let ass = (Stack.pop valueStack) in
@@ -1776,12 +1786,14 @@ Ao ler #BLKDEC olhamos a pilha de valor para pegar as associações que foram cr
         );
         | _ -> raise (AutomatonException "Error on #BLKDEC" );
 );
-
 ```
+
 O #BLKCMD é responsável pelo fechamento do bloco. Nele as locatons criadas dentro do bloco serão apagadas assim como os respectivos mapeamentos na memória para essas locations. As locations e o ambiente anterior serão resgatados. Isso é feito ao lermos #BLKCMD da dois pops na pilha de valor, resgatamos os mapeamentos de E e as locations, salvas antes do início do escopo sendo fechado, e o ambiente atual é atualizado com as locations apagando-se as locations usadas apenas no escopo do bloco que foi recentemente fechado.
+
 ```
 𝛅(#BLKCMD :: C, E :: L :: V, E', S, L') = 𝛅(C, V, E, S', L), where S' = S / L'.
 ```
+
 ```
 | OPBLKCMD -> (
   let env = (Stack.pop valueStack) in
@@ -1803,6 +1815,7 @@ O #BLKCMD é responsável pelo fechamento do bloco. Nele as locatons criadas den
  ```
 
 No automato criamos os tipos _valueStackOptions_, _storable_ e _bindable_ que são os valores que o podem ser inseridos na pilha de valor, os possíveis valores associados à Hashtable de memória e os possíveis valores associados à Hashtable do ambiente respectivamente. Os tipos _storable_ e _bindable_ são os responsáveis por fazerem o mampeamento dos dados.  O tipo _loc_ foi definido para ser reaproveitado pois era usado em diferentes lugares.
+
 ```
 exception AutomatonException of string;;
 
@@ -1834,7 +1847,10 @@ type loc =
   | Location of int
 ;;
 ```
+
+
 Nós usamos a estrutura de [Hashtbl](https://caml.inria.fr/pub/docs/manual-ocaml/libref/Hashtbl.html) para os dicionários de ambiente e memória, [List](https://caml.inria.fr/pub/docs/manual-ocaml/libref/List.html) para a lista de locations e a [Stack](https://caml.inria.fr/pub/docs/manual-ocaml/libref/Stack.html) para as pilhas de controle e valor, todos inicializadas no arquivo [main.ml](https://github.com/sevontheedge/Ocampiler/src/main.ml).
+
 ```
   let tree = Statement(Parser.main Lexer.token (Lexing.from_string !fileContents) )
   and controlStack = (Stack.create()) 
@@ -1842,15 +1858,4 @@ Nós usamos a estrutura de [Hashtbl](https://caml.inria.fr/pub/docs/manual-ocaml
   and environment = (Hashtbl.create 10)
   and memory = (Hashtbl.create 10)
   and locations = ref [] 
-
-
-
-
-
-
-
-
-
-
-
-
+```

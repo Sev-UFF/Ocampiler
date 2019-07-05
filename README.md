@@ -30,5 +30,5 @@ ocampiler -f <impfile> [-s | -a | -t | --at | --state n | --last n | --stats]
 --stats: Exibe o número de passos e o tempo de execução do autômato.
 ```
 # Documentação (P1, P2, P3)
-Os documentos referentes às apresentações evolutivas e às provas encontra-se na pasta [doc](https://github.com/sevontheedge/Ocampiler/doc/README.md)
+Os documentos referentes às apresentações evolutivas e às provas encontra-se na pasta [doc](https://github.com/sevontheedge/Ocampiler/tree/master/doc)
 
