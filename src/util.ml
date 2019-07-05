@@ -44,7 +44,11 @@ and string_of_expression expression =
   | ValRef(x) -> "VALREF (" ^ (string_of_expression x) ^ ")"
   | Formal(x) -> "FORMAL (" ^ (string_of_expression x) ^ ")"
   | Actual(x) -> "ACTUAL (" ^ (string_of_expression x) ^ ")"
-  
+
+and string_of_actuals actual = 
+  "{\n\t" ^ String.concat ", " (List.map string_of_expression actual) ^ "\n}"
+
+ 
 
 and string_of_command command = 
   match command with

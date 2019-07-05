@@ -21,6 +21,7 @@
         %type <Pi.expression> bindableVariable
         %type <Pi.expression> variable
         %type <Pi.statement> abstraction
+        %type <Pi.expression list> explist 
         %%
         main:
             statement EOF     { $1 }
@@ -48,20 +49,23 @@
           | command  command                              { Pi.CSeq($1, $2) }
           | LET declaration IN command                    { Pi.Blk($2, $4)}
           | LET declaration IN command END                { Pi.Blk($2, $4)}
-          | ID expression                                 { Pi.Call(Pi.Id($1), Pi.Actual($2))}  
+          | ID expression                                   { Pi.Call(Pi.Id($1), Pi.Actual($2))}  
           | LPAREN command RPAREN                         { $2 }
         ;
         expression: 
           ADDRESS ID                    { Pi.DeRef(Pi.Id($2))}
-          | bindableVariable            { $1 }
+          | bindableVariable            { $1 } 
           | LPAREN expression RPAREN    { $2 }
+        ;
+        explist:
+          explist                 { $1 }   
+          
         ;
         bindableVariable: 
             arithmeticExpression              { Pi.AExp( $1) }
           | booleanExpression                 { Pi.BExp( $1) }
           | variable                          { $1 }
           | LPAREN bindableVariable RPAREN    { $2 }
-            
         ;
         variable:
             ID                        { Pi.Id( $1) }

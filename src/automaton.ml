@@ -37,7 +37,11 @@ let rec delta controlStack valueStack environment memory locations =
                   (Stack.push (Bool(b)) valueStack);
                 );
             );
-            | AExp(aExp) -> (
+          | Actual(actuals) -> (
+              (Stack.push actuals valueStack);
+              
+          );
+          | AExp(aExp) -> (
               match aExp with 
               | Num(x) -> (
                 (Stack.push (Int(x)) valueStack);
@@ -670,6 +674,10 @@ let rec delta controlStack valueStack environment memory locations =
              (Stack.push (Str(x)) valueStack);
           );
           | Assign(_, _) -> raise (AutomatonException "Error on Assign");
+          | Call (x,y) -> (
+            (Stack.push (Statement(Cmd(Call(x,y)))) controlStack );
+            (Stack.push (Statement(Exp(y))) controlStack);
+          );
           | Cond(BExp(x), y, z) -> (
             (Stack.push (CmdOc(OPCOND)) controlStack);
             (Stack.push (Statement(Exp(BExp(x)))) controlStack );
