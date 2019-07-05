@@ -1690,6 +1690,58 @@ Ao lermos um Bind de um Id x e uma expressão y é colocado OPBIND, seguido da e
 );
 ```
 
+
+Ao lermos um #BIND pegamos um valor B da pilha de valor e uma string identificadora W e cria-se uma associação W -> B. Caso exista um ambiente no topo da pilha de valores W->B é adicionado a este ambiente, caso contrário é criado um novo ambiente e W->B é adicionado a ele, o ambiente então volta à pilha de valor.
+```
+𝛅(#BIND :: C, B :: W :: E' :: V, E, S, L) = 𝛅(C, ({W ↦ B} ∪ E') :: V, E, S, L), where E' ∈ Env,
+𝛅(#BIND :: C, B :: W :: H :: V, E, S, L) = 𝛅(C, {W ↦ B} :: H :: V, E, S, L), where H ∉ Env,
+```
+
+```
+OPBIND -> (
+          let l = (Stack.pop valueStack) in
+            let id = (Stack.pop valueStack) in
+            match id with 
+            |Str(w) -> (
+              match (Stack.top valueStack) with
+              |Env(h) -> (
+                match (Stack.pop valueStack) with 
+                | Env (env) -> (                                   (*env exists *)  
+                    let newEnv = (Hashtbl.copy env) in
+                    match l with 
+                    |Bind(y)   -> ( ( Hashtbl.add newEnv w (Loc(y)) );
+                                    ( Stack.push (Env(newEnv)) valueStack ); 
+                    );
+                    |Int(cte)  -> ( ( Hashtbl.add newEnv w (IntConst(cte)) );
+                                    ( Stack.push (Env(newEnv)) valueStack ); 
+                    );                   
+                    |Bool(cte) -> ( ( Hashtbl.add newEnv w (BoolConst(cte)) );
+                                    ( Stack.push (Env(newEnv)) valueStack ); 
+                    );                    
+                    | _ -> raise (AutomatonException "Error on #BIND valor not binded" );
+                );
+                | _ -> raise (AutomatonException "Error on #BIND env not found" );
+              );
+              |_ -> (   let newEnv = (Hashtbl.create 3) in            (*1st dec of block*)
+                        match l with 
+                        |Bind(y)   -> (( Hashtbl.add newEnv w (Loc(y)) );
+                                       ( Stack.push (Env(newEnv)) valueStack );
+                        );
+                        |Int(cte)  -> (( Hashtbl.add newEnv w (IntConst(cte)) );
+                                       ( Stack.push (Env(newEnv)) valueStack );
+                        );
+                        |Bool(cte) -> (( Hashtbl.add newEnv w (BoolConst(cte)) );
+                                       ( Stack.push (Env(newEnv)) valueStack );
+                        );                       
+                        | _ -> raise (AutomatonException "Error on #BIND map not created" );
+              );
+            );
+            | _ -> raise (AutomatonException "Error on #BIND not a valid ID" );
+          );
+```
+
+
+
 Ao ler Blk entramos em um bloco, adicionando um ou mais BIND's para construir o ambiente e memória do escopo atual. Então coloca-se na pilha de controle, OPBLKCMD, Um ou mais comandos y (corpo do bloco), OPBLKDEC, uma ou mais declaraçes x e na pilha de valor as locations até então criadas. E no último passo a lista de locations é limpa para o bloco recém-criado.
 ```
 𝛅(Blk(D, M) :: C, V, E, S, L) = 𝛅(D :: #BLKDEC :: M :: #BLKCMD :: C, L :: V, E, S, ∅)
@@ -1793,85 +1845,6 @@ Nós usamos a estrutura de [Hashtbl](https://caml.inria.fr/pub/docs/manual-ocaml
 
 
 
-
-
-
-
-
-
-Ao lermos um #BIND pegasse um valor B da pilha de valor e uma string identificadora W e cria-se uma associação W -> B e caso exista um enviroment W->B  adicionado ao enviroment caso contrário é criado um novo enviroment W->B é adicionado a ele e ele é colocado na pilha de valor.
-```
-𝛅(#BIND :: C, B :: W :: E' :: V, E, S, L) = 𝛅(C, ({W ↦ B} ∪ E') :: V, E, S, L), where E' ∈ Env,
-𝛅(#BIND :: C, B :: W :: H :: V, E, S, L) = 𝛅(C, {W ↦ B} :: H :: V, E, S, L), where H ∉ Env,
-```
-
-```
-| OPBIND -> (
-  let l = (Stack.pop valueStack) in
-    let id = (Stack.pop valueStack) in
-      match id with
-      | Str(st) ->(
-        match l with
-          | Bind(y) -> (             
-            let possibleEnv = (Stack.top valueStack) in
-            match possibleEnv with
-            | Env(x) -> (
-              let env = (Stack.pop valueStack) in
-              match env with 
-              | Env(e) -> (
-                let newEnv = (Hashtbl.copy e) in
-                (Hashtbl.add newEnv st (Loc(y)) );
-                (Stack.push (Env(newEnv)) valueStack );
-              );
-              | _  -> raise (AutomatonException "Error on #BIND1" );
-            );
-            | _ -> (
-              let newEnv = (Hashtbl.create 3) in
-                (Hashtbl.add newEnv st (Loc(y)));
-                (Stack.push (Env(newEnv)) valueStack );
-            );
-          );
-          | Bool(b) -> (
-            match (Stack.top valueStack) with
-            |Env(x) -> (  
-                if not(Hashtbl.mem x st) then 
-                  let currentEnv = (Stack.pop valueStack) in
-                    match currentEnv with
-                    |Env(cEnv) -> (
-                        (Hashtbl.add cEnv st (BoolConst(b)) );
-                        (Stack.push (Env(cEnv)) valueStack);
-                    );
-                    | _ -> raise (AutomatonException "Error on #BIND Boolconst(b)" );
-            );
-            | _ -> (
-                let newEnv = (Hashtbl.create 3) in
-                (Hashtbl.add newEnv st (BoolConst(b)));
-                (Stack.push (Env(newEnv)) valueStack )
-            );
-          );
-          | Int(i) -> (
-            match (Stack.top valueStack) with
-            |Env(x) -> (
-                  if not(Hashtbl.mem x st) then   
-                    let currentEnv = (Stack.pop valueStack) in
-                      match currentEnv with
-                      |Env(cEnv) -> (
-                         (Hashtbl.add cEnv st (IntConst(i)) );
-                          (Stack.push (Env(cEnv)) valueStack);
-                      );
-                      | _ -> raise (AutomatonException "Error on #BIND const(i)" );
-            ); 
-            | _ -> (
-                let newEnv = (Hashtbl.create 3) in
-                (Hashtbl.add newEnv st (IntConst(i)));
-                (Stack.push (Env(newEnv)) valueStack )
-            );
-          );
-          | _ -> raise (AutomatonException "Error on #BIND2" );
-      );
-      | _ -> raise (AutomatonException "Error on #BIND" );
-  );
-```
 
 
 
