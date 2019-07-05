@@ -65,7 +65,8 @@ Já no nível dos comandos temos a seguinte especificação
 ```
 <Statement> ::= <Cmd> 
 
-<Cmd>       ::= Id(<String>) | Nop | Assign(<Id>, <Exp>) | Loop(<BoolExp>, <Cmd>) | 
+<Exp>       ::= Id(<String>) 
+<Cmd>       ::= Nop | Assign(<Id>, <Exp>) | Loop(<BoolExp>, <Cmd>) | 
                 CSeq(<Cmd>, <Cmd>) | Cond(<BoolExp>, <Cmd>, <Cmd>)
 ```
 
@@ -85,7 +86,9 @@ type statement =
 ;;
 
 ```
+
 A nível das declarações temos a seguinte especificação
+
 ```
 <Statement> ::= <Dec> 
 
@@ -95,23 +98,17 @@ A nível das declarações temos a seguinte especificação
 
 <Cmd>       ::= Blk(<Dec>, <Cmd>) 
 ```
-que foi implementada extendo os tipos definidos para comando
+
+que foi implementada extendo os tipos definidos para comando e expressões além de adicionar o novo tipo de declaração
+
 ```
 type expression = 
-  | AExp of arithmeticExpression
-  | BExp of booleanExpression
-  | Id of string
   | Ref of expression
   | DeRef of expression
   | ValRef of expression
 ;;
 
 type command = 
-  | Loop of expression * command
-  | CSeq of command * command
-  | Nop
-  | Assign of expression * expression
-  | Cond of expression * command * command
   | Blk of declaration * command
 ;;
 
@@ -121,8 +118,6 @@ type declaration =
 ;;
 
 type statement = 
-  | Exp of expression
-  | Cmd of command
   | Dec of declaration
 ;;
 ```
@@ -239,6 +234,8 @@ O %%,% {e%} são sinais de pontuação que aparecem em todos os arquivos gramati
 
 A tabela definida no arquivo do parser tem algumas restrições. Primeiro ela deve retornar um tipo único, no nosso caso a π denotação que englobe todas as outras, _statement_. Definimos todos os tipos definidos da gramática também no parser para a melhor estruturação da leitura dos tokens. 
 
+A implementação dos tipos _bindableVariable_  e _variable_ foi uma tentativa de contornar os problemas referentes às referências e constantes, não permitindo declarações de constantes que usem os símbolos de referência. Apesar disso ainda há problemas que podem ser criados por essa manipulação que não foram tratados aqui.
+
 Temos então a definição dos tipos das π denotações no nível do parser
 
 ```
@@ -262,7 +259,7 @@ main:
 ;
 ```
 
-Para cada tipo definido então definimos a estrutura de tokens associado a ele que está de acordo com as especificações da linguagem. Cada tipo pode retornar outros tipos, ou diretamente uma π denotação, o parser funciona como um todo então através da recursão. Os tipos mantém a mesma hierarquia do π framework e da linguagem.
+Para cada tipo definido então definimos a estrutura de tokens associado a ele que está de acordo com as especificações da linguagem. Cada tipo pode retornar outros tipos, ou diretamente uma π denotação, o parser funciona como um todo então através da recursão. Os tipos mantém a mesma hierarquia do π framework e da linguagem retornando sempre uma _statement_.
 
 ```
 statement:
@@ -324,7 +321,18 @@ Assign(Id(x), Sum(Id(x), Num(1)))
 
 ## Autômato π 
 
-No autômato, o nosso código inicia-se com um POP na pilha de controle, e logo em seguida faz-se o seguinte pattern matching, para tomar a devida decisão de acordo com o elemento que se retirou, podendo ele ser algum tipo indutivo de π ou algum opcode. Dessa forma, o autômato opera recebendo um estado válido(q) e faz uma transição para o estado (q') através da função de transição δ  - δ(q) -> δ(q') - conforme o exemplo a seguir.
+No autômato, o nosso código inicia-se com um POP na pilha de controle, e logo em seguida faz-se o seguinte pattern matching, para tomar a devida decisão de acordo com o elemento que se retirou, podendo ele ser algum tipo indutivo de π ou algum opcode. 
+
+Dessa forma, o autômato opera recebendo um estado válido(q) e faz uma transição para o estado (q') através da função de transição δ  - δ(q) -> δ(q'). 
+
+A Assinatura da função δ do autômato é
+```
+let rec delta controlStack valueStack environment memory locations
+```
+
+A seguir explicamos todas as transições implementadas no autômato comparando-as com a [especificação definida sobre o π Autômato](https://github.com/ChristianoBraga/PiFramework/doc/pi-in-a-nutshell.md)
+
+
 
 
 Quando lê-se o Num(N), simplesmente colocamos o valor N na pilha de valores.
@@ -1522,49 +1530,9 @@ CSeq(x, y) ->
   (Stack.push (Statement(Cmd(x))) controlStack );
 );
 ```
-No automato criamos os tipos valueStackOptions , storable e bindable que respectivamente são: os valores que o podem ser inseridos na pilha de controle, storable que está associado a memória e o bindable que está associado ao ambiente. Os tipos storable e bindable são os responsáveis por fazerem o mampeamento dos dados. 
-```
-exception AutomatonException of string;;
-
-  
-type valueStackOptions = 
-  | Int of int
-  | Str of string
-  | Bool of bool
-  | LoopValue of command
-  | CondValue of command
-  | Bind of loc
-  | Locations of int list
-  | Env of (string, bindable) Hashtbl.t
-;;
-
-type storable = 
-  | Integer of int
-  | Boolean of bool
-  | Pointer of loc
-;;
-
-type bindable = 
-  | Loc of loc
-  | IntConst of int
-  | BoolConst of bool
-;;
-
-type loc =
-  | Location of int
-;;
-```
-Nós usamos a estrutura de hashtable(pro enviroment e pra memória), estrutura de lista para guardar as locations e a estrutura de pilha para as stacks de controle e valor que são inicializadas no arquivo [main.ml](https://github.com/sevontheedge/Ocampiler/blob/master/src/main.ml) .
-```
-  let tree = Statement(Parser.main Lexer.token (Lexing.from_string !fileContents) )
-  and controlStack = (Stack.create()) 
-  and valueStack = (Stack.create()) 
-  and environment = (Hashtbl.create 10)
-  and memory = (Hashtbl.create 10)
-  and locations = ref [] 
 
 ```
-Ao dar pattern match com DeRef de um Id W é colocado no topo da pilha de valor a location l correspondente a W. Para isso buscamos no enviroment o bindable correspondente a W e colocamos ele no topo da pilha de valor e caso W seja uma constante não será possível acessar seu endereço.
+Ao ler um DeRef colocamos a location l correspondente ao Id W lido. Para isso buscamos no enviroment o bindable correspondente a W e colocamos ele no topo da pilha de valor e caso W seja uma constante não será possível acessar seu endereço.
 ```
 𝛅(DeRef(Id(W)) :: C, V, E, S, L) = 𝛅(C, l :: V, E, S, L), where l = E[W]
 
@@ -1589,17 +1557,23 @@ Ao dar pattern match com DeRef de um Id W é colocado no topo da pilha de valor 
 );
 ```
 
-Ao dar pattern match com ValRef de um Id W é colocado no topo da pilha de valor T = S[S[E[W]]], por exemplo: 
+Ao ler um ValRef, referente a um Id W, é colocado no topo da pilha de valor T = S[S[E[W]]].
+
+Um exemplo dessa manipulação é mostrado através do seguinte cenário:
 
 ```
-...
-z := 7        z |-> lz ^ lz |-> 7 
-x := &z       x |-> lx ^ lx |-> lz
-y := *x
+Ambiente:
+z |-> lz
+x |-> lx
+
+
+Memória:
+lz |-> 7 
+lx |-> lz
  
 
 ```
-Ao fazer um Valref com ```y := *x ( y |-> ly ^ ly |-> 7)``` buscasse no enviroment o bindable correspondente a x (lx); em seguida buscasse na memória o storable no qual a location lx está  apontando(lx -> lz que é o endereço de &z); buscasse na memória o storable para o qual lz aponta (lz -> 7) e esse valor é colocado no topo da pilha de valor (7). 
+Ao fazer um Valref com ```y := *x ``` buscasse no enviroment o bindable correspondente a x (lx); em seguida buscasse na memória o storable no qual a location lx está  apontando(lx -> lz que é o endereço da variável de id z); buscasse então na memória o storable para o qual lz aponta (lz -> 7) e esse valor é colocado no topo da pilha de valor (7). Caso esse caminho seja interrompido é leventado uma exceção. 
 
 
 ```
@@ -1635,7 +1609,7 @@ Ao fazer um Valref com ```y := *x ( y |-> ly ^ ly |-> 7)``` buscasse no envirome
 );
 ```
 
-Ao dar Pattern Match com um ref de x, é colocado #OPREF na pilha de controle e x no topo da pilha. Dessa forma, Ref cria uma location na memoria e depois um valor é associado a essa location.
+Ao ler o Ref de x, é colocado #REF na pilha de controle e x no topo da pilha. Dessa forma, Ref cria uma location na memoria e depois um valor é associado a essa location.
 ```
 𝛅(Ref(X) :: C, V, E, S, L) = 𝛅(X :: #REF :: C, V, E, S, L)`
 ```
@@ -1645,27 +1619,25 @@ Ao dar Pattern Match com um ref de x, é colocado #OPREF na pilha de controle e 
   (Stack.push (Statement(Exp(ref))) controlStack);
 );
 ```
-Ao dar Pattern Match com #OPREF criasse uma nova location e a colocamos na pilha de valor e a memória recebe essa nova location com o valor que lhe foi associado .(lista de locations e memória são atualizadas S->S' e L->L').
+
+Ao lermos um #REF criasse uma nova location e a colocamos na pilha de valor e a memória recebe essa nova location com o valor que lhe foi associado. A lista de locations e memória são atualizadas S->S' e L->L'.
 ```
-Exemplo : 
+Exemplo: 
 Pilha de Controle:[ #REF, ....]
 Pilha de Valor:
-[ 0, y, Env({( x -> LOC[6] )}), Locations({}) ]
+[ 0, y, ... ]
 Ambiente:{}
 Memória:{( LOC[6] -> -1 )}
 Locations:{ 6 }
 
----Após OPREF teremos :
+---Após #REF teremos:
 
 Pilha de Controle:[ ...]
-Pilha de Valor:[ LOC[11], y, Env({( x -> LOC[6] )}), Locations({}) ]
+Pilha de Valor:[ LOC[11], y, ... ]
 Ambiente:{}
 Memória:{( LOC[6] -> -1 ),( LOC[11] -> 0 )}
 Locations:{6, 11}
-
-
 ```
-
 ```
 𝛅(#REF :: C, T :: V, E, S, L) = 𝛅(C, l :: V, E, S', L'), where S' = S ∪ [l ↦ T], l ∉ S, L' = L ∪ {l}
 ```
@@ -1688,26 +1660,9 @@ Locations:{6, 11}
   | _  -> raise (AutomatonException "Error on #REF" );
 );
 ```
-As declarações podem ser um Bind ou uma sequência de declaraçes.
 
-```
-| Dec (dec) -> (
-  match dec with 
-  | Bind(Id(x), y) -> (
-    (Stack.push (DecOc(OPBIND)) controlStack );
-    (Stack.push (Statement(Exp(y))) controlStack );
-    (Stack.push (Str(x)) valueStack);
-  );
-  | Bind(_, _) -> (
-    raise (AutomatonException "Error on Bind" );
-  );
-  | DSeq(x, y) -> (
-  (Stack.push (Statement(Dec(y))) controlStack);
-  (Stack.push (Statement(Dec(x))) controlStack);
- );
-);
-```
-Ao dar pattern Match com Dseq nós colocamos as declarações x e y na pilha de controle.
+
+Ao lermos um Dseq nós colocamos as declarações x e y na pilha de controle.
 ```
 𝛅(DSeq(D₁, D₂), X) :: C, V, E, S, L) = 𝛅(D₁ :: D₂ :: C, V, E, S, L)
 ```
@@ -1718,7 +1673,8 @@ Ao dar pattern Match com Dseq nós colocamos as declarações x e y na pilha de 
 );
 ```
 
-Ao dar pattern Match com Bind de um Id x e uma expressão y, é colocado OPBIND, seguido da expressão y na pilha de controle e a string identidicadora na pilha de valor. Dessa forma o Bind faz uma associação entre um ID e um valor(que pode ser uma location no caso de variáveis ou inteiro/booleano no caso de constantes).
+
+Ao lermos um Bind de um Id x e uma expressão y é colocado OPBIND, seguido da expressão y na pilha de controle e a string identificadora na pilha de valor. Dessa forma o Bind faz uma associação entre um ID e um valor(que pode ser uma location no caso de variáveis ou inteiro/booleano no caso de constantes).
 ```
 𝛅(Bind(Id(W), X) :: C, V, E, S, L) = 𝛅(X :: #BIND :: C, W :: V, E, S, L)
 ```
@@ -1734,7 +1690,116 @@ Ao dar pattern Match com Bind de um Id x e uma expressão y, é colocado OPBIND,
 );
 ```
 
-Ao dar pattern match com OPBIND pegasse um valor B da pilha de valor e uma string identificadora W e cria-se uma associação W -> B e caso exista um enviroment W->B  adicionado ao enviroment caso contrário é criado um novo enviroment W->B é adicionado a ele e ele é colocado na pilha de valor.
+Ao ler Blk entramos em um bloco, adicionando um ou mais BIND's para construir o ambiente e memória do escopo atual. Então coloca-se na pilha de controle, OPBLKCMD, Um ou mais comandos y (corpo do bloco), OPBLKDEC, uma ou mais declaraçes x e na pilha de valor as locations até então criadas. E no último passo a lista de locations é limpa para o bloco recém-criado.
+```
+𝛅(Blk(D, M) :: C, V, E, S, L) = 𝛅(D :: #BLKDEC :: M :: #BLKCMD :: C, L :: V, E, S, ∅)
+```
+
+```
+| Blk(x, y) -> (
+  (Stack.push (DecOc(OPBLKCMD)) controlStack);
+  (Stack.push (Statement(Cmd(y))) controlStack);
+  (Stack.push (DecOc(OPBLKDEC)) controlStack);
+  (Stack.push (Statement(Dec(x))) controlStack);
+  (Stack.push (Locations(!locations)) valueStack);
+  locations := [] ;
+);
+```
+
+
+Ao ler #BLKDEC olhamos a pilha de valor para pegar as associações que foram criadas pelo BIND e trazer essas associaçes para o novo ambiente necessário pelo novo escopo aberto por um bloco. O novo ambiente(E/E') é montado da seguinte forma se em E já tiver uma associação de mesmo id existente em E' essa será trocada para o valor definido por E` senão uma nova será criada. Além disso na pilha de valor é colocado o ambiente E para guardar o estado atual antes do novo escopo.
+```
+𝛅(#BLKDEC :: C, E' :: V, E, S, L) = 𝛅(C, E :: V, E / E', S, L)
+```
+```
+| OPBLKDEC -> (
+  let ass = (Stack.pop valueStack) in
+    let env = Hashtbl.copy environment in
+      match ass with
+        | Env(e) -> (
+          (Stack.push (Env(env)) valueStack);
+          (Hashtbl.iter (  fun key value -> if not(Hashtbl.mem environment key ) then 
+                                                (Hashtbl.add environment key value) 
+                                            else (Hashtbl.replace environment key value) ) e);
+        );
+        | _ -> raise (AutomatonException "Error on #BLKDEC" );
+);
+
+```
+O #BLKCMD é responsável pelo fechamento do bloco. Nele as locatons criadas dentro do bloco serão apagadas assim como os respectivos mapeamentos na memória para essas locations. As locations e o ambiente anterior serão resgatados. Isso é feito ao lermos #BLKCMD da dois pops na pilha de valor, resgatamos os mapeamentos de E e as locations, salvas antes do início do escopo sendo fechado, e o ambiente atual é atualizado com as locations apagando-se as locations usadas apenas no escopo do bloco que foi recentemente fechado.
+```
+𝛅(#BLKCMD :: C, E :: L :: V, E', S, L') = 𝛅(C, V, E, S', L), where S' = S / L'.
+```
+```
+| OPBLKCMD -> (
+  let env = (Stack.pop valueStack) in
+    let locs = (Stack.pop valueStack) in
+      match locs with
+        | Locations(x) -> (
+          match env with
+            | Env(y) -> (
+              (Hashtbl.clear environment);
+              (Hashtbl.add_seq environment (Hashtbl.to_seq y));
+              (Hashtbl.iter (  fun key value -> if (List.mem key !locations) then 
+                                              (Hashtbl.remove memory key) ) memory );
+              locations := x; 
+              );
+            | _ -> raise (AutomatonException "Error on #BLKCMD" );
+        );
+        | _ -> raise (AutomatonException "Error on #BLKCMD" );
+);
+ ```
+
+No automato criamos os tipos _valueStackOptions_, _storable_ e _bindable_ que são os valores que o podem ser inseridos na pilha de valor, os possíveis valores associados à Hashtable de memória e os possíveis valores associados à Hashtable do ambiente respectivamente. Os tipos _storable_ e _bindable_ são os responsáveis por fazerem o mampeamento dos dados.  O tipo _loc_ foi definido para ser reaproveitado pois era usado em diferentes lugares.
+```
+exception AutomatonException of string;;
+
+  
+type valueStackOptions = 
+  | Int of int
+  | Str of string
+  | Bool of bool
+  | LoopValue of command
+  | CondValue of command
+  | Bind of loc
+  | Locations of int list
+  | Env of (string, bindable) Hashtbl.t
+;;
+
+type storable = 
+  | Integer of int
+  | Boolean of bool
+  | Pointer of loc
+;;
+
+type bindable = 
+  | Loc of loc
+  | IntConst of int
+  | BoolConst of bool
+;;
+
+type loc =
+  | Location of int
+;;
+```
+Nós usamos a estrutura de [Hashtbl](https://caml.inria.fr/pub/docs/manual-ocaml/libref/Hashtbl.html) para os dicionários de ambiente e memória, [List](https://caml.inria.fr/pub/docs/manual-ocaml/libref/List.html) para a lista de locations e a [Stack](https://caml.inria.fr/pub/docs/manual-ocaml/libref/Stack.html) para as pilhas de controle e valor, todos inicializadas no arquivo [main.ml](https://github.com/sevontheedge/Ocampiler/src/main.ml).
+```
+  let tree = Statement(Parser.main Lexer.token (Lexing.from_string !fileContents) )
+  and controlStack = (Stack.create()) 
+  and valueStack = (Stack.create()) 
+  and environment = (Hashtbl.create 10)
+  and memory = (Hashtbl.create 10)
+  and locations = ref [] 
+
+
+
+
+
+
+
+
+
+Ao lermos um #BIND pegasse um valor B da pilha de valor e uma string identificadora W e cria-se uma associação W -> B e caso exista um enviroment W->B  adicionado ao enviroment caso contrário é criado um novo enviroment W->B é adicionado a ele e ele é colocado na pilha de valor.
 ```
 𝛅(#BIND :: C, B :: W :: E' :: V, E, S, L) = 𝛅(C, ({W ↦ B} ∪ E') :: V, E, S, L), where E' ∈ Env,
 𝛅(#BIND :: C, B :: W :: H :: V, E, S, L) = 𝛅(C, {W ↦ B} :: H :: V, E, S, L), where H ∉ Env,
@@ -1808,64 +1873,8 @@ Ao dar pattern match com OPBIND pegasse um valor B da pilha de valor e uma strin
   );
 ```
 
-Ao entrarmos em um bloco adicionaremos um ou mais BIND's e vamos construir Ambiente e memória pra um dado escopo. Então o pattern match do Bloco coloca na pilha de controle, OPBLKCMD, Um ou mais comandos y(corpo do bloco), OPBLKDEC, Uma ou mais declaraçes x e na pilha de valor as locations até então criadas. E no último passo a lista de locations é limpa para o bloco criado.
-```
-𝛅(Blk(D, M) :: C, V, E, S, L) = 𝛅(D :: #BLKDEC :: M :: #BLKCMD :: C, L :: V, E, S, ∅)
-```
 
-```
-| Blk(x, y) -> (
-  (Stack.push (DecOc(OPBLKCMD)) controlStack);
-  (Stack.push (Statement(Cmd(y))) controlStack);
-  (Stack.push (DecOc(OPBLKDEC)) controlStack);
-  (Stack.push (Statement(Dec(x))) controlStack);
-  (Stack.push (Locations(!locations)) valueStack);
-  locations := [] ;
-);
-```
 
-OPBLKDEC vai na pilha de valor pegar as associações que foram criadas pelo BIND e vai trazer essas associaçes pro ambiente(E/E'), se E já tiver uma associação E' essa será trocada senão ela será adicionada. Além disso na pilha de valor é colocado o ambiente E.
-```
-𝛅(#BLKDEC :: C, E' :: V, E, S, L) = 𝛅(C, E :: V, E / E', S, L)
-```
-```
-| OPBLKDEC -> (
-  let ass = (Stack.pop valueStack) in
-    let env = Hashtbl.copy environment in
-      match ass with
-        | Env(e) -> (
-          (Stack.push (Env(env)) valueStack);
-          (Hashtbl.iter (  fun key value -> if not(Hashtbl.mem environment key ) then 
-                                                (Hashtbl.add environment key value) 
-                                            else (Hashtbl.replace environment key value) ) e);
-        );
-        | _ -> raise (AutomatonException "Error on #BLKDEC" );
-);
-
-```
-O OPBLKCMD  é responsável pelo fechamento do bloco. Nele as locatons criadas dentro do bloco serão apagadas assim como os respectivos mapeamentos para essas locations. As locations e o ambiente anterior serão resgatados. Nesse caso o pattern match com OPBLKCMD da dois pops na pilha de valor, limpa o enviroment atual, adiciona os mapeamentos de E e apaga todas as Locations L' e o enviroment atual passa a ser E e as locations são atualizadas com x, onde x = L - L'.
-```
-𝛅(#BLKCMD :: C, E :: L :: V, E', S, L') = 𝛅(C, V, E, S', L), where S' = S / L'.
-```
-```
-| OPBLKCMD -> (
-  let env = (Stack.pop valueStack) in
-    let locs = (Stack.pop valueStack) in
-      match locs with
-        | Locations(x) -> (
-          match env with
-            | Env(y) -> (
-              (Hashtbl.clear environment);
-              (Hashtbl.add_seq environment (Hashtbl.to_seq y));
-              (Hashtbl.iter (  fun key value -> if (List.mem key !locations) then 
-                                              (Hashtbl.remove memory key) ) memory );
-              locations := x; 
-              );
-            | _ -> raise (AutomatonException "Error on #BLKCMD" );
-        );
-        | _ -> raise (AutomatonException "Error on #BLKCMD" );
-);
- ```
 
 
 
