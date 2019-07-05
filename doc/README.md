@@ -1,4 +1,4 @@
-# P1 Compiladores
+# Prova Formal de Compiladores
 
 Em cada tópico a seguir explicaremos como implementamos o funcionamento do π framework em Ocaml.
 
