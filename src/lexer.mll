@@ -30,12 +30,14 @@
           | "else"                  { ELSE }
           | "end"                   { END }
           | ":="                    { ASSIGN }
-          | "="                    { BIND }
-          | "let"                    { LET }
-          | "var"                    { VAR }
-          | "const"                    { CNS }
+          | "="                     { BIND }
+          | "let"                   { LET }
+          | "var"                   { VAR }
+          | "const"                 { CNS }
           | "in"                    { IN }
-          | "&"                    { ADDRESS }
-          | ","                    { COMMA }
+          | "fn"                    { ABS }
+          | "&"                     { ADDRESS }
+          | ","                     { COMMA }
+          | ";"                     { PV }       
           | (['a'-'z' 'A'-'Z' '_'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*) as  lxm      { ID(lxm) }
           | eof                     { EOF }

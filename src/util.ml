@@ -15,6 +15,7 @@ let readInputFile file_name =
     close_in ch;
     s;;
 
+
 (* Pi Denotations *)
 let rec string_of_arithmetic_expression arithmetic_expression = 
   match arithmetic_expression with 
@@ -45,6 +46,10 @@ and string_of_expression expression =
   | Ref(x) -> "REF (" ^ (string_of_expression x) ^ ")"
   | DeRef(x) -> "DEREF (" ^ (string_of_expression x) ^ ")"
   | ValRef(x) -> "VALREF (" ^ (string_of_expression x) ^ ")"
+  | Formal(x) -> "FORMAL (" ^ (string_of_explist x) ^ ")"
+  | Actual(x) -> "ACTUAL (" ^ (string_of_explist x) ^ ")"
+  | Parametro(x)-> "" ^ (string_of_explist x) ^ ""
+  
 
 and string_of_command command = 
   match command with
@@ -54,17 +59,20 @@ and string_of_command command =
   | Assign(x, y) -> "ASSIGN (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
   | Cond(x, y, z) -> "COND (" ^ (string_of_expression x) ^ ", " ^ (string_of_command y) ^ ", " ^ (string_of_command z) ^ ")"
   | Blk(x, y) -> "BLK (" ^ (string_of_declaration x) ^ ", " ^ (string_of_command y) ^ ")"
+  | Call(x,y) -> "CALL (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
 
 and string_of_declaration declaration =
   match declaration with
   | Bind(x, y) -> "BIND (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
   | DSeq(x, y) ->  "DSEQ (" ^ (string_of_declaration x) ^ ", " ^ (string_of_declaration y) ^ ")"
+  | BindAbs(x,y) -> "BINDABS (" ^ (string_of_expression x) ^ ", " ^ (string_of_statement y) ^ ")"
 
 and string_of_statement statement =
   match statement with
   | Exp (x) -> string_of_expression x
   | Cmd (x) -> string_of_command x
   | Dec(x) -> string_of_declaration x
+  | Abs(x,y) -> "ABS (" ^ (string_of_expression x) ^ ", " ^ (string_of_command y) ^ ")"
   
 and string_of_exp_opcode expOc =
   match expOc with
@@ -100,6 +108,9 @@ and string_of_control ctn =
   | ExpOc(x) -> string_of_exp_opcode x
   | CmdOc(x) -> string_of_cmd_opcode x 
   | DecOc(x) -> string_dec_opcode x
+
+and string_of_explist p = 
+  "" ^ String.concat ", " (List.map string_of_expression p) ^ ""
 ;;
   
 (* Stacks *)
@@ -127,6 +138,7 @@ let rec string_of_bindable bindable =
   | Loc(x) ->  (string_of_loc x) 
   | IntConst(x) -> "IntConst (" ^ (string_of_int x) ^ ")"
   | BoolConst(x) -> "BoolConst (" ^ (string_of_bool x) ^ ")"
+  | Close (x) -> "Closure (" ^ (string_of_value_stack x) ^ ")"
 
 and string_of_loc loc =
   match loc with
@@ -142,7 +154,7 @@ and string_of_value_stack item =
   | Bind(x) -> (string_of_loc x)
   | Env(x) -> "Env(" ^  (string_of_dictionary x string_of_bindable_dictionary) ^ ")"
   | Locations(x) -> "Locations(" ^ (string_of_list x) ^ ")"
-
+  | Closure(x,y,z) -> " Closure (" ^(string_of_expression x) ^ (string_of_command y) ^ (string_of_dictionary z string_of_bindable_dictionary) ^ ")"
 
   and string_of_storable storable =
   match storable with

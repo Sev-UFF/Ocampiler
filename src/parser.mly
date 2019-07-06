@@ -4,7 +4,7 @@
         %token <string> ID
         %token PLUS MINUS TIMESORPOINTER DIV
         %token LESS LESSEQUAL GREATER GREATEREQUAL EQUALS AND OR
-        %token LOOP DO IF THEN ELSE END ASSIGN LET VAR CNS BIND IN COMMA ADDRESS POINTER
+        %token LOOP DO IF THEN ELSE END ASSIGN LET VAR CNS BIND IN COMMA ADDRESS POINTER ABS PV
         %token NEGATION NOP
         %token LPAREN RPAREN 
         %token EOF 
@@ -20,52 +20,62 @@
         %type <Pi.command> command
         %type <Pi.expression> bindableVariable
         %type <Pi.expression> variable
-        %type <Pi.expression> explist
+        %type <Pi.statement> abstraction
+        %type <Pi.expression> parametros
         %%
         main:
             statement EOF     { $1 }
         ;
         statement:
-          expression     { Pi.Exp($1)}
+            expression   { Pi.Exp($1)}
           | command      { Pi.Cmd($1)}
         ;
         declaration:
-          | VAR ID BIND expression              { Pi.Bind(Pi.Id($2), Pi.Ref($4)) }
-          | CNS ID BIND bindableVariable        { Pi.Bind(Pi.Id($2), $4) }
-          | declaration COMMA declaration       { Pi.DSeq($1, $3) }
-          | LPAREN declaration RPAREN           { $2 }
+          | VAR ID BIND expression            { Pi.Bind(Pi.Id($2), Pi.Ref($4)) }
+          | CNS ID BIND bindableVariable      { Pi.Bind(Pi.Id($2), $4) }
+          | declaration COMMA declaration     { Pi.DSeq($1, $3) }
+          | ABS ID abstraction                { Pi.BindAbs(Pi.Id($2), $3)}
+          | LPAREN declaration RPAREN         { $2 }
+        ;
+        abstraction:
+          | LPAREN expression RPAREN BIND command               { Pi.Abs(Pi.Formal($2::[]), $5)}
+          | LPAREN abstraction RPAREN             { $2 }
         ;
         command:
-          LOOP expression DO command  END                { Pi.Loop(($2), $4)}
-          | IF expression THEN command ELSE command END  { Pi.Cond(($2), $4, $6)}
-          | IF expression THEN command END               { Pi.Cond(($2), $4, Pi.Nop)}
-          | ID ASSIGN expression                         { Pi.Assign(Pi.Id($1), $3) }
-          | command  command                             { Pi.CSeq($1, $2) }
-          | LET declaration IN command                   { Pi.Blk($2, $4)}
-          | LET declaration IN command END               { Pi.Blk($2, $4)}
-          | LPAREN command RPAREN                        { $2 }
+          LOOP expression DO command  END                 { Pi.Loop(($2), $4)}
+          | IF expression THEN command ELSE command END   { Pi.Cond(($2), $4, $6)}
+          | IF expression THEN command END                { Pi.Cond(($2), $4, Pi.Nop)}
+          | ID ASSIGN expression                          { Pi.Assign(Pi.Id($1), $3) }
+          | command  command                              { Pi.CSeq($1, $2) }
+          | LET declaration IN command                    { Pi.Blk($2, $4)}
+          | LET declaration IN command END                { Pi.Blk($2, $4)}
+          | ID LPAREN expression RPAREN                   { Pi.Call(Pi.Id($1), Pi.Actual($3::[])) } 
+          | ID LPAREN parametros RPAREN                   { Pi.Call(Pi.Id($1), Pi.Actual($3::[])) } 
+          | LPAREN command RPAREN                         { $2 }
+        ;
+        parametros: 
+          
+          | expression PV expression { Pi.Parametro($1::$3::[]) }
+          | expression PV parametros { Pi.Parametro($1::$3::[]) }
+          | expression                  { $1 }
         ;
         expression: 
-            ADDRESS ID                                   { Pi.DeRef(Pi.Id($2))}
-            | bindableVariable                           { $1 }
-            | LPAREN expression RPAREN                   { $2 }  
-
+          ADDRESS ID                    { Pi.DeRef(Pi.Id($2))}
+          | parametros                   { $1 }
+          | bindableVariable            { $1 }
+          | LPAREN expression RPAREN    { $2 }
         ;
-        explist:
-          expression expression                          { $1::$2::[] }  
-          |LPAREN explist RPAREN                          { (($2))}
-        ;
-         bindableVariable: 
-             arithmeticExpression                        { Pi.AExp( $1) }
-            | booleanExpression                          { Pi.BExp( $1) }
-            | variable                                   { $1 }
-            | LPAREN bindableVariable RPAREN             { $2 }
+        bindableVariable: 
+            arithmeticExpression              { Pi.AExp( $1) }
+          | booleanExpression                 { Pi.BExp( $1) }
+          | variable                          { $1 }
+          | LPAREN bindableVariable RPAREN    { $2 }
             
         ;
         variable:
-           ID                                            { Pi.Id( $1) }
-          | TIMESORPOINTER ID                            { Pi.ValRef(Pi.Id($2))}
-          | LPAREN variable RPAREN                       { $2 }
+            ID                        { Pi.Id( $1) }
+          | TIMESORPOINTER ID         { Pi.ValRef(Pi.Id($2))}
+          | LPAREN variable RPAREN    { $2 }
         ;
         arithmeticExpression:  
           NUMBER                                                     { Pi.Num($1) }
