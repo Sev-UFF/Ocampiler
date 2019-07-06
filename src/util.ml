@@ -1,6 +1,9 @@
 open Pi;;
 open AutomatonType;;
 
+
+
+
 (* Boolean *)
 let string_of_bool x =
   if x then "True" else "False";;

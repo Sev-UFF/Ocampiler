@@ -20,6 +20,7 @@
         %type <Pi.command> command
         %type <Pi.expression> bindableVariable
         %type <Pi.expression> variable
+        %type <Pi.expression> explist
         %%
         main:
             statement EOF     { $1 }
@@ -47,8 +48,12 @@
         expression: 
             ADDRESS ID                                   { Pi.DeRef(Pi.Id($2))}
             | bindableVariable                           { $1 }
-            | LPAREN expression RPAREN                   { $2 }
-            
+            | LPAREN expression RPAREN                   { $2 }  
+
+        ;
+        explist:
+          expression expression                          { $1::$2::[] }  
+          |LPAREN explist RPAREN                          { (($2))}
         ;
          bindableVariable: 
              arithmeticExpression                        { Pi.AExp( $1) }

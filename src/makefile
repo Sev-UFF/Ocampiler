@@ -44,7 +44,10 @@ clear:
 	rm -f *.cm[io] *.cmx *~ .*~ #*#
 	rm -f $(GENERATED)
 	rm -f $(EXEC)
-
+p3:
+	git pull origin p3
+	git checkout p3
+	$(MAKE) run
 
 p2:
 	git pull origin p2
