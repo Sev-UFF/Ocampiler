@@ -29,6 +29,7 @@ type token =
   | ADDRESS
   | POINTER
   | ABS
+  | PV
   | NEGATION
   | NOP
   | LPAREN

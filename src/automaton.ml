@@ -37,10 +37,6 @@ let rec delta controlStack valueStack environment memory locations =
                   (Stack.push (Bool(b)) valueStack);
                 );
             );
-          | Actual(actuals) -> (
-              (Stack.push actuals valueStack);
-              
-          );
           | AExp(aExp) -> (
               match aExp with 
               | Num(x) -> (
@@ -715,7 +711,14 @@ let rec delta controlStack valueStack environment memory locations =
             (Stack.push (DecOc(OPBIND)) controlStack );
             (Stack.push (Statement(y)) controlStack );
             (Stack.push (Str(x)) valueStack);
-          ) ;
+          );
+          | BindAbs(Formal(x),y) -> (
+            (Stack.push (DecOc(OPBIND)) controlStack );
+            (Stack.push (Statement(y)) controlStack );
+            (Stack.push (Param(x)) valueStack);
+            (*(List.iter (fun parametro -> Stack.push ((parametro)) valueStack) x );*)
+
+          );
           | Bind(_, _) -> (
             raise (AutomatonException "Error on Bind" );
           );

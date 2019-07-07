@@ -1,6 +1,9 @@
 open Pi;;
 open AutomatonType;;
 
+
+
+
 (* Boolean *)
 let string_of_bool x =
   if x then "True" else "False";;
@@ -11,6 +14,7 @@ let readInputFile file_name =
     let s = really_input_string ch (in_channel_length ch) in
     close_in ch;
     s;;
+
 
 (* Pi Denotations *)
 let rec string_of_arithmetic_expression arithmetic_expression = 
@@ -42,13 +46,10 @@ and string_of_expression expression =
   | Ref(x) -> "REF (" ^ (string_of_expression x) ^ ")"
   | DeRef(x) -> "DEREF (" ^ (string_of_expression x) ^ ")"
   | ValRef(x) -> "VALREF (" ^ (string_of_expression x) ^ ")"
-  | Formal(x) -> "FORMAL (" ^ (string_of_expression x) ^ ")"
-  | Actual(x) -> "ACTUAL (" ^ (string_of_expression x) ^ ")"
-
-and string_of_actuals actual = 
-  "{\n\t" ^ String.concat ", " (List.map string_of_expression actual) ^ "\n}"
-
- 
+  | Formal(x) -> "FORMAL (" ^ (string_of_explist x) ^ ")"
+  | Actual(x) -> "ACTUAL (" ^ (string_of_explist x) ^ ")"
+  | Parametro(x)-> "" ^ (string_of_explist x) ^ ""
+  
 
 and string_of_command command = 
   match command with
@@ -107,6 +108,9 @@ and string_of_control ctn =
   | ExpOc(x) -> string_of_exp_opcode x
   | CmdOc(x) -> string_of_cmd_opcode x 
   | DecOc(x) -> string_dec_opcode x
+
+and string_of_explist p = 
+  "" ^ String.concat ", " (List.map string_of_expression p) ^ ""
 ;;
   
 (* Stacks *)

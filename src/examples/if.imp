@@ -1,10 +1,10 @@
-let var z = 1
+let var z = 1 , var b = 3
 in 
-    let fn f(x) =    
-        let var y = x
+    let fn f(x;w) =    
+        let var y = x , var a = w
         in      
             #while not (y == 0)
             #do 
               #z := z * y
               y := y - 1
-    in f(10)
+    in f(10;28;30;40)

@@ -24,8 +24,9 @@
     | Ref of expression
     | DeRef of expression
     | ValRef of expression
-    | Formal of expression
-    | Actual of expression
+    | Formal of expression list
+    | Actual of expression list
+    | Parametro of expression list
 
   and command = 
     | Loop of expression * command
