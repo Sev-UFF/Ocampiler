@@ -54,7 +54,7 @@
         ;
         explist:
             explist {[]}
-          | expression PV expression {(($3::$1::[]))}
+          | expression PV expression {  ($3::$1::[])}
           | explist PV expression {($3::$1)}
           | expression {($1::[])}
         ;

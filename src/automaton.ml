@@ -670,11 +670,13 @@ let rec delta controlStack valueStack environment memory locations =
              (Stack.push (Str(x)) valueStack);
           );
           | Assign(_, _) -> raise (AutomatonException "Error on Assign");
-          | Call (x,y) -> (
-            (Stack.push (Statement(Cmd(Call(x,y)))) controlStack );
-            (Stack.push (Statement(Exp(y))) controlStack);
-            (*(List.iter (fun parametro ->  match parametro with
-                                          |Exp(n)-> raise (AutomatonException "Error on Assign") ) y);*)
+          | Call (x,y) -> (    
+            match y with
+            |Actual(z) -> (
+              ( Stack.push (DecOc (OPCALL(x, (List.length z))) )  controlStack );
+              ( Stack.push (Statement(Exp(y))) controlStack);
+              ( List.iter (fun parametro -> Stack.push (Statement(Exp(parametro))) controlStack ) z);
+            );
           );
           | Cond(BExp(x), y, z) -> (
             (Stack.push (CmdOc(OPCOND)) controlStack);
@@ -1072,6 +1074,9 @@ let rec delta controlStack valueStack environment memory locations =
                       | _ -> raise (AutomatonException "Error on #BLKCMD" );
                   );
                   | _ -> raise (AutomatonException "Error on #BLKCMD" );
+          );
+          | OPCALL(x,y) -> ( 
+            print_endline("<><><><><><> A IMPLEMENTAR <><><><><><><>");
           );
       );
     );

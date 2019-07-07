@@ -75,6 +75,7 @@
    | OPBLKDEC
    | OPBLKCMD
    | OPBIND
+   | OPCALL of expression * int
 
   and control = 
   | Statement of statement

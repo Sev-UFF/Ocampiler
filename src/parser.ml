@@ -780,7 +780,7 @@ let yyact = [|
     let _3 = (Parsing.peek_val __caml_parser_env 0 : Pi.expression) in
     Obj.repr(
 # 57 "parser.mly"
-                                     (((_3::_1::[])))
+                                     (  (_3::_1::[]))
 # 785 "parser.ml"
                : Pi.expression list))
 ; (fun __caml_parser_env ->

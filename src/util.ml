@@ -51,7 +51,7 @@ and string_of_expression expression =
 
 and string_of_explist p = 
   "" ^ String.concat ", " (List.map string_of_expression p) ^ ""
-  
+
 and string_of_command command = 
   match command with
   | Loop(x, y) -> "LOOP (" ^ (string_of_expression x) ^ ", " ^ (string_of_command y) ^ ")"
@@ -96,12 +96,13 @@ and string_of_exp_opcode expOc =
   | OPLOOP  -> "#LOOP"
   | OPCOND -> "#COND"
 
-  and string_dec_opcode decOc = 
+and string_dec_opcode decOc = 
   match decOc with
   | OPREF -> "#REF"
   | OPBLKDEC -> "#BLKDEC"
   | OPBLKCMD -> "#BLKCMD"
   | OPBIND -> "#BIND"
+  | OPCALL(x,y) -> "#CALL (" ^ (string_of_expression x) ^ "," ^  (string_of_int y)^ ")"
 
 and string_of_control ctn =
   match ctn with 
