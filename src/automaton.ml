@@ -673,6 +673,8 @@ let rec delta controlStack valueStack environment memory locations =
           | Call (x,y) -> (
             (Stack.push (Statement(Cmd(Call(x,y)))) controlStack );
             (Stack.push (Statement(Exp(y))) controlStack);
+            (*(List.iter (fun parametro ->  match parametro with
+                                          |Exp(n)-> raise (AutomatonException "Error on Assign") ) y);*)
           );
           | Cond(BExp(x), y, z) -> (
             (Stack.push (CmdOc(OPCOND)) controlStack);

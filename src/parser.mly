@@ -21,7 +21,7 @@
         %type <Pi.expression> bindableVariable
         %type <Pi.expression> variable
         %type <Pi.statement> abstraction
-        %type <Pi.expression> parametros
+        %type <Pi.expression list> explist
         %%
         main:
             statement EOF     { $1 }
@@ -38,7 +38,7 @@
           | LPAREN declaration RPAREN         { $2 }
         ;
         abstraction:
-          | LPAREN expression RPAREN BIND command               { Pi.Abs(Pi.Formal($2::[]), $5)}
+          | LPAREN explist RPAREN BIND command    { Pi.Abs(Pi.Formal(List.rev $2), $5)}
           | LPAREN abstraction RPAREN             { $2 }
         ;
         command:
@@ -49,24 +49,20 @@
           | command  command                              { Pi.CSeq($1, $2) }
           | LET declaration IN command                    { Pi.Blk($2, $4)}
           | LET declaration IN command END                { Pi.Blk($2, $4)}
-          | ID LPAREN expression RPAREN                   { Pi.Call(Pi.Id($1), Pi.Actual($3::[])) } 
-          | ID LPAREN parametros RPAREN                   { Pi.Call(Pi.Id($1), Pi.Actual($3::[])) } 
+          | ID LPAREN explist RPAREN                      { Pi.Call(Pi.Id($1), Pi.Actual(List.rev $3) ) } 
           | LPAREN command RPAREN                         { $2 }
         ;
-        parametros: 
-          
-          | expression PV expression { Pi.Parametro($1::$3::[]) }
-          | expression PV parametros { Pi.Parametro($1::$3::[]) }
-          | expression                  { $1 }
+        explist:
+            explist {[]}
+          | expression PV expression {(($3::$1::[]))}
+          | explist PV expression {($3::$1)}
+          | expression {($1::[])}
         ;
         expression: 
           ADDRESS ID                    { Pi.DeRef(Pi.Id($2))}
-          | parametros                   { $1 }
           | bindableVariable            { $1 }
-          | LPAREN expression RPAREN    { $2 }
-        ;
- 
-        
+          | LPAREN expression RPAREN    { $2 }     
+        ;   
         bindableVariable: 
             arithmeticExpression              { Pi.AExp( $1) }
           | booleanExpression                 { Pi.BExp( $1) }
@@ -96,8 +92,7 @@
           | arithmeticExpression DIV variable                        { Pi.Div(Pi.AExp($1), $3 )  }
           | variable DIV arithmeticExpression                        { Pi.Div($1, Pi.AExp($3) )  }
           | variable DIV variable                                    { Pi.Div($1, $3 )  }
-          | LPAREN arithmeticExpression RPAREN                       { $2 }
-         
+          | LPAREN arithmeticExpression RPAREN                       { $2 }      
         ;
         booleanExpression:
           BOOLEAN                                                    { Pi.Boo($1) }

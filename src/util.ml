@@ -48,9 +48,10 @@ and string_of_expression expression =
   | ValRef(x) -> "VALREF (" ^ (string_of_expression x) ^ ")"
   | Formal(x) -> "FORMAL (" ^ (string_of_explist x) ^ ")"
   | Actual(x) -> "ACTUAL (" ^ (string_of_explist x) ^ ")"
-  | Parametro(x)-> "" ^ (string_of_explist x) ^ ""
-  
 
+and string_of_explist p = 
+  "" ^ String.concat ", " (List.map string_of_expression p) ^ ""
+  
 and string_of_command command = 
   match command with
   | Loop(x, y) -> "LOOP (" ^ (string_of_expression x) ^ ", " ^ (string_of_command y) ^ ")"
@@ -108,9 +109,6 @@ and string_of_control ctn =
   | ExpOc(x) -> string_of_exp_opcode x
   | CmdOc(x) -> string_of_cmd_opcode x 
   | DecOc(x) -> string_dec_opcode x
-
-and string_of_explist p = 
-  "" ^ String.concat ", " (List.map string_of_expression p) ^ ""
 ;;
   
 (* Stacks *)
