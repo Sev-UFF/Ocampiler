@@ -86,6 +86,9 @@ fat:
 fib:
 	./ocampiler -f examples/fibonacci.imp --stats -t
 
+if:
+	./ocampiler -f examples/if.imp --stats -t
+
 help:         
 	##               Options of make command
     ## 

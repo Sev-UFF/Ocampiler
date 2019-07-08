@@ -26,7 +26,6 @@
     | ValRef of expression
     | Formal of expression list
     | Actual of expression list
-    | Parametro of expression list
 
   and command = 
     | Loop of expression * command
@@ -37,9 +36,6 @@
     | Blk of declaration * command
     | Call of expression * expression
 
-  (*and abstraction = 
-    | Abs of expression * command
-*)
   and declaration = 
     | DSeq of declaration * declaration
     | Bind of expression * expression 

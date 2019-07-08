@@ -674,7 +674,6 @@ let rec delta controlStack valueStack environment memory locations =
             match y with
             |Actual(z) -> (
               ( Stack.push (DecOc (OPCALL(x, (List.length z))) )  controlStack );
-              ( Stack.push (Statement(Exp(y))) controlStack);
               ( List.iter (fun parametro -> Stack.push (Statement(Exp(parametro))) controlStack ) z);
             );
           );
@@ -720,8 +719,6 @@ let rec delta controlStack valueStack environment memory locations =
             (Stack.push (DecOc(OPBIND)) controlStack );
             (Stack.push (Statement(y)) controlStack );
             (Stack.push (Param(x)) valueStack);
-            (*(List.iter (fun parametro -> Stack.push ((parametro)) valueStack) x );*)
-
           );
           | Bind(_, _) -> (
             raise (AutomatonException "Error on Bind" );

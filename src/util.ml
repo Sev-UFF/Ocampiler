@@ -153,7 +153,7 @@ and string_of_value_stack item =
   | Bind(x) -> (string_of_loc x)
   | Env(x) -> "Env(" ^  (string_of_dictionary x string_of_bindable_dictionary) ^ ")"
   | Locations(x) -> "Locations(" ^ (string_of_list x) ^ ")"
-  | Closure(x,y,z) -> " Closure (" ^(string_of_expression x) ^ (string_of_command y) ^ (string_of_dictionary z string_of_bindable_dictionary) ^ ")"
+  | Closure(x,y,z) -> (string_of_expression x) ^ ", " ^ (string_of_command y) ^ ", " ^ (string_of_dictionary z string_of_bindable_dictionary)
 
   and string_of_storable storable =
   match storable with
