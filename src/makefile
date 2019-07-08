@@ -38,11 +38,7 @@ install:
 
 # Building the world
 run:  depend $(EXEC)
-
-printparser: # Debugging parser
-	export OCAMLRUNPARAM='p'
 	
-
 # Clean up
 clear:
 	rm -f *.cm[io] *.cmx *~ .*~ #*#
@@ -63,42 +59,14 @@ p1:
 	git checkout p1
 	$(MAKE) run
 
-test:
-	./ocampiler -f examples/aexp.imp -s -a -t |more
-	./ocampiler -f examples/bexp.imp -s -a -t |more
-	./ocampiler -f examples/fatorial.imp -s -a -t |more
-	./ocampiler -f examples/fibonacci.imp -s -a -t |more
-	./ocampiler -f examples/assign.imp -s -a -t |more
-	./ocampiler -f examples/assign2.imp -s -a -t |more
-	./ocampiler -f examples/deref.imp -s -a -t 
-
-quicktest:
-	./ocampiler -f examples/aexp.imp -s -a -t 
-	./ocampiler -f examples/bexp.imp -s -a -t 
-	./ocampiler -f examples/fatorial.imp -s -a -t 
-	./ocampiler -f examples/fibonacci.imp -s -a -t 
-	./ocampiler -f examples/assign.imp -s -a -t 
-	./ocampiler -f examples/assign2.imp -s -a -t --stats
-
-fat:
-	./ocampiler -f examples/fatorial.imp --stats -t
-
-fib:
-	./ocampiler -f examples/fibonacci.imp --stats -t
-
-if:
-	./ocampiler -f examples/if.imp --stats -t
 
 help:         
 	##               Options of make command
     ## 
 	## 
-	##   test      : execute /examples programs for imp language with pause (|more)
-	##   quicktest : execute /examples programs for imp language without pause
-	##   fat       : execute a fatorial program for imp
-	##   fib       : execute a fibonnacci program for imp
 	##   p1        : switch to branch p1
 	##   p2        : switch to branch p2
+	##   p3        : switch to branch p3
 	##   clear     : clear the actual build
 	##   install   : install ocaml and all of its dependences
 	##   run       : build the project 

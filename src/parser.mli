@@ -28,8 +28,8 @@ type token =
   | COMMA
   | ADDRESS
   | POINTER
-  | ABS
-  | PV
+  | FUNCTION
+  | CALL
   | NEGATION
   | NOP
   | LPAREN

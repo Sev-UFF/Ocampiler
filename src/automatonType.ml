@@ -14,7 +14,6 @@ type valueStackOptions =
   | Param of expression list
   | Locations of int list
   | Env of (string, bindable) Hashtbl.t
-  | Closure of  expression * command * ((string, bindable) Hashtbl.t)
   
 
 and storable = 
@@ -28,7 +27,6 @@ and bindable =
   | Loc of loc
   | IntConst of int
   | BoolConst of bool
-  | Close of valueStackOptions
   
 and loc =
   | Location of int;;

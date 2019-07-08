@@ -24,8 +24,6 @@
     | Ref of expression
     | DeRef of expression
     | ValRef of expression
-    | Formal of expression list
-    | Actual of expression list
 
   and command = 
     | Loop of expression * command
@@ -34,18 +32,21 @@
     | Assign of expression * expression
     | Cond of expression * command * command
     | Blk of declaration * command
-    | Call of expression * expression
+    | Call of expression * expression list (* Call(<Id>, <Exp>* ) *)
 
   and declaration = 
     | DSeq of declaration * declaration
-    | Bind of expression * expression 
-    | BindAbs of expression * statement
+    | Bind of expression * expression   (* Bind(<Id>, <Exp>) *)
+    | BindAbs of expression * statement (* Bind(<Id>, <Abs>) *)
+
+  and abstraction = 
+   | AbsFunction of expression list * command  (* Abs(<Id*>, <Blk>)  *)
  
   and statement = 
    | Exp of expression
    | Cmd of command
    | Dec of declaration
-   | Abs of expression * command
+   | Abs of abstraction
   
   and expOc =
    | OPSUM
@@ -65,13 +66,13 @@
    | OPASSIGN 
    | OPLOOP 
    | OPCOND
+   | OPCALL of expression * int
 
    and decOC =
    | OPREF
    | OPBLKDEC
    | OPBLKCMD
    | OPBIND
-   | OPCALL of expression * int
 
   and control = 
   | Statement of statement

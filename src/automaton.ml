@@ -670,13 +670,6 @@ let rec delta controlStack valueStack environment memory locations =
              (Stack.push (Str(x)) valueStack);
           );
           | Assign(_, _) -> raise (AutomatonException "Error on Assign");
-          | Call (x,y) -> (    
-            match y with
-            |Actual(z) -> (
-              ( Stack.push (DecOc (OPCALL(x, (List.length z))) )  controlStack );
-              ( List.iter (fun parametro -> Stack.push (Statement(Exp(parametro))) controlStack ) z);
-            );
-          );
           | Cond(BExp(x), y, z) -> (
             (Stack.push (CmdOc(OPCOND)) controlStack);
             (Stack.push (Statement(Exp(BExp(x)))) controlStack );
@@ -715,11 +708,6 @@ let rec delta controlStack valueStack environment memory locations =
             (Stack.push (Statement(y)) controlStack );
             (Stack.push (Str(x)) valueStack);
           );
-          | BindAbs(Formal(x),y) -> (
-            (Stack.push (DecOc(OPBIND)) controlStack );
-            (Stack.push (Statement(y)) controlStack );
-            (Stack.push (Param(x)) valueStack);
-          );
           | Bind(_, _) -> (
             raise (AutomatonException "Error on Bind" );
           );
@@ -727,11 +715,6 @@ let rec delta controlStack valueStack environment memory locations =
           (Stack.push (Statement(Dec(y))) controlStack);
           (Stack.push (Statement(Dec(x))) controlStack);
          );
-        );
-        | Abs (x,y) -> (
-          let env = (Hashtbl.copy environment) in(
-            (Stack.push (Closure(x , y , env))  valueStack);
-          );
         );
 
       );   
@@ -1032,10 +1015,7 @@ let rec delta controlStack valueStack environment memory locations =
                         );
                         |Bool(cte) -> (( Hashtbl.add newEnv w (BoolConst(cte)) );
                                        ( Stack.push (Env(newEnv)) valueStack );
-                        ); 
-                        |Closure(x,y,z) -> ( ( Hashtbl.add newEnv w (Close(l)) );
-                                             ( Stack.push (Env(newEnv)) valueStack );
-                        );                      
+                        );                       
                         | _ -> raise (AutomatonException "Error on #BIND map not created" );
               );
             );
@@ -1071,9 +1051,6 @@ let rec delta controlStack valueStack environment memory locations =
                       | _ -> raise (AutomatonException "Error on #BLKCMD" );
                   );
                   | _ -> raise (AutomatonException "Error on #BLKCMD" );
-          );
-          | OPCALL(x,y) -> ( 
-            print_endline("<><><><><><> A IMPLEMENTAR <><><><><><><>");
           );
       );
     );
