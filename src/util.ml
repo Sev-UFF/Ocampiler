@@ -64,7 +64,8 @@ and string_of_declaration declaration =
   match declaration with
   | Bind(x, y) -> "BIND (" ^ (string_of_expression x) ^ ", " ^ (string_of_expression y) ^ ")"
   | DSeq(x, y) ->  "DSEQ (" ^ (string_of_declaration x) ^ ", " ^ (string_of_declaration y) ^ ")"
-  | BindAbs(x,y) -> "BINDABS (" ^ (string_of_expression x) ^ ", " ^ (string_of_statement y) ^ ")"
+  | BindAbs(x,y) -> "BINDABS (" ^ (string_of_expression x) ^ ", " ^ (string_of_abstraction y) ^ ")"
+  | Rbnd(x,y) -> "RBND (" ^ (string_of_expression x) ^ ", " ^ (string_of_abstraction y) ^ ")"
 
 and string_of_abstraction abstraction = 
   match abstraction with
@@ -97,7 +98,7 @@ and string_of_exp_opcode expOc =
   | OPASSIGN  -> "#ASSIGN"
   | OPLOOP  -> "#LOOP"
   | OPCOND -> "#COND"
-  | OPCALL(x,y) -> "#CALL (" ^ (string_of_expression x) ^ "," ^  (string_of_int y)^ ")"
+  | OPCALL(x,y) -> "#CALL (" ^ (string_of_expression x) ^ "," ^ (string_of_int y) ^ ")"
 
 and string_dec_opcode decOc = 
   match decOc with
@@ -139,6 +140,8 @@ let rec string_of_bindable bindable =
   | Loc(x) ->  (string_of_loc x) 
   | IntConst(x) -> "IntConst (" ^ (string_of_int x) ^ ")"
   | BoolConst(x) -> "BoolConst (" ^ (string_of_bool x) ^ ")"
+  | Closure(f, b, e) -> "Closure(" ^ (string_of_expression_list f) ^ ", " ^ (string_of_command b) ^ ", " ^ (string_of_dictionary e string_of_bindable_dictionary) ^ ")"
+  | Rec(f, b, e, e_line) -> "Rec(" ^ (string_of_expression_list f) ^ ", " ^ (string_of_command b) ^ ", " ^ (string_of_dictionary e string_of_bindable_dictionary) ^ ", " ^ (string_of_dictionary e_line string_of_bindable_dictionary) ^ ")"
 
 and string_of_loc loc =
   match loc with

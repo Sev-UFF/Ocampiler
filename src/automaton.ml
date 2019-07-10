@@ -695,6 +695,10 @@ let rec delta controlStack valueStack environment memory locations =
             locations := [] ;
           );
           | Nop -> ();
+          | Call(id, actuals) -> (
+            ( Stack.push (CmdOc (OPCALL(id, (List.length actuals))) )  controlStack );
+            ( List.iter (fun parametro -> Stack.push (Statement(Exp(parametro))) controlStack ) actuals);
+          );
         );
         | Dec (dec) -> (
           match dec with 
@@ -703,18 +707,23 @@ let rec delta controlStack valueStack environment memory locations =
             (Stack.push (Statement(Exp(y))) controlStack );
             (Stack.push (Str(x)) valueStack);
           );
-          | BindAbs(Id(x),y) -> (
+          | BindAbs(Id(x), y) -> (
             (Stack.push (DecOc(OPBIND)) controlStack );
-            (Stack.push (Statement(y)) controlStack );
+            (Stack.push (Statement(Abs(y))) controlStack );
             (Stack.push (Str(x)) valueStack);
           );
           | Bind(_, _) -> (
             raise (AutomatonException "Error on Bind" );
           );
           | DSeq(x, y) -> (
-          (Stack.push (Statement(Dec(y))) controlStack);
-          (Stack.push (Statement(Dec(x))) controlStack);
+            (Stack.push (Statement(Dec(y))) controlStack);
+            (Stack.push (Statement(Dec(x))) controlStack);
          );
+        );
+        | Abs(x) -> 
+          match x with
+          | AbsFunction(f, b) -> (
+            (Stack.push (Clos(f, b, (Hashtbl.copy environment))) valueStack)
         );
 
       );   
@@ -959,6 +968,9 @@ let rec delta controlStack valueStack environment memory locations =
               );
               | _ -> raise (AutomatonException "Error on #COND" );
         );
+        | OPCALL(Id(x), n) -> (
+(* implementar e perguntar sobre o perador \ descrito nos slides *)
+        );
       );
 
       | DecOc(decOc) -> (
@@ -1055,5 +1067,42 @@ let rec delta controlStack valueStack environment memory locations =
       );
     );
     delta controlStack valueStack environment memory locations;
-  end;;
+  end
+  
+  and matchFunction formals actuals = 
+    if ((List.length formals) != (List.length actuals)) then (Hashtbl.create 10)
+    else (_match formals actuals (Hashtbl.create 10))
+  
+  (* Recebe duas listas de tamanho igual *)
+  and _match formals actuals env = 
+    match formals, actuals with
+    | [], [] -> env;
+    | Id(f)::ftl, ahd::atl -> (
+      let newEnv = (_match ftl atl env) in
+      match ahd with
+      | Int(i) -> (
+        (Hashtbl.add newEnv f (IntConst(i)));
+        newEnv;
+      );
+      | Bool(b) ->  (
+        (Hashtbl.add newEnv f (BoolConst(b)));
+        newEnv;
+      );
+    )
+    
+  and reclose env atual = 
+  (Hashtbl.iter 
+    (
+      fun key value -> 
+        match value with
+        | Closure(f, b, e) -> (
+         ( Hashtbl.replace env key (Rec(f, b, e, atual) ) );
+        );
+        | Rec(f, b, e, e_line) -> (
+          ( Hashtbl.replace env key (Rec(f, b, e, atual) ) );
+         );
+        | _ -> ();
+    )
+   env);
+  env;;
 

@@ -30,6 +30,7 @@ type token =
   | POINTER
   | FUNCTION
   | CALL
+  | REC
   | NEGATION
   | NOP
   | LPAREN

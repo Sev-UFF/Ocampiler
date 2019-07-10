@@ -4,7 +4,7 @@
         %token <string> ID
         %token PLUS MINUS TIMESORPOINTER DIV
         %token LESS LESSEQUAL GREATER GREATEREQUAL EQUALS AND OR
-        %token LOOP DO IF THEN ELSE END ASSIGN LET VAR CNS BIND IN COMMA ADDRESS POINTER FUNCTION CALL
+        %token LOOP DO IF THEN ELSE END ASSIGN LET VAR CNS BIND IN COMMA ADDRESS POINTER FUNCTION CALL REC
         %token NEGATION NOP
         %token LPAREN RPAREN 
         %token EOF 
@@ -35,7 +35,8 @@
           | VAR ID BIND expression            { Pi.Bind(Pi.Id($2), Pi.Ref($4)) }
           | CNS ID BIND bindableVariable      { Pi.Bind(Pi.Id($2), $4) }
           | declaration COMMA declaration     { Pi.DSeq($1, $3) }
-          | FUNCTION ID abstraction { Pi.BindAbs(Pi.Id($2), Pi.Abs($3)) }
+          | FUNCTION ID abstraction           { Pi.BindAbs(Pi.Id($2), $3) }
+          | REC FUNCTION ID abstraction       { Pi.Rbnd(Pi.Id($3), $4) }
           | LPAREN declaration RPAREN         { $2 }
         ;
         abstraction:
@@ -54,14 +55,14 @@
           | LPAREN command RPAREN                         { $2 }
         ;
         expList:
-           expList COMMA expression { ($1@[$3]) }
-          | expression { [$1] }
+           expList COMMA expression     { ($1@[$3]) }
+          | expression                  { [$1] }
         ;
         idList:
-          | idList COMMA idList { $1@$3 }
-          | idList COMMA ID { $1@[Pi.Id($3)] }
-          | ID COMMA idList { [Pi.Id($1)]@$3 }
-          | ID { [ Pi.Id($1) ] }
+          | idList COMMA idList         { $1@$3 }
+          | idList COMMA ID             { $1@[Pi.Id($3)] }
+          | ID COMMA idList             { [Pi.Id($1)]@$3 }
+          | ID                          { [ Pi.Id($1) ] }
         ;
         expression: 
           ADDRESS ID                    { Pi.DeRef(Pi.Id($2))}
