@@ -36,7 +36,7 @@
 
   and declaration = 
     | DSeq of declaration * declaration
-    | Bind of expression * expression   (* Bind(<Id>, <Exp>) *)
+    | Bind of expression * expression  (* Bind(<Id>, <Exp>) *)
     | BindAbs of expression * abstraction (* Bind(<Id>, <Abs>) *)
     | Rbnd of expression * abstraction (* Rbnd(<Id>, <Abs>)  *)
 

@@ -21,8 +21,8 @@
         %type <Pi.expression> bindableVariable
         %type <Pi.expression> variable
         %type <Pi.abstraction> abstraction
-        %type <(Pi.expression list)> expList
-        %type <(Pi.expression list)> idList
+        %type <(Pi.expression list)> actuals
+        %type <(Pi.expression list)> formals
         %%
         main:
             statement EOF     { $1 }
@@ -40,9 +40,9 @@
           | LPAREN declaration RPAREN         { $2 }
         ;
         abstraction:
-           /* LPAREN idList RPAREN BIND command    { Pi.AbsFunction($2, $5)} */
+           LPAREN formals RPAREN BIND command    { Pi.AbsFunction($2, $5)}
           | LPAREN  RPAREN BIND command    { Pi.AbsFunction([], $4)}
-          /* | LPAREN abstraction RPAREN             { $2 } */
+          | LPAREN abstraction RPAREN             { $2 }
         ;
         command:
           LOOP expression DO command  END                 { Pi.Loop(($2), $4)}
@@ -52,16 +52,15 @@
           | command  command                              { Pi.CSeq($1, $2) }
           | LET declaration IN command                    { Pi.Blk($2, $4)}
           | LET declaration IN command END                { Pi.Blk($2, $4)}
+          | ID LPAREN actuals RPAREN                      { Pi.Call(Pi.Id($1), $3) }
           | LPAREN command RPAREN                         { $2 }
         ;
-        expList:
-           expList COMMA expression     { ($1@[$3]) }
+        actuals:
+           actuals COMMA expression     { ($1@[$3]) }
           | expression                  { [$1] }
         ;
-        idList:
-          | idList COMMA idList         { $1@$3 }
-          | idList COMMA ID             { $1@[Pi.Id($3)] }
-          | ID COMMA idList             { [Pi.Id($1)]@$3 }
+        formals:
+           ID COMMA formals             { [Pi.Id($1)]@$3 }
           | ID                          { [ Pi.Id($1) ] }
         ;
         expression: 

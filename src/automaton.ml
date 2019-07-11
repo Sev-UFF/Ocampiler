@@ -10,7 +10,7 @@ let rec delta controlStack valueStack environment memory locations =
   trace := (!trace)@[( (Stack.copy controlStack), (Stack.copy valueStack), (Hashtbl.copy environment), (Hashtbl.copy memory), (copia))];
 
   (* Linha para debugar. apagar depois *)
-  print_endline(string_of_iteration controlStack valueStack environment memory !locations ); 
+  (* print_endline(string_of_iteration controlStack valueStack environment memory !locations );  *)
   
   if not(Stack.is_empty controlStack) then begin 
     
@@ -969,7 +969,20 @@ let rec delta controlStack valueStack environment memory locations =
               | _ -> raise (AutomatonException "Error on #COND" );
         );
         | OPCALL(Id(x), n) -> (
-(* implementar e perguntar sobre o perador \ descrito nos slides *)
+          let fnc = (Hashtbl.find environment x) in
+          match fnc with 
+          | Closure(f, b, e) -> (
+            let actuals = (n_pop valueStack n) in
+              let env = (Hashtbl.copy environment) in
+                (Stack.push (Env(env)) valueStack);
+                (Stack.push (DecOc(OPBLKCMD)) controlStack);
+                (Stack.push (Statement(Cmd(b))) controlStack);
+
+                let e_barra_e1 = (overwrite (Hashtbl.copy environment) e) in
+                let result_barra_match = (overwrite e_barra_e1 (matchFunction f actuals)) in
+                (Hashtbl.clear environment);
+                (Hashtbl.add_seq environment (Hashtbl.to_seq result_barra_match));
+          );
         );
       );
 
@@ -1012,7 +1025,10 @@ let rec delta controlStack valueStack environment memory locations =
                     );                   
                     |Bool(cte) -> ( ( Hashtbl.add newEnv w (BoolConst(cte)) );
                                     ( Stack.push (Env(newEnv)) valueStack ); 
-                    );                    
+                    );  
+                    |Clos(f, b, e) -> ( ( Hashtbl.add newEnv w (Closure(f, b, e)) );
+                                    ( Stack.push (Env(newEnv)) valueStack ); 
+                    );                   
                     | _ -> raise (AutomatonException "Error on #BIND valor not binded" );
                 );
                 | _ -> raise (AutomatonException "Error on #BIND env not found" );
@@ -1027,7 +1043,10 @@ let rec delta controlStack valueStack environment memory locations =
                         );
                         |Bool(cte) -> (( Hashtbl.add newEnv w (BoolConst(cte)) );
                                        ( Stack.push (Env(newEnv)) valueStack );
-                        );                       
+                        ); 
+                        | Clos(f, b, e) -> ( ( Hashtbl.add newEnv w (Closure(f, b, e)) );
+                        ( Stack.push (Env(newEnv)) valueStack ); 
+        );                       
                         | _ -> raise (AutomatonException "Error on #BIND map not created" );
               );
             );
@@ -1039,10 +1058,9 @@ let rec delta controlStack valueStack environment memory locations =
                 match ass with
                   | Env(e) -> (
                     (Stack.push (Env(env)) valueStack);
-                    (Hashtbl.iter 
-                      (  fun key value -> if not(Hashtbl.mem environment key ) then 
-                                            (Hashtbl.add environment key value) 
-                                          else (Hashtbl.replace environment key value) ) e);
+                    let new_env = (overwrite environment e) in
+                    (Hashtbl.clear environment);
+                    (Hashtbl.add_seq environment (Hashtbl.to_seq new_env));
                   );
                   | _ -> raise (AutomatonException "Error on #BLKDEC" );
           );
@@ -1068,6 +1086,24 @@ let rec delta controlStack valueStack environment memory locations =
     );
     delta controlStack valueStack environment memory locations;
   end
+
+  and n_pop stack n = 
+  if (n == 0) then []
+  else [(Stack.pop stack)]@(n_pop stack (n-1))
+
+  and overwrite old_environment new_environment = 
+    let old = (Hashtbl.copy old_environment) in
+    (
+      Hashtbl.iter 
+      (
+        fun key value -> 
+          if not(Hashtbl.mem old key ) then 
+            (Hashtbl.add old key value) 
+          else (Hashtbl.replace old key value) 
+      ) 
+      new_environment
+    );
+    old;
   
   and matchFunction formals actuals = 
     if ((List.length formals) != (List.length actuals)) then (Hashtbl.create 10)
