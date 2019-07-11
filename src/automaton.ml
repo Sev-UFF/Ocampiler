@@ -10,7 +10,7 @@ let rec delta controlStack valueStack environment memory locations =
   trace := (!trace)@[( (Stack.copy controlStack), (Stack.copy valueStack), (Hashtbl.copy environment), (Hashtbl.copy memory), (copia))];
 
   (* Linha para debugar. apagar depois *)
-  print_endline(string_of_iteration controlStack valueStack environment memory !locations ); 
+  (* print_endline(string_of_iteration controlStack valueStack environment memory !locations );  *)
   
   if not(Stack.is_empty controlStack) then begin 
     
@@ -712,6 +712,22 @@ let rec delta controlStack valueStack environment memory locations =
             (Stack.push (Statement(Abs(y))) controlStack );
             (Stack.push (Str(x)) valueStack);
           );
+          | Rbnd(Id(x), AbsFunction(f, b)) -> (
+            let topo = (Stack.pop valueStack) in
+            (* TODO: Comentar esse caso com o professor *)
+            match topo with 
+            | Env(e) -> (
+              (Hashtbl.add e x (Closure(f, b, (Hashtbl.copy environment))));
+              (Stack.push (Env(reclose e (Hashtbl.copy environment) )) valueStack);
+            );
+            | _ -> (
+              (Stack.push topo valueStack);
+              let new_env = (Hashtbl.create 3) in
+              (Hashtbl.add new_env x (Closure(f, b, (Hashtbl.copy environment))));
+              (Stack.push (Env(reclose new_env (Hashtbl.copy environment) )) valueStack);
+            );
+            
+          );
           | Bind(_, _) -> (
             raise (AutomatonException "Error on Bind" );
           );
@@ -970,18 +986,31 @@ let rec delta controlStack valueStack environment memory locations =
         );
         | OPCALL(Id(x), n) -> (
           let fnc = (Hashtbl.find environment x) in
+          let actuals = (n_pop valueStack n) in
+          let env = (Hashtbl.copy environment) in
+          (Stack.push (Env(env)) valueStack);
+          (Stack.push (DecOc(OPBLKCMD)) controlStack);
+
           match fnc with 
-          | Closure(f, b, e) -> (
-            let actuals = (n_pop valueStack n) in
-              let env = (Hashtbl.copy environment) in
-                (Stack.push (Env(env)) valueStack);
-                (Stack.push (DecOc(OPBLKCMD)) controlStack);
+          | Closure(f, b, e_1) -> (
+
                 (Stack.push (Statement(Cmd(b))) controlStack);
 
-                let e_barra_e1 = (overwrite (Hashtbl.copy environment) e) in
+                let e_barra_e1 = (overwrite (Hashtbl.copy environment) e_1) in
                 let result_barra_match = (overwrite e_barra_e1 (matchFunction f actuals)) in
                 (Hashtbl.clear environment);
                 (Hashtbl.add_seq environment (Hashtbl.to_seq result_barra_match));
+          );
+          | Rec(f, b, e_1, e_2) -> (
+
+            (Stack.push (Statement(Cmd(b))) controlStack);
+
+
+            let e_barra_e1 = (overwrite (Hashtbl.copy environment) e_1) in
+            let result_barra_unfold =  (overwrite e_barra_e1 (reclose e_2 environment)) in
+            let result_barra_match = (overwrite result_barra_unfold (matchFunction f actuals)) in
+            (Hashtbl.clear environment);
+            (Hashtbl.add_seq environment (Hashtbl.to_seq result_barra_match));
           );
         );
       );
@@ -1085,6 +1114,7 @@ let rec delta controlStack valueStack environment memory locations =
                         );
                         locations := x;
                       );
+                      (* TODO: Comentar esse caso com o professor *)
                       | _ -> (
                         (Stack.push possibleLocs valueStack);
 
