@@ -10,7 +10,7 @@ let rec delta controlStack valueStack environment memory locations =
   trace := (!trace)@[( (Stack.copy controlStack), (Stack.copy valueStack), (Hashtbl.copy environment), (Hashtbl.copy memory), (copia))];
 
   (* Linha para debugar. apagar depois *)
-  print_endline(string_of_iteration controlStack valueStack environment memory !locations ); 
+(*  print_endline(string_of_iteration controlStack valueStack environment memory !locations ); *) 
   
   if not(Stack.is_empty controlStack) then begin 
     
