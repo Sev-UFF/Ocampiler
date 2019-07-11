@@ -40,9 +40,9 @@
           | LPAREN declaration RPAREN         { $2 }
         ;
         abstraction:
-           LPAREN formals RPAREN BIND command    { Pi.AbsFunction($2, $5)}
-          | LPAREN  RPAREN BIND command    { Pi.AbsFunction([], $4)}
-          | LPAREN abstraction RPAREN             { $2 }
+           LPAREN formals RPAREN BIND command    { Pi.AbsFunction($2, $5) }
+          | LPAREN  RPAREN BIND command          { Pi.AbsFunction([], $4) }
+          | LPAREN abstraction RPAREN            { $2 }
         ;
         command:
           LOOP expression DO command  END                 { Pi.Loop(($2), $4)}

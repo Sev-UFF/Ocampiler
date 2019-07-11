@@ -140,12 +140,15 @@ let rec string_of_bindable bindable =
   | Loc(x) ->  (string_of_loc x) 
   | IntConst(x) -> "IntConst (" ^ (string_of_int x) ^ ")"
   | BoolConst(x) -> "BoolConst (" ^ (string_of_bool x) ^ ")"
-  | Closure(f, b, e) -> "Closure(" ^ (string_of_expression_list f) ^ ", " ^ (string_of_command b) ^ ", " ^ (string_of_dictionary e string_of_bindable_dictionary) ^ ")"
+  | Closure(f, b, e) -> string_of_closure f b e 
   | Rec(f, b, e, e_line) -> "Rec(" ^ (string_of_expression_list f) ^ ", " ^ (string_of_command b) ^ ", " ^ (string_of_dictionary e string_of_bindable_dictionary) ^ ", " ^ (string_of_dictionary e_line string_of_bindable_dictionary) ^ ")"
 
 and string_of_loc loc =
   match loc with
   | Location(x) -> "LOC[" ^ (string_of_int x) ^ "]"
+
+and string_of_closure f b e = 
+"Closure(" ^ (string_of_expression_list f) ^ ", " ^ (string_of_command b) ^ ", " ^ (string_of_dictionary e string_of_bindable_dictionary) ^ ")"
 
 and string_of_value_stack item =
   match item with
@@ -157,6 +160,7 @@ and string_of_value_stack item =
   | Bind(x) -> (string_of_loc x)
   | Env(x) -> "Env(" ^  (string_of_dictionary x string_of_bindable_dictionary) ^ ")"
   | Locations(x) -> "Locations(" ^ (string_of_list x) ^ ")"
+  | Clos(f, b, e) -> string_of_closure f b e 
 
   and string_of_storable storable =
   match storable with

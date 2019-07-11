@@ -10,7 +10,7 @@ let rec delta controlStack valueStack environment memory locations =
   trace := (!trace)@[( (Stack.copy controlStack), (Stack.copy valueStack), (Hashtbl.copy environment), (Hashtbl.copy memory), (copia))];
 
   (* Linha para debugar. apagar depois *)
-  (* print_endline(string_of_iteration controlStack valueStack environment memory !locations );  *)
+  print_endline(string_of_iteration controlStack valueStack environment memory !locations ); 
   
   if not(Stack.is_empty controlStack) then begin 
     
@@ -1067,18 +1067,30 @@ let rec delta controlStack valueStack environment memory locations =
 
           | OPBLKCMD -> (
             let env = (Stack.pop valueStack) in
-              let locs = (Stack.pop valueStack) in
-                match locs with
-                  | Locations(x) -> (  
-                    match env with
-                      | Env(y) -> (
+              let possibleLocs = (Stack.pop valueStack) in
+                match env with 
+                  | Env(y) -> (
+                    match possibleLocs with 
+                      | Locations(x) -> (
                         (Hashtbl.clear environment);
                         (Hashtbl.add_seq environment (Hashtbl.to_seq y));
-                        (Hashtbl.iter (  fun key value -> if (List.mem key !locations) 
-                              then (Hashtbl.remove memory key) ) memory );
+                        (
+                          Hashtbl.iter 
+                          (  
+                            fun key value -> 
+                              if (List.mem key !locations) 
+                              then (Hashtbl.remove memory key) 
+                          ) 
+                          memory 
+                        );
                         locations := x;
                       );
-                      | _ -> raise (AutomatonException "Error on #BLKCMD" );
+                      | _ -> (
+                        (Stack.push possibleLocs valueStack);
+
+                        (Hashtbl.clear environment);
+                        (Hashtbl.add_seq environment (Hashtbl.to_seq y));
+                      );
                   );
                   | _ -> raise (AutomatonException "Error on #BLKCMD" );
           );

@@ -710,21 +710,21 @@ let yyact = [|
     let _5 = (Parsing.peek_val __caml_parser_env 0 : Pi.command) in
     Obj.repr(
 # 43 "parser.mly"
-                                                 ( Pi.AbsFunction(_2, _5))
+                                                 ( Pi.AbsFunction(_2, _5) )
 # 715 "parser.ml"
                : Pi.abstraction))
 ; (fun __caml_parser_env ->
     let _4 = (Parsing.peek_val __caml_parser_env 0 : Pi.command) in
     Obj.repr(
 # 44 "parser.mly"
-                                           ( Pi.AbsFunction([], _4))
+                                                 ( Pi.AbsFunction([], _4) )
 # 722 "parser.ml"
                : Pi.abstraction))
 ; (fun __caml_parser_env ->
     let _2 = (Parsing.peek_val __caml_parser_env 1 : Pi.abstraction) in
     Obj.repr(
 # 45 "parser.mly"
-                                                  ( _2 )
+                                                 ( _2 )
 # 729 "parser.ml"
                : Pi.abstraction))
 ; (fun __caml_parser_env ->
