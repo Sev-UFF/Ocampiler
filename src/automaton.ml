@@ -720,17 +720,17 @@ let rec delta controlStack valueStack environment memory locations =
           );
           | Rbnd(Id(x), AbsFunction(f, b)) -> (
             let topo = (Stack.pop valueStack) in
-            (* TODO: Comentar esse caso com o professor *)
+            (* TODO: colocar essa explicação na apresentacao *)
             match topo with 
             | Env(e) -> (
               (Hashtbl.add e x (Closure(f, b, (Hashtbl.copy environment))));
-              (Stack.push (Env(reclose e (Hashtbl.copy environment) )) valueStack);
+              (Stack.push (Env(reclose e e )) valueStack);
             );
             | _ -> (
               (Stack.push topo valueStack);
               let new_env = (Hashtbl.create 3) in
               (Hashtbl.add new_env x (Closure(f, b, (Hashtbl.copy environment))));
-              (Stack.push (Env(reclose new_env (Hashtbl.copy environment) )) valueStack);
+              (Stack.push (Env(reclose new_env new_env )) valueStack);
             );
             
           );
@@ -1018,7 +1018,7 @@ let rec delta controlStack valueStack environment memory locations =
 
 
             let e_barra_e1 = (overwrite (Hashtbl.copy environment) e_1) in
-            let result_barra_unfold =  (overwrite e_barra_e1 (reclose e_2 environment)) in
+            let result_barra_unfold =  (overwrite e_barra_e1 (reclose e_2 e_2)) in
             let result_barra_match = (overwrite result_barra_unfold (matchFunction f actuals)) in
             (Hashtbl.clear environment);
             (Hashtbl.add_seq environment (Hashtbl.to_seq result_barra_match));
@@ -1173,7 +1173,8 @@ let rec delta controlStack valueStack environment memory locations =
     )
     
   and reclose env atual = 
-  (Hashtbl.iter 
+  (
+    Hashtbl.iter 
     (
       fun key value -> 
         match value with
@@ -1185,6 +1186,7 @@ let rec delta controlStack valueStack environment memory locations =
          );
         | _ -> ();
     )
-   env);
+   env
+  );
   env;;
 
