@@ -53,6 +53,7 @@
           | LET declaration IN command                    { Pi.Blk($2, $4)}
           | LET declaration IN command END                { Pi.Blk($2, $4)}
           | ID LPAREN actuals RPAREN                      { Pi.Call(Pi.Id($1), $3) }
+          | ID LPAREN  RPAREN                             { Pi.Call(Pi.Id($1), []) }
           | LPAREN command RPAREN                         { $2 }
         ;
         actuals:

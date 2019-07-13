@@ -697,7 +697,13 @@ let rec delta controlStack valueStack environment memory locations =
           | Nop -> ();
           | Call(id, actuals) -> (
             ( Stack.push (CmdOc (OPCALL(id, (List.length actuals))) )  controlStack );
-            ( List.iter (fun parametro -> Stack.push (Statement(Exp(parametro))) controlStack ) actuals);
+            ( 
+              List.iter 
+              (
+                fun parametro -> Stack.push (Statement(Exp(parametro))) controlStack 
+              ) 
+              actuals
+            );
           );
         );
         | Dec (dec) -> (
@@ -988,8 +994,13 @@ let rec delta controlStack valueStack environment memory locations =
           let fnc = (Hashtbl.find environment x) in
           let actuals = (n_pop valueStack n) in
           let env = (Hashtbl.copy environment) in
+          (* TODO: Implementação das locations foi feita por nos *)
+          (Stack.push (Locations(!locations)) valueStack);
+          locations := [];
           (Stack.push (Env(env)) valueStack);
           (Stack.push (DecOc(OPBLKCMD)) controlStack);
+
+          (* Dar erro quando fnc nao for closure ou rec *)
 
           match fnc with 
           | Closure(f, b, e_1) -> (
@@ -1096,10 +1107,10 @@ let rec delta controlStack valueStack environment memory locations =
 
           | OPBLKCMD -> (
             let env = (Stack.pop valueStack) in
-              let possibleLocs = (Stack.pop valueStack) in
+              let locs = (Stack.pop valueStack) in
                 match env with 
                   | Env(y) -> (
-                    match possibleLocs with 
+                    match locs with 
                       | Locations(x) -> (
                         (Hashtbl.clear environment);
                         (Hashtbl.add_seq environment (Hashtbl.to_seq y));
@@ -1113,13 +1124,6 @@ let rec delta controlStack valueStack environment memory locations =
                           memory 
                         );
                         locations := x;
-                      );
-                      (* TODO: Comentar esse caso com o professor *)
-                      | _ -> (
-                        (Stack.push possibleLocs valueStack);
-
-                        (Hashtbl.clear environment);
-                        (Hashtbl.add_seq environment (Hashtbl.to_seq y));
                       );
                   );
                   | _ -> raise (AutomatonException "Error on #BLKCMD" );
@@ -1148,7 +1152,7 @@ let rec delta controlStack valueStack environment memory locations =
     old;
   
   and matchFunction formals actuals = 
-    if ((List.length formals) != (List.length actuals)) then (Hashtbl.create 10)
+    if ((List.length formals) != (List.length actuals)) then (Hashtbl.create 0)
     else (_match formals actuals (Hashtbl.create 10))
   
   (* Recebe duas listas de tamanho igual *)
