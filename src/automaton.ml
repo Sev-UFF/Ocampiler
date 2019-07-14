@@ -1011,7 +1011,6 @@ let rec delta controlStack valueStack environment memory locations =
           | Closure(f, b, e_1) -> (
 
                 (Stack.push (Statement(Cmd(b))) controlStack);
-
                 let e_barra_e1 = (overwrite (Hashtbl.copy environment) e_1) in
                 let result_barra_match = (overwrite e_barra_e1 (matchFunction f actuals)) in
                 (Hashtbl.clear environment);
@@ -1020,8 +1019,6 @@ let rec delta controlStack valueStack environment memory locations =
           | Rec(f, b, e_1, e_2) -> (
 
             (Stack.push (Statement(Cmd(b))) controlStack);
-
-
             let e_barra_e1 = (overwrite (Hashtbl.copy environment) e_1) in
             let result_barra_unfold =  (overwrite e_barra_e1 (reclose e_2 environment)) in
             let result_barra_match = (overwrite result_barra_unfold (matchFunction f actuals)) in
