@@ -36,6 +36,7 @@ let rec delta controlStack valueStack environment memory locations =
                 | BoolConst(b) -> (
                   (Stack.push (Bool(b)) valueStack);
                 );
+                | _ -> ();
             );
           | AExp(aExp) -> (
               match aExp with 
@@ -617,6 +618,7 @@ let rec delta controlStack valueStack environment memory locations =
                   |BoolConst(x) -> (
                     raise (AutomatonException "Error on DeRef nao pode acessar endereco de constante - bool");
                   );
+                  | _ -> ();
               );
               | _ -> raise (AutomatonException "Error on DeRef 666");
             );
@@ -740,6 +742,9 @@ let rec delta controlStack valueStack environment memory locations =
           | DSeq(x, y) -> (
             (Stack.push (Statement(Dec(y))) controlStack);
             (Stack.push (Statement(Dec(x))) controlStack);
+         );
+         | _ ->(
+           raise (AutomatonException "Error on DEC" )
          );
         );
         | Abs(x) -> 
@@ -954,6 +959,7 @@ let rec delta controlStack valueStack environment memory locations =
                   | BoolConst(b) -> (
                     raise (AutomatonException "Error on #ASSIGN. Cannot change constant value.")
                   );
+                  | _ -> ();
               );
               | _ ->  raise (AutomatonException "Error on #ASSIGN not a str(x)")
         );
@@ -1023,7 +1029,9 @@ let rec delta controlStack valueStack environment memory locations =
             (Hashtbl.clear environment);
             (Hashtbl.add_seq environment (Hashtbl.to_seq result_barra_match));
           );
+          | _ -> ();
         );
+        | _ -> ();
       );
 
       | DecOc(decOc) -> (
