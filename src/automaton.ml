@@ -1003,10 +1003,9 @@ let rec delta controlStack valueStack environment memory locations =
           (* TODO: Implementação das locations foi feita por nos *)
           (Stack.push (Locations(!locations)) valueStack);
           locations := [];
+          (***)
           (Stack.push (Env(env)) valueStack);
           (Stack.push (DecOc(OPBLKCMD)) controlStack);
-
-          (* Dar erro quando fnc nao for closure ou rec *)
 
           match fnc with 
           | Closure(f, b, e_1) -> (
