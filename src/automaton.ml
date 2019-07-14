@@ -1133,6 +1133,7 @@ let rec delta controlStack valueStack environment memory locations =
                         );
                         locations := x;
                       );
+                      | _ -> ();
                   );
                   | _ -> raise (AutomatonException "Error on #BLKCMD" );
           );
@@ -1179,7 +1180,7 @@ let rec delta controlStack valueStack environment memory locations =
         newEnv;
       );
     )
-    
+
   and reclose env atual = 
   (Hashtbl.iter 
     (
