@@ -1029,7 +1029,7 @@ let rec delta controlStack valueStack environment memory locations =
             (Hashtbl.clear environment);
             (Hashtbl.add_seq environment (Hashtbl.to_seq result_barra_match));
           );
-          | _ -> ();
+          | _ -> raise (AutomatonException "Error on #CALL" );
         );
         | _ -> ();
       );
