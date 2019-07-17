@@ -10,7 +10,7 @@ let rec delta controlStack valueStack environment memory locations =
   trace := (!trace)@[( (Stack.copy controlStack), (Stack.copy valueStack), (Hashtbl.copy environment), (Hashtbl.copy memory), (copia))];
 
   (* Linha para debugar. apagar depois *)
-  print_endline(string_of_iteration controlStack valueStack environment memory !locations ); 
+  print_endline(string_of_iteration controlStack valueStack environment memory !locations );  
   
   if not(Stack.is_empty controlStack) then begin 
     
@@ -670,14 +670,6 @@ let rec delta controlStack valueStack environment memory locations =
              (Stack.push (Str(x)) valueStack);
           );
           | Assign(_, _) -> raise (AutomatonException "Error on Assign");
-          | Call (x,y) -> (    
-            match y with
-            |Actual(z) -> (
-              ( Stack.push (DecOc (OPCALL(x, (List.length z))) )  controlStack );
-              ( Stack.push (Statement(Exp(y))) controlStack);
-              ( List.iter (fun parametro -> Stack.push (Statement(Exp(parametro))) controlStack ) z);
-            );
-          );
           | Cond(BExp(x), y, z) -> (
             (Stack.push (CmdOc(OPCOND)) controlStack);
             (Stack.push (Statement(Exp(BExp(x)))) controlStack );
@@ -703,6 +695,10 @@ let rec delta controlStack valueStack environment memory locations =
             locations := [] ;
           );
           | Nop -> ();
+          | Call(id, actuals) -> (
+            ( Stack.push (CmdOc (OPCALL(id, (List.length actuals))) )  controlStack );
+            ( List.iter (fun parametro -> Stack.push (Statement(Exp(parametro))) controlStack ) actuals);
+          );
         );
         | Dec (dec) -> (
           match dec with 
@@ -711,30 +707,39 @@ let rec delta controlStack valueStack environment memory locations =
             (Stack.push (Statement(Exp(y))) controlStack );
             (Stack.push (Str(x)) valueStack);
           );
-          | BindAbs(Id(x),y) -> (
+          | BindAbs(Id(x), y) -> (
             (Stack.push (DecOc(OPBIND)) controlStack );
-            (Stack.push (Statement(y)) controlStack );
+            (Stack.push (Statement(Abs(y))) controlStack );
             (Stack.push (Str(x)) valueStack);
           );
-          | BindAbs(Formal(x),y) -> (
-            (Stack.push (DecOc(OPBIND)) controlStack );
-            (Stack.push (Statement(y)) controlStack );
-            (Stack.push (Param(x)) valueStack);
-            (*(List.iter (fun parametro -> Stack.push ((parametro)) valueStack) x );*)
-
+          | Rbnd(Id(x), AbsFunction(f, b)) -> (
+            let topo = (Stack.pop valueStack) in
+            (* TODO: Comentar esse caso com o professor *)
+            match topo with 
+            | Env(e) -> (
+              (Hashtbl.add e x (Closure(f, b, (Hashtbl.copy environment))));
+              (Stack.push (Env(reclose e (Hashtbl.copy environment) )) valueStack);
+            );
+            | _ -> (
+              (Stack.push topo valueStack);
+              let new_env = (Hashtbl.create 3) in
+              (Hashtbl.add new_env x (Closure(f, b, (Hashtbl.copy environment))));
+              (Stack.push (Env(reclose new_env (Hashtbl.copy environment) )) valueStack);
+            );
+            
           );
           | Bind(_, _) -> (
             raise (AutomatonException "Error on Bind" );
           );
           | DSeq(x, y) -> (
-          (Stack.push (Statement(Dec(y))) controlStack);
-          (Stack.push (Statement(Dec(x))) controlStack);
+            (Stack.push (Statement(Dec(y))) controlStack);
+            (Stack.push (Statement(Dec(x))) controlStack);
          );
         );
-        | Abs (x,y) -> (
-          let env = (Hashtbl.copy environment) in(
-            (Stack.push (Closure(x , y , env))  valueStack);
-          );
+        | Abs(x) -> 
+          match x with
+          | AbsFunction(f, b) -> (
+            (Stack.push (Clos(f, b, (Hashtbl.copy environment))) valueStack)
         );
 
       );   
@@ -979,6 +984,35 @@ let rec delta controlStack valueStack environment memory locations =
               );
               | _ -> raise (AutomatonException "Error on #COND" );
         );
+        | OPCALL(Id(x), n) -> (
+          let fnc = (Hashtbl.find environment x) in
+          let actuals = (n_pop valueStack n) in
+          let env = (Hashtbl.copy environment) in
+          (Stack.push (Env(env)) valueStack);
+          (Stack.push (DecOc(OPBLKCMD)) controlStack);
+
+          match fnc with 
+          | Closure(f, b, e_1) -> (
+
+                (Stack.push (Statement(Cmd(b))) controlStack);
+
+                let e_barra_e1 = (overwrite (Hashtbl.copy environment) e_1) in
+                let result_barra_match = (overwrite e_barra_e1 (matchFunction f actuals)) in
+                (Hashtbl.clear environment);
+                (Hashtbl.add_seq environment (Hashtbl.to_seq result_barra_match));
+          );
+          | Rec(f, b, e_1, e_2) -> (
+
+            (Stack.push (Statement(Cmd(b))) controlStack);
+
+
+            let e_barra_e1 = (overwrite (Hashtbl.copy environment) e_1) in
+            let result_barra_unfold =  (overwrite e_barra_e1 (reclose e_2 environment)) in
+            let result_barra_match = (overwrite result_barra_unfold (matchFunction f actuals)) in
+            (Hashtbl.clear environment);
+            (Hashtbl.add_seq environment (Hashtbl.to_seq result_barra_match));
+          );
+        );
       );
 
       | DecOc(decOc) -> (
@@ -1020,7 +1054,10 @@ let rec delta controlStack valueStack environment memory locations =
                     );                   
                     |Bool(cte) -> ( ( Hashtbl.add newEnv w (BoolConst(cte)) );
                                     ( Stack.push (Env(newEnv)) valueStack ); 
-                    );                    
+                    );  
+                    |Clos(f, b, e) -> ( ( Hashtbl.add newEnv w (Closure(f, b, e)) );
+                                    ( Stack.push (Env(newEnv)) valueStack ); 
+                    );                   
                     | _ -> raise (AutomatonException "Error on #BIND valor not binded" );
                 );
                 | _ -> raise (AutomatonException "Error on #BIND env not found" );
@@ -1036,9 +1073,9 @@ let rec delta controlStack valueStack environment memory locations =
                         |Bool(cte) -> (( Hashtbl.add newEnv w (BoolConst(cte)) );
                                        ( Stack.push (Env(newEnv)) valueStack );
                         ); 
-                        |Closure(x,y,z) -> ( ( Hashtbl.add newEnv w (Close(l)) );
-                                             ( Stack.push (Env(newEnv)) valueStack );
-                        );                      
+                        | Clos(f, b, e) -> ( ( Hashtbl.add newEnv w (Closure(f, b, e)) );
+                        ( Stack.push (Env(newEnv)) valueStack ); 
+        );                       
                         | _ -> raise (AutomatonException "Error on #BIND map not created" );
               );
             );
@@ -1050,36 +1087,101 @@ let rec delta controlStack valueStack environment memory locations =
                 match ass with
                   | Env(e) -> (
                     (Stack.push (Env(env)) valueStack);
-                    (Hashtbl.iter 
-                      (  fun key value -> if not(Hashtbl.mem environment key ) then 
-                                            (Hashtbl.add environment key value) 
-                                          else (Hashtbl.replace environment key value) ) e);
+                    let new_env = (overwrite environment e) in
+                    (Hashtbl.clear environment);
+                    (Hashtbl.add_seq environment (Hashtbl.to_seq new_env));
                   );
                   | _ -> raise (AutomatonException "Error on #BLKDEC" );
           );
 
           | OPBLKCMD -> (
             let env = (Stack.pop valueStack) in
-              let locs = (Stack.pop valueStack) in
-                match locs with
-                  | Locations(x) -> (  
-                    match env with
-                      | Env(y) -> (
+              let possibleLocs = (Stack.pop valueStack) in
+                match env with 
+                  | Env(y) -> (
+                    match possibleLocs with 
+                      | Locations(x) -> (
                         (Hashtbl.clear environment);
                         (Hashtbl.add_seq environment (Hashtbl.to_seq y));
-                        (Hashtbl.iter (  fun key value -> if (List.mem key !locations) 
-                              then (Hashtbl.remove memory key) ) memory );
+                        (
+                          Hashtbl.iter 
+                          (  
+                            fun key value -> 
+                              if (List.mem key !locations) 
+                              then (Hashtbl.remove memory key) 
+                          ) 
+                          memory 
+                        );
                         locations := x;
                       );
-                      | _ -> raise (AutomatonException "Error on #BLKCMD" );
+                      (* TODO: Comentar esse caso com o professor *)
+                      | _ -> (
+                        (Stack.push possibleLocs valueStack);
+                        (Hashtbl.clear environment);
+                        (Hashtbl.add_seq environment (Hashtbl.to_seq y));
+                      );
                   );
                   | _ -> raise (AutomatonException "Error on #BLKCMD" );
-          );
-          | OPCALL(x,y) -> ( 
-            print_endline("<><><><><><> A IMPLEMENTAR <><><><><><><>");
           );
       );
     );
     delta controlStack valueStack environment memory locations;
-  end;;
+  end
+
+  and n_pop stack n = 
+  if (n == 0) then []
+  else [(Stack.pop stack)]@(n_pop stack (n-1))
+
+  and overwrite old_environment new_environment = 
+    let old = (Hashtbl.copy old_environment) in
+    (
+      Hashtbl.iter 
+      (
+        fun key value -> 
+          if not(Hashtbl.mem old key ) then 
+            (Hashtbl.add old key value) 
+          else (Hashtbl.replace old key value) 
+      ) 
+      new_environment
+    );
+    old;
+  
+  and matchFunction formals actuals = 
+    if ((List.length formals) != (List.length actuals)) then (Hashtbl.create 10)
+    else (_match formals actuals (Hashtbl.create 10))
+  
+  (* Recebe duas listas de tamanho igual *)
+  and _match formals actuals env = 
+    match formals, actuals with
+    | [], [] -> env;
+    | Id(f)::ftl, ahd::atl -> (
+      let newEnv = (_match ftl atl env) in
+      match ahd with
+      | Int(i) -> (
+        (Hashtbl.add newEnv f (IntConst(i)));
+        newEnv;
+      );
+      | Bool(b) ->  (
+        (Hashtbl.add newEnv f (BoolConst(b)));
+        newEnv;
+      );
+    
+    )
+    | _ , _ -> raise (AutomatonException "aqui");
+    
+  and reclose env atual = 
+  (Hashtbl.iter 
+    (
+      fun key value -> 
+        match value with
+        | Closure(f, b, e) -> (
+         ( Hashtbl.replace env key (Rec(f, b, e, atual) ) );
+        );
+        | Rec(f, b, e, e_line) -> (
+          ( Hashtbl.replace env key (Rec(f, b, e, atual) ) );
+         );
+        | _ -> ();
+    )
+   env);
+  env;;
 
