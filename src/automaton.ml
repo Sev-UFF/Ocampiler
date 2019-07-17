@@ -998,12 +998,11 @@ let rec delta controlStack valueStack environment memory locations =
         );
         | OPCALL(Id(x), n) -> (
           let fnc = (Hashtbl.find environment x) in
-          let actuals = (n_pop valueStack n) in
-          let env = (Hashtbl.copy environment) in
-          (* TODO: Implementação das locations foi feita por nos *)
+          let actuals = (List.rev (n_pop valueStack n)) in
+          let env = (Hashtbl.copy environment) in        
           (Stack.push (Locations(!locations)) valueStack);
           locations := [];
-          (***)
+        
           (Stack.push (Env(env)) valueStack);
           (Stack.push (DecOc(OPBLKCMD)) controlStack);
 
