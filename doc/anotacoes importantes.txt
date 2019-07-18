@@ -17,6 +17,10 @@ processo de compilacao:
         ocamlc -o bin/parser.cmi -c bin/parser.mli
 
 
+printparser: # Debugging parser
+	export OCAMLRUNPARAM='p'
+
+
 uso do make:
     run:
         make

@@ -1,22 +1,11 @@
 #teste para os novos casos de arithmetic expressions com valref
 
-let var x = 0 , var y = 5, var z = 0 in
-    x := &y
-    z := *x
-    z := z + *x
-    z := *x + y
-    z := *x + *x
-    z := 1 + *x
-    z := *x + 7
-    z := z - *x
-    z := *x - y
-    z := *x - *x
-    z := 1 - *x
-    z := *x * 7
-    z := z / *x
-    z := *x / y
-    z := *x / *x
-    z := 1 / *x
-    z := *x / 7
+let var x = 0, var t = 4 in
+    let var x = 2, var z = 3 in
+        let var x = 4 in
+             x := 4
+        end
+    end
+    t := 5
 end
 

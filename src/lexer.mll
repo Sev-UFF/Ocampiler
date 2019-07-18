@@ -35,9 +35,10 @@
           | "var"                   { VAR }
           | "const"                 { CNS }
           | "in"                    { IN }
-          | "fn"                    { ABS }
+          | "fn"                    { FUNCTION }
+          | "call"                  { CALL }
+          | "rec"                  { REC }
           | "&"                     { ADDRESS }
-          | ","                     { COMMA }
-          | ";"                     { PV }       
+          | ","                     { COMMA }    
           | (['a'-'z' 'A'-'Z' '_'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*) as  lxm      { ID(lxm) }
           | eof                     { EOF }

@@ -4,7 +4,7 @@
         %token <string> ID
         %token PLUS MINUS TIMESORPOINTER DIV
         %token LESS LESSEQUAL GREATER GREATEREQUAL EQUALS AND OR
-        %token LOOP DO IF THEN ELSE END ASSIGN LET VAR CNS BIND IN COMMA ADDRESS POINTER ABS PV
+        %token LOOP DO IF THEN ELSE END ASSIGN LET VAR CNS BIND IN COMMA ADDRESS POINTER FUNCTION CALL REC
         %token NEGATION NOP
         %token LPAREN RPAREN 
         %token EOF 
@@ -20,8 +20,9 @@
         %type <Pi.command> command
         %type <Pi.expression> bindableVariable
         %type <Pi.expression> variable
-        %type <Pi.statement> abstraction
-        %type <Pi.expression list> explist
+        %type <Pi.abstraction> abstraction
+        %type <(Pi.expression list)> actuals
+        %type <(Pi.expression list)> formals
         %%
         main:
             statement EOF     { $1 }
@@ -34,12 +35,14 @@
           | VAR ID BIND expression            { Pi.Bind(Pi.Id($2), Pi.Ref($4)) }
           | CNS ID BIND bindableVariable      { Pi.Bind(Pi.Id($2), $4) }
           | declaration COMMA declaration     { Pi.DSeq($1, $3) }
-          | ABS ID abstraction                { Pi.BindAbs(Pi.Id($2), $3)}
+          | FUNCTION ID abstraction           { Pi.BindAbs(Pi.Id($2), $3) }
+          | REC FUNCTION ID abstraction       { Pi.Rbnd(Pi.Id($3), $4) }
           | LPAREN declaration RPAREN         { $2 }
         ;
         abstraction:
-          | LPAREN explist RPAREN BIND command    { Pi.Abs(Pi.Formal(List.rev $2), $5)}
-          | LPAREN abstraction RPAREN             { $2 }
+           LPAREN formals RPAREN BIND command    { Pi.AbsFunction($2, $5) }
+          | LPAREN  RPAREN BIND command          { Pi.AbsFunction([], $4) }
+          | LPAREN abstraction RPAREN            { $2 }
         ;
         command:
           LOOP expression DO command  END                 { Pi.Loop(($2), $4)}
@@ -49,14 +52,17 @@
           | command  command                              { Pi.CSeq($1, $2) }
           | LET declaration IN command                    { Pi.Blk($2, $4)}
           | LET declaration IN command END                { Pi.Blk($2, $4)}
-          | ID LPAREN explist RPAREN                      { Pi.Call(Pi.Id($1), Pi.Actual(List.rev $3) ) } 
+          | ID LPAREN actuals RPAREN                      { Pi.Call(Pi.Id($1), $3) }
+          | ID LPAREN  RPAREN                             { Pi.Call(Pi.Id($1), []) }
           | LPAREN command RPAREN                         { $2 }
         ;
-        explist:
-            explist {[]}
-          | expression PV expression {  ($3::$1::[])}
-          | explist PV expression {($3::$1)}
-          | expression {($1::[])}
+        actuals:
+           actuals COMMA expression     { ($1@[$3]) }
+          | expression                  { [$1] }
+        ;
+        formals:
+           ID COMMA formals             { [Pi.Id($1)]@$3 }
+          | ID                          { [ Pi.Id($1) ] }
         ;
         expression: 
           ADDRESS ID                    { Pi.DeRef(Pi.Id($2))}
