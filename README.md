@@ -7,7 +7,7 @@
 
 Este trabalho é uma tarefa do curso de [Compiladores](http://www2.ic.uff.br/~cbraga/pmwiki/pmwiki.php/Classes/Compiladores) ministrado pelo professor [Chistiano Braga](http://www2.ic.uff.br/~cbraga/pmwiki/pmwiki.php/Main/AffiliationAndResearchInterests) no primeiro semestre de 2019 na Universidade Federal Fluminense feito por [Felipe Assad](https://github.com/assadfelipe), [Jorge Felipe](https://github.com/junglejf) e [Thiago Augusto](https://github.com/sevontheedge).
 
-Ocampiler usa Ocamllex and Ocamlyacc que é a alternativa em Ocaml das ferramentas lex (um gerador de analisador léxico) e yacc (um gerador de analisador sintático LALR). 
+Ocampiler usa Ocamllex and Ocamlyacc que é a alternativa em Ocaml das ferramentas lex (um gerador de analisador léxico) e yacc (um gerador de analisador sintático LALR(1)). 
 
 # Instalação
 ```
