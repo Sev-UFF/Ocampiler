@@ -11,17 +11,14 @@ type valueStackOptions =
   | LoopValue of command
   | CondValue of command
   | Bind of loc
-  | Param of expression list
   | Locations of int list
   | Env of (string, bindable) Hashtbl.t
   | Clos of expression list * command * ((string, bindable) Hashtbl.t)
-  
 
 and storable = 
   | Integer of int
   | Boolean of bool
   | Pointer of loc
-
 
 and bindable = 
   | Loc of loc

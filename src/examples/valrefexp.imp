@@ -1,0 +1,12 @@
+#Teste com exp nos paramêtros
+
+let var s = 1, var t = 1, var res = 0
+in
+    t := &s
+    let fn dif(x,y,a,b) =    
+        res := (x - y - a - b)
+    in dif(*t * 3, *t+1, s, *t) 
+    
+end
+
+

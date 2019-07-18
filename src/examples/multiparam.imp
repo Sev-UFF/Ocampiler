@@ -1,0 +1,10 @@
+#Função com vários parâmetros
+
+let var s = 1 
+in
+    
+    let fn dif(x,y,a,b,c) =    
+        s := x - y + c - a - b  
+    in dif(3,6, 1, 1,5) 
+    s := s
+end

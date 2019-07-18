@@ -36,6 +36,7 @@ let rec delta controlStack valueStack environment memory locations =
                 | BoolConst(b) -> (
                   (Stack.push (Bool(b)) valueStack);
                 );
+                | _ -> ();
             );
           | AExp(aExp) -> (
               match aExp with 
@@ -617,6 +618,7 @@ let rec delta controlStack valueStack environment memory locations =
                   |BoolConst(x) -> (
                     raise (AutomatonException "Error on DeRef nao pode acessar endereco de constante - bool");
                   );
+                  | _ -> ();
               );
               | _ -> raise (AutomatonException "Error on DeRef 666");
             );
@@ -697,7 +699,13 @@ let rec delta controlStack valueStack environment memory locations =
           | Nop -> ();
           | Call(id, actuals) -> (
             ( Stack.push (CmdOc (OPCALL(id, (List.length actuals))) )  controlStack );
-            ( List.iter (fun parametro -> Stack.push (Statement(Exp(parametro))) controlStack ) actuals);
+            ( 
+              List.iter 
+              (
+                fun parametro -> Stack.push (Statement(Exp(parametro))) controlStack 
+              ) 
+              actuals
+            );
           );
         );
         | Dec (dec) -> (
@@ -734,6 +742,9 @@ let rec delta controlStack valueStack environment memory locations =
           | DSeq(x, y) -> (
             (Stack.push (Statement(Dec(y))) controlStack);
             (Stack.push (Statement(Dec(x))) controlStack);
+         );
+         | _ ->(
+           raise (AutomatonException "Error on DEC" )
          );
         );
         | Abs(x) -> 
@@ -948,6 +959,7 @@ let rec delta controlStack valueStack environment memory locations =
                   | BoolConst(b) -> (
                     raise (AutomatonException "Error on #ASSIGN. Cannot change constant value.")
                   );
+                  | _ -> ();
               );
               | _ ->  raise (AutomatonException "Error on #ASSIGN not a str(x)")
         );
@@ -986,8 +998,11 @@ let rec delta controlStack valueStack environment memory locations =
         );
         | OPCALL(Id(x), n) -> (
           let fnc = (Hashtbl.find environment x) in
-          let actuals = (n_pop valueStack n) in
-          let env = (Hashtbl.copy environment) in
+          let actuals = (List.rev (n_pop valueStack n)) in
+          let env = (Hashtbl.copy environment) in        
+          (Stack.push (Locations(!locations)) valueStack);
+          locations := [];
+        
           (Stack.push (Env(env)) valueStack);
           (Stack.push (DecOc(OPBLKCMD)) controlStack);
 
@@ -995,7 +1010,6 @@ let rec delta controlStack valueStack environment memory locations =
           | Closure(f, b, e_1) -> (
 
                 (Stack.push (Statement(Cmd(b))) controlStack);
-
                 let e_barra_e1 = (overwrite (Hashtbl.copy environment) e_1) in
                 let result_barra_match = (overwrite e_barra_e1 (matchFunction f actuals)) in
                 (Hashtbl.clear environment);
@@ -1004,15 +1018,15 @@ let rec delta controlStack valueStack environment memory locations =
           | Rec(f, b, e_1, e_2) -> (
 
             (Stack.push (Statement(Cmd(b))) controlStack);
-
-
             let e_barra_e1 = (overwrite (Hashtbl.copy environment) e_1) in
             let result_barra_unfold =  (overwrite e_barra_e1 (reclose e_2 environment)) in
             let result_barra_match = (overwrite result_barra_unfold (matchFunction f actuals)) in
             (Hashtbl.clear environment);
             (Hashtbl.add_seq environment (Hashtbl.to_seq result_barra_match));
           );
+          | _ -> raise (AutomatonException "Error on #CALL" );
         );
+        | _ -> ();
       );
 
       | DecOc(decOc) -> (
@@ -1096,10 +1110,10 @@ let rec delta controlStack valueStack environment memory locations =
 
           | OPBLKCMD -> (
             let env = (Stack.pop valueStack) in
-              let possibleLocs = (Stack.pop valueStack) in
+              let locs = (Stack.pop valueStack) in
                 match env with 
                   | Env(y) -> (
-                    match possibleLocs with 
+                    match locs with 
                       | Locations(x) -> (
                         (Hashtbl.clear environment);
                         (Hashtbl.add_seq environment (Hashtbl.to_seq y));
@@ -1114,12 +1128,7 @@ let rec delta controlStack valueStack environment memory locations =
                         );
                         locations := x;
                       );
-                      (* TODO: Comentar esse caso com o professor *)
-                      | _ -> (
-                        (Stack.push possibleLocs valueStack);
-                        (Hashtbl.clear environment);
-                        (Hashtbl.add_seq environment (Hashtbl.to_seq y));
-                      );
+                      | _ -> ();
                   );
                   | _ -> raise (AutomatonException "Error on #BLKCMD" );
           );
@@ -1147,7 +1156,7 @@ let rec delta controlStack valueStack environment memory locations =
     old;
   
   and matchFunction formals actuals = 
-    if ((List.length formals) != (List.length actuals)) then (Hashtbl.create 10)
+    if ((List.length formals) != (List.length actuals)) then (Hashtbl.create 0)
     else (_match formals actuals (Hashtbl.create 10))
   
   (* Recebe duas listas de tamanho igual *)
@@ -1167,8 +1176,6 @@ let rec delta controlStack valueStack environment memory locations =
       );
     
     )
-    | _ , _ -> raise (AutomatonException "aqui");
-    
   and reclose env atual = 
   (Hashtbl.iter 
     (

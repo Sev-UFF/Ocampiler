@@ -1,9 +1,11 @@
 #Calcula fatorial de um número n
 
-let var fatn = 1,  var x = 4, var n = 0 in 
-        n := x
-        while not (x == 0) do 
-            fatn := fatn * x
-            x := x - 1
-        end
-end
+let var z = 1 in
+   let  fn f(x) =
+    let var y = x in
+        while not (y == 0) do
+            z := z * y
+            y := y - 1
+    end
+   in
+   f(4)

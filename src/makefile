@@ -59,6 +59,12 @@ p1:
 	git checkout p1
 	$(MAKE) run
 
+teste:
+	 ./ocampiler -f examples/fatorial.imp -t --stats
+	 ./ocampiler -f examples/mutual.imp -t --stats
+	 ./ocampiler -f examples/fibonacci.imp -t --stats
+	 ./ocampiler -f examples/valrefexp.imp -t --stats
+	 ./ocampiler -f examples/multiparam.imp -t --stats
 
 help:         
 	##               Options of make command

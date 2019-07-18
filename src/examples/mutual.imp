@@ -1,3 +1,5 @@
+#fatorial mutuamente recursivo
+
 let var z = 1 in
    let rec fn f(x) =
         z := z * x
