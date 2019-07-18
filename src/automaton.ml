@@ -721,24 +721,9 @@ let rec delta controlStack valueStack environment memory locations =
           );
           | Rbnd(Id(x), AbsFunction(f, b)) -> (
             (Stack.push (DecOc(OPBIND)) controlStack);
-            (Stack.push (Env(reclose enviroment (Hashtbl.copy environment))) valueStack);
-            (* nossa versão
-            let topo = (Stack.pop valueStack) in
-            (* TODO: colocar essa explicação na apresentacao *)
-            match topo with 
-            | Env(e) -> (
-              (Hashtbl.add e x (Closure(f, b, (Hashtbl.copy environment))));
-              (Stack.push (Env(reclose e e )) valueStack);
-            );
-            | _ -> (
-              (Stack.push topo valueStack);
-              let new_env = (Hashtbl.create 3) in
+            let new_env = (Hashtbl.create 3) in
               (Hashtbl.add new_env x (Closure(f, b, (Hashtbl.copy environment))));
-              (Stack.push (Env(reclose new_env new_env )) valueStack);
-              print_endline(string_of_iteration2 controlStack environment memory !locations );
-              
-            );
-            *)
+              (Stack.push (Env(reclose new_env (Hashtbl.copy environment) )) valueStack);       
           );
           | Bind(_, _) -> (
             raise (AutomatonException "Error on Bind" );
@@ -1140,7 +1125,7 @@ let rec delta controlStack valueStack environment memory locations =
 
   and n_pop stack n = 
   if (n == 0) then []
-  else (n_pop stack (n-1)) @ c[(Stack.pop stack)]
+  else (n_pop stack (n-1)) @ [(Stack.pop stack)]
 
   and overwrite old_environment new_environment = 
     let old = (Hashtbl.copy old_environment) in
